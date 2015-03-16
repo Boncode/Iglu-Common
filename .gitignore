@@ -1,0 +1,10 @@
+
+.idea/*
+
+logs/*
+
+*.iml
+
+*.class
+
+target/*
