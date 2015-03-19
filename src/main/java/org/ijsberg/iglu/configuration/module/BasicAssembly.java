@@ -22,6 +22,7 @@ package org.ijsberg.iglu.configuration.module;
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.FileSupport;
@@ -44,6 +45,9 @@ public abstract class BasicAssembly implements Assembly {
 
 	public void setProperties(Component component, String fileName) {
 		Properties properties = PropertiesSupport.loadProperties(fileName);
+		if(properties == null) {
+			throw new ConfigurationException("properties file " + fileName + " not found");
+		}
 		propertyFileNamesByComponents.put(component, fileName);
 		component.setProperties(properties);
 	}
