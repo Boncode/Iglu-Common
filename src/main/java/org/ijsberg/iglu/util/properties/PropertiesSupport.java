@@ -22,9 +22,7 @@ package org.ijsberg.iglu.util.properties;
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 
@@ -151,4 +149,16 @@ public class PropertiesSupport {
 	}
 
 
+	public static void saveProperties(Properties properties, String fileName) throws IOException {
+		FileOutputStream outputStream = new FileOutputStream(fileName);
+		PrintStream printStream = new PrintStream(outputStream);
+
+		for(String propertyName : properties.stringPropertyNames()) {
+			printStream.println(propertyName + "=" + properties.getProperty(propertyName));
+		}
+
+		printStream.close();
+		outputStream.close();
+
+	}
 }

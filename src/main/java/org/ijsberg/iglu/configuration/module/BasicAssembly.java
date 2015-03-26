@@ -25,7 +25,6 @@ import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
 
 import java.io.File;
@@ -58,7 +57,7 @@ public abstract class BasicAssembly implements Assembly {
 			String fileName = propertyFileNamesByComponents.get(component);
 			System.out.println(new LogEntry("" + propertyFileNamesByComponents));
 			System.out.println(new LogEntry("saving properties to " + fileName));
-			FileSupport.saveProperties(component.getProperties(), fileName);
+			PropertiesSupport.saveProperties(component.getProperties(), fileName);
 		}
 	}
 
