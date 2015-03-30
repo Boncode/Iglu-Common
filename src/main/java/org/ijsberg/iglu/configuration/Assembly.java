@@ -50,4 +50,6 @@ public interface Assembly {
 
 	@ExposeInConsole(description = "saves properties of components registered with", paramDesc = {})
 	void saveProperties() throws IOException;
+
+	void saveProperties(Class<?> componentInterface) throws IOException;
 }

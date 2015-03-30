@@ -54,13 +54,25 @@ public abstract class BasicAssembly implements Assembly {
 	@Override
 	public void saveProperties() throws IOException {
 		for(Component component : propertyFileNamesByComponents.keySet()) {
-			String fileName = propertyFileNamesByComponents.get(component);
-			System.out.println(new LogEntry("" + propertyFileNamesByComponents));
-			System.out.println(new LogEntry("saving properties to " + fileName));
-			PropertiesSupport.saveProperties(component.getProperties(), fileName);
+			saveProperties(component);
 		}
 	}
 
+	@Override
+	public void saveProperties(Class<?> componentInterface) throws IOException {
+		for(Component component : propertyFileNamesByComponents.keySet()) {
+			if(component.implementsInterface(componentInterface)) {
+				saveProperties(component);
+			}
+		}
+	}
+
+	private void saveProperties(Component component) throws IOException {
+		String fileName = propertyFileNamesByComponents.get(component);
+		System.out.println(new LogEntry("" + propertyFileNamesByComponents));
+		System.out.println(new LogEntry("saving properties to " + fileName));
+		PropertiesSupport.saveProperties(component.getProperties(), fileName);
+	}
 
 	public void initialize(String[] args) {
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
@@ -74,4 +86,11 @@ public abstract class BasicAssembly implements Assembly {
 	}
 
 
+	public static void savePropertiesForComponent(Class<?> componentInterface) throws IOException {
+		for(Component component : core.getInternalComponents().values()) {
+			if(component.implementsInterface(Assembly.class)) {
+				component.getProxy(Assembly.class).saveProperties(componentInterface);
+			}
+		}
+	}
 }

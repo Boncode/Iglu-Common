@@ -295,6 +295,9 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		} else {
 			System.out.println("Creating server environment for assembly " + args[0]);
 			server = new ServerEnvironment(args);
+
+			//TODO error handling
+
 			System.out.println("Starting server ...");
 			server.start();
 			System.out.println("... Server started");
@@ -309,6 +312,8 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 	}
 
 	public static void stopAsWindowsService(String[] args) throws Exception {
+
+		//TODO server is null if startup failed
 		server.stop();
 	}
 }
