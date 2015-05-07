@@ -64,7 +64,7 @@ public class CommandLine {
 
 
 	public CommandLine(String commandLine) {
-		String[] commandAndArguments = splitCommandLine(commandLine);
+		String[] commandAndArguments = splitCommandLine(commandLine.trim());
 		unitIdentifierSequence = splitCommand(commandAndArguments[0]);
 
 		if (commandAndArguments.length > 1) {

@@ -60,6 +60,10 @@ public class CommandLineProcessorTest {
 		command = AssemblyCommandLine.splitCommandLine("service.agent.process(14, 12, \"hello world\") ");
 		assertEquals("service.agent.process", command[0]);
 		assertEquals("14, 12, \"hello world\"", command[1]);
+
+		command = AssemblyCommandLine.splitCommandLine("service.agent.process()");
+		assertEquals("service.agent.process", command[0]);
+		//assertEquals(0, command[1].length());
 	}
 
 	@Test

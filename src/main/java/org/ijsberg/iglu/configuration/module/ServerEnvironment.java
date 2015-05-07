@@ -21,6 +21,7 @@ package org.ijsberg.iglu.configuration.module;
 
 import org.ijsberg.iglu.configuration.*;
 import org.ijsberg.iglu.configuration.classloading.ExtendedClassPathClassLoader;
+import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.invocation.RootConsole;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
@@ -100,7 +101,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		Component rootConsole = new StandardComponent(new RootConsole(assembly));
 		assembly.getCoreCluster().connect("RootConsole", rootConsole);
 		Component serverComponent = new StandardComponent(this);
-		assembly.getCoreCluster().connect("ServerEnvironment", serverComponent);
+		assembly.getCoreCluster().connect("ServerEnvironment", serverComponent, SystemUpdater.class);
 
 		initializeShutdownHook();
 	}
@@ -128,6 +129,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 
 	@Override
 	public void reload() {
+		//async reload triggered
 		reloadRequested = true;
 	}
 
@@ -164,6 +166,11 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 			e.printStackTrace();
 		}
 
+	}
+
+	@Override
+	public void resume() {
+		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 
@@ -293,14 +300,16 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		if (args.length == 0) {
 			printUsage();
 		} else {
-			System.out.println("Creating server environment for assembly " + args[0]);
-			server = new ServerEnvironment(args);
-
-			//TODO error handling
-
-			System.out.println("Starting server ...");
-			server.start();
-			System.out.println("... Server started");
+			try {
+				System.out.println("Creating server environment for assembly " + args[0]);
+				server = new ServerEnvironment(args);
+				System.out.println("Starting server ...");
+				server.start();
+				System.out.println("... Server started");
+			} catch(Throwable t) {
+				System.out.println("clean start of ServerEnvironment failed: shutting down ...");
+				stopAsWindowsService(new String[0]);
+			}
 		}
 	}
 
@@ -312,8 +321,19 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 	}
 
 	public static void stopAsWindowsService(String[] args) throws Exception {
-
-		//TODO server is null if startup failed
-		server.stop();
+		if(server != null/* && server.isRunning*/) {
+			try {
+				server.stop();
+			} catch (ResourceException e) {
+				System.out.println(new LogEntry(Level.CRITICAL, "ServerEnvironment is unable to stop cleanly as service", e));
+				try {
+					server.forceStop();
+				} catch (Throwable t) {
+					System.out.println("regular service stop is not possible: exiting");
+					t.printStackTrace();
+					System.exit(1);
+				}
+			}
+		}
 	}
 }

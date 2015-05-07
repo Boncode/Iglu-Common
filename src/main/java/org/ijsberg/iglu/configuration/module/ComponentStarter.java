@@ -19,10 +19,14 @@
 
 package org.ijsberg.iglu.configuration.module;
 
+import org.ijsberg.iglu.configuration.BusyException;
+import org.ijsberg.iglu.configuration.BusyStartable;
 import org.ijsberg.iglu.configuration.Startable;
+import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,13 +38,27 @@ import java.util.Map;
  * @author jmeetsma
  * @see Startable
  */
-public class ComponentStarter implements Startable {
+public class ComponentStarter implements BusyStartable {
 
 	protected boolean isStarted = false;
 	protected Map<Integer, Startable> registeredStartables = new LinkedHashMap<Integer, Startable>();
+	protected Map<Integer, BusyStartable> registeredBusyStartables = new LinkedHashMap<Integer, BusyStartable>();
+	protected Map<Integer, BusyStartable> pausedBusyStartables = new LinkedHashMap<Integer, BusyStartable>();
+
+
+	public synchronized void register(BusyStartable startable) {
+		register((Startable) startable);
+		registeredBusyStartables.put(startable.toString().hashCode(), startable);
+	}
+
+	public synchronized void unregister(BusyStartable startable) {
+		unregister((Startable) startable);
+		registeredBusyStartables.remove(startable.toString().hashCode());
+	}
 
 	public synchronized void register(Startable startable) {
 
+		System.out.println("registering " + startable + " with " + this);
 		System.out.println(new LogEntry("registering " + startable + " with " + this));
 		System.out.flush();
 		if (isStarted && !startable.isStarted()) {
@@ -78,8 +96,44 @@ public class ComponentStarter implements Startable {
 	}
 
 	public synchronized void stop() {
-		isStarted = false;
+		try {
+			pause();
+		} catch (BusyException e) {
+			resume();
+			throw new ResourceException("cannot stop components currently", e);
+		}
+		forceStop();
+	}
 
+	@Override
+	public synchronized void pause() throws BusyException {
+		for(BusyStartable busyStartable : registeredBusyStartables.values()) {
+			busyStartable.pause();
+			pausedBusyStartables.put(busyStartable.toString().hashCode(), busyStartable);
+		}
+	}
+
+	@Override
+	public synchronized void resume() {
+		for(BusyStartable busyStartable : new ArrayList<BusyStartable>(pausedBusyStartables.values())) {
+			busyStartable.resume();
+			pausedBusyStartables.remove(busyStartable.toString().hashCode());
+		}
+	}
+
+	@Override
+	public boolean isBusy() {
+		for(BusyStartable busyStartable : registeredBusyStartables.values()) {
+			if(busyStartable.isBusy()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void forceStop() {
+		isStarted = false;
 		Startable[] startables = registeredStartables.values().toArray(new Startable[0]);
 		for (int i = startables.length - 1; i >= 0; i--) {
 			if (startables[i].isStarted()) {
@@ -88,5 +142,4 @@ public class ComponentStarter implements Startable {
 			}
 		}
 	}
-
 }

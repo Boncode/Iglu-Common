@@ -137,11 +137,21 @@ public class PropertiesSupport {
 		Properties retval = new Properties();
 		try {
 			File file = new File(fileName);
-			if (file.exists()) {
-				retval.load(new FileInputStream(file));
+			InputStream fis = null;
+			if (file.exists() && file.length() != 0) {
+				FileSupport.copyFile(file, file.getAbsolutePath() + ".bak", true);
+				fis = new FileInputStream(file);
 			} else {
-				retval.load(FileSupport.getInputStreamFromClassLoader(fileName));
+				file = new File(file.getAbsolutePath() + ".bak");
+				if(file.exists() && file.length() != 0) {
+					FileSupport.copyFile(file, fileName, true);
+					fis = new FileInputStream(file);
+				} else {
+					fis = FileSupport.getInputStreamFromClassLoader(fileName);
+				}
 			}
+			retval.load(fis);
+			fis.close();
 		} catch (IOException ioe) {
 			throw new ResourceException("can not load properties from file '" + fileName + "'", ioe);
 		}
@@ -153,12 +163,29 @@ public class PropertiesSupport {
 		FileOutputStream outputStream = new FileOutputStream(fileName);
 		PrintStream printStream = new PrintStream(outputStream);
 
-		for(String propertyName : properties.stringPropertyNames()) {
+		TreeSet<String> propertyNames = new TreeSet<String>(properties.stringPropertyNames());
+
+		for(String propertyName : propertyNames) {
 			printStream.println(propertyName + "=" + properties.getProperty(propertyName));
 		}
 
 		printStream.close();
 		outputStream.close();
+
+	}
+
+	public static Properties removeSubSection(Properties properties, String sectionKey) {
+		Properties subsection = getSubsection(properties, sectionKey);
+		for(String subsectionKey : subsection.stringPropertyNames()) {
+			properties.remove(sectionKey + KEY_SEPARATOR + subsectionKey);
+		}
+		return subsection;
+	}
+
+	public static void addSubsection(Properties properties, String sectionKey, Properties subsection) {
+		for(String subsectionKey : subsection.stringPropertyNames()) {
+			properties.setProperty(sectionKey + KEY_SEPARATOR + subsectionKey, subsection.getProperty(subsectionKey));
+		}
 
 	}
 }

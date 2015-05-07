@@ -190,6 +190,13 @@ public abstract class ElementList implements Serializable {
 	}
 
 	/**
+	 * @return the first subnode found or null in case it doesn't exist
+	 */
+	public Node getFirstNodeByNameInRoot(String name) {
+		return getFirstNodeByName(name, false);
+	}
+
+	/**
 	 * @param name
 	 * @return the first subnode with a certain name
 	 */
