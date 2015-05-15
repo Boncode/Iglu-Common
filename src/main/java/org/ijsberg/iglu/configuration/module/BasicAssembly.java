@@ -43,6 +43,7 @@ public abstract class BasicAssembly implements Assembly {
 
 
 	public void setProperties(Component component, String fileName) {
+		System.out.println(new LogEntry("loading properties for component " + component + " from " + fileName));
 		Properties properties = PropertiesSupport.loadProperties(fileName);
 		if(properties == null) {
 			throw new ConfigurationException("properties file " + fileName + " not found");

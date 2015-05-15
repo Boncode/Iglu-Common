@@ -307,6 +307,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 				server.start();
 				System.out.println("... Server started");
 			} catch(Throwable t) {
+				t.printStackTrace();
 				System.out.println("clean start of ServerEnvironment failed: shutting down ...");
 				stopAsWindowsService(new String[0]);
 			}
