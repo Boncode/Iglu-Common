@@ -62,7 +62,7 @@ public class TelnetServerIntegrationTest extends BasicAssembly {
 		//give async process time to finish
 		Thread.sleep(250);
 
-		assertEquals("Hello world!", testObject.getMessage("world!"));
+		assertEquals("\"Hello \"world!", testObject.getMessage("world!"));
 
 		Thread.sleep(100);
 		socket.close();

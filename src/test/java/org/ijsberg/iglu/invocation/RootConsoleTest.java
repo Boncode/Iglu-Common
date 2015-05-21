@@ -72,7 +72,7 @@ public class RootConsoleTest extends CommandLineProcessorTest {
 
 		assertEquals(2, consoleDir.list().length);
 		String output = new String(FileSupport.getBinaryFromFS(consoleDir.getAbsolutePath() + "/output.txt")).trim();
-		assertEquals("Hello World!", output.trim());
+		assertEquals("Hello \"World!\"", output.trim());
 
 		//reset file
 //		closeOutputStream();

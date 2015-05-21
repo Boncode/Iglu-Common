@@ -71,7 +71,7 @@ public class CommandLineProcessorTest {
 
 		String[] arguments = AssemblyCommandLine.splitArguments("14, \"some kind of string\", 20");
 		assertEquals("14", arguments[0]);
-		assertEquals("some kind of string", arguments[1]);
+		assertEquals("\"some kind of string\"", arguments[1]);
 		assertEquals("20", arguments[2]);
 
 	}
@@ -89,7 +89,7 @@ public class CommandLineProcessorTest {
 		setUpAssembly();
 		CommandLineProcessor processor = new CommandLineProcessor(assembly);
 		Object result = processor.processCommandLine("cluster.object.getMessage(\"World!\")");
-		assertEquals("Hello World!", result);
+		assertEquals("Hello \"World!\"", result);
 
 		try {
 			processor.processCommandLine("cluster.object.bogus()");
