@@ -21,6 +21,7 @@ package org.ijsberg.iglu.util.properties;
 
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
+import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.io.*;
 import java.util.*;
@@ -134,6 +135,7 @@ public class PropertiesSupport {
 	}
 
 	public static Properties loadProperties(String fileName) {
+
 		Properties retval = new Properties();
 		try {
 			File file = new File(fileName);
