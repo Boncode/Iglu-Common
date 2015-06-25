@@ -84,10 +84,36 @@ import java.util.zip.ZipFile;
  */
 public class ExtendedClassPathClassLoader extends URLClassLoader {
 
+	private static class TimeAndLocation {
+		private long time;
+		private Object location;
+
+		TimeAndLocation(long time, Object location) {
+			this.time = time;
+			this.location = location;
+		}
+
+		long getTime() {
+			return time;
+		}
+
+		void setTime(long time) {
+			this.time = time;
+		}
+
+		Object getLocation() {
+			return location;
+		}
+
+		void setLocation(Object location) {
+			this.location = location;
+		}
+	}
+
 	//contains either a filename pointing to a JAR containing the resource or an actual file
-	private TreeMap<String, Object> classResourceLocations = new TreeMap<String, Object>();
-	private HashMap<String, Object> propertiesResourceLocations = new HashMap<String, Object>(10);
-	private TreeMap<String, Object> mixedResourceLocations = new TreeMap<String, Object>();
+	private TreeMap<String, TimeAndLocation> classResourceLocations = new TreeMap<String, TimeAndLocation>();
+	private HashMap<String, TimeAndLocation> propertiesResourceLocations = new HashMap<String, TimeAndLocation>(10);
+	private TreeMap<String, TimeAndLocation> mixedResourceLocations = new TreeMap<String, TimeAndLocation>();
 
 	private Map<String, Set<Object>> multipleLocationsForResource = new TreeMap<String, Set<Object>>();
 
@@ -157,7 +183,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 						if ((fileName.endsWith(".jar") || fileName.endsWith(".zip")) && !file.isHidden()) {
 							mapFilesInZip(fileName);
 						} else { // .class .properties etc.
-							mapClassResourceEntry(file.getPath().substring(location.length()), file);
+							mapClassResourceEntry(file.getPath().substring(location.length()), file, file.lastModified());
 							fileCreationTimes.put(file, new Long(file.lastModified()));
 						}
 					}
@@ -203,7 +229,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		while (e.hasMoreElements()) {
 			ZipEntry entry = e.nextElement();
 			if (!entry.isDirectory()) {
-				mapClassResourceEntry(entry.getName(), fileName);
+				mapClassResourceEntry(entry.getName(), fileName, entry.getTime());
 			}
 		}
 		try {
@@ -232,24 +258,26 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	 * @param fileName
 	 * @param location
 	 */
-	private void mapClassResourceEntry(String fileName, Object location) {
-		Object previouslyFoundLocation = mixedResourceLocations.get(fileName);
-		if (previouslyFoundLocation != null && !previouslyFoundLocation.equals(location)) {
+	private void mapClassResourceEntry(String fileName, Object location, long time) {
+		TimeAndLocation previouslyFoundLocation = mixedResourceLocations.get(fileName);
+		if (previouslyFoundLocation != null && !previouslyFoundLocation.getLocation().equals(location)) {
 			//this may indicate a conflict
 			//it occurs frequently for "/MANIFEST.MF" which shouldn't be a problem
 			//it may occur for other resources
 			//log those occurrences that seem suspicious
 			registerMultipleLocations(fileName, location);
-			return;
+			if(previouslyFoundLocation.getTime() > time) {
+				return;
+			}
 		}
 		if (fileName.endsWith(".properties")) {
 			String className = convertFileNameToClassName(fileName);
-			propertiesResourceLocations.put(className, fileName);
+			propertiesResourceLocations.put(className, new TimeAndLocation(time, fileName));
 		} else if (fileName.endsWith(".class")) {
 			String className = convertFileNameToClassName(fileName);
-			classResourceLocations.put(className, location);
+			classResourceLocations.put(className, new TimeAndLocation(time, location));
 		}
-		mixedResourceLocations.put(fileName, location);
+		mixedResourceLocations.put(fileName, new TimeAndLocation(time, location));
 	}
 
 
@@ -315,9 +343,9 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	 * @throws ClassNotFoundException
 	 */
 	public Class<?> findClass(String className) throws ClassNotFoundException {
-		Object location = classResourceLocations.get(className);
+		TimeAndLocation location = classResourceLocations.get(className);
 		if (location == null && this.propertiesResourceLocations.containsKey(className)) {
-			String fileName = (String) propertiesResourceLocations.get(className);
+			String fileName = (String) propertiesResourceLocations.get(className).getLocation();
 			if (fileName.endsWith(".properties")) {
 				//notify invoker that file is present as properties file
 				return ResourceBundle.class;
@@ -335,7 +363,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 
 		byte[] data;
 		try {
-			data = getData(fileName, location);
+			data = getData(fileName, location.getLocation());
 		} catch (IOException ioe) {
 			throw new NoClassDefFoundError("class '" + className + "' could not be loaded from '" + location + "' with message: " + ioe);
 		}
@@ -400,15 +428,15 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	 * @return
 	 */
 	public URL findResource(String fileName) {
-		Object location = this.mixedResourceLocations.get(fileName);
+		TimeAndLocation location = this.mixedResourceLocations.get(fileName);
 		if (location == null) {
 			return super.findResource(fileName);
 		}
 		String url;
-		if (location instanceof File) {
-			url = "file:/" + FileSupport.convertToUnixStylePath(((File) location).getAbsolutePath());
+		if (location.getLocation() instanceof File) {
+			url = "file:/" + FileSupport.convertToUnixStylePath(((File) location.getLocation()).getAbsolutePath());
 		} else {
-			url = "jar:file:" + FileSupport.convertToUnixStylePath((String) location) + "!/" + fileName;
+			url = "jar:file:" + FileSupport.convertToUnixStylePath((String) location.getLocation()) + "!/" + fileName;
 		}
 		try {
 			return new URL(url);

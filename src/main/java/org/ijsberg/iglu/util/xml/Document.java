@@ -154,7 +154,7 @@ public class Document extends ElementList {
 				int endPos = xmlDef.indexOf("?>");
 				if (endPos != -1) {
 					Tag xmlDefTag = new Tag(lineNr, xmlDef.substring(startPos, endPos + 2));
-					encoding = xmlDefTag.getAttributes().getProperty("encoding");
+					encoding = xmlDefTag.getAttribute("encoding");
 					break LOOP;
 				}
 
@@ -253,6 +253,8 @@ public class Document extends ElementList {
 			throw new IllegalArgumentException("input can not be null");
 		}
 		ArrayList splitContents = split(xmlInput, interpreteAsXHTML, true);
+
+		//System.out.println("====> " + splitContents);
 
 
 		build(splitContents, interpreteAsXHTML);

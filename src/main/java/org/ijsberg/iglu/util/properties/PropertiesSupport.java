@@ -141,7 +141,12 @@ public class PropertiesSupport {
 			File file = new File(fileName);
 			InputStream fis = null;
 			if (file.exists() && file.length() != 0) {
-				FileSupport.copyFile(file, file.getAbsolutePath() + ".bak", true);
+				try {
+					FileSupport.copyFile(file, file.getAbsolutePath() + ".bak", true);
+				} catch(IOException e) {
+					//process may not have write permission
+					System.out.println("creation of backup file " + file.getAbsolutePath() + ".bak failed with message: " + e.getMessage());
+				}
 				fis = new FileInputStream(file);
 			} else {
 				file = new File(file.getAbsolutePath() + ".bak");

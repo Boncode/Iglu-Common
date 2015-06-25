@@ -192,8 +192,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 					t.printStackTrace();
 				}
 			}
-			System.out
-					.println(new LogEntry("Application shutdown process completed..."));
+			System.out.println(new LogEntry("Application shutdown process completed..."));
 		}
 	}
 

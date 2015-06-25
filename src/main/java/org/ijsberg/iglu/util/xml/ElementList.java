@@ -35,11 +35,15 @@ public abstract class ElementList implements Serializable {
 	protected final static String EOL = System.getProperty("line.separator");
 	protected final static char NEWLINE = '\n';
 
+	protected int startLineNr = -1;
+	protected int endLineNr = -1;
+
+
 	//attributes are contained in a context
-	protected Properties nodeAttributes;// = new PropertyBundle();
+	protected LinkedHashMap<XmlTextElement, XmlTextElement> nodeAttributes;// = new PropertyBundle();
 
 	//contents can be XMLTexts, special tags, and subNodes
-	protected ArrayList contents = new ArrayList(50);
+	protected ArrayList<XmlElement> contents = new ArrayList<XmlElement>(50);
 
 	//formatting styles
 	public static final byte LEAVE_AS_IS = 0;
@@ -51,12 +55,11 @@ public abstract class ElementList implements Serializable {
 	protected boolean containsSingleString;
 
 	//adds contents
-	protected void build(List xmlElements, boolean interpreteAsXHTML) throws ParseException {
+	protected void build(List<XmlElement> xmlElements, boolean interpreteAsXHTML) throws ParseException {
 		this.interpreteAsXHTML = interpreteAsXHTML;
-
 		int nrofElements = xmlElements.size();
 		for (int i = 0; i < nrofElements; i++) {
-			Object element = xmlElements.get(i);
+			XmlElement element = xmlElements.get(i);
 
 			if (element instanceof Node) {
 				this.addNode((Node) element);
@@ -64,10 +67,6 @@ public abstract class ElementList implements Serializable {
 				Tag subtag = (Tag) element;
 
 				if (subtag.type == Tag.START_TAG) {
-/*					if (tagname == null)
-					{
-						tagname = subtag.tagname;
-					}*/
 					if (subtag.correspondingTag != null) {
 						//collect elements inbetween
 						ArrayList elementsInbetween = new ArrayList();
@@ -80,7 +79,6 @@ public abstract class ElementList implements Serializable {
 						if (!newNode.isEmptyXHTMLMarkupNode())//skip empty markup
 						{
 							contents.add(newNode);
-//							if (interpreteAsXHTML && isHTMLMarkupTag(subtag.tagname))
 							if (interpreteAsXHTML && isHTMLMarkupTag(getName())) {
 								containsMarkupText = true;
 							}
@@ -109,7 +107,7 @@ public abstract class ElementList implements Serializable {
 					//comment- and instruction tags
 					contents.add(element);
 				}
-			} else if (element instanceof /*XMLTextElement*/ String) {
+			} else if (element instanceof XmlTextElement) {
 				contents.add(element);
 				if (element.toString().trim().length() > 0) {
 					if (contents.size() == 1) //TODO what about comment tags?
@@ -139,7 +137,6 @@ public abstract class ElementList implements Serializable {
 				}
 			}
 		}
-		//TODO cleanup unnecessary nested markup nodes
 	}
 
 
@@ -454,7 +451,7 @@ public abstract class ElementList implements Serializable {
 			if (o instanceof Node) {
 				Node subNode = (Node) o;
 				result.append(subNode.getContentsWithoutTags());
-			} else if (o instanceof String) {
+			} else if (o instanceof XmlTextElement) {
 				result.append(o.toString());
 			} else if (o instanceof Tag) {
 				//skip comment etc.
@@ -472,7 +469,7 @@ public abstract class ElementList implements Serializable {
 	 */
 	public void setValue(String value) {
 		contents = new ArrayList();
-		contents.add(value);
+		contents.add(new XmlTextElement(value, this.startLineNr, this.endLineNr));
 		if (value.trim().length() > 0) {
 			containsSingleString = true;
 		}
@@ -483,7 +480,7 @@ public abstract class ElementList implements Serializable {
 	 *
 	 * @param value
 	 */
-	public void addValue(String value) {
+/*	public void addValue(String value) {
 		contents.add(value);
 		if (value.trim().length() > 0) {
 			if (contents.size() == 1) {
@@ -494,7 +491,7 @@ public abstract class ElementList implements Serializable {
 			}
 		}
 	}
-
+*/
 	/**
 	 * Empties this node
 	 */
@@ -570,7 +567,7 @@ public abstract class ElementList implements Serializable {
 	}
 
 
-	protected static class Tag {
+	protected static class Tag implements XmlElement {
 		protected String contents;
 		public static final byte UNDETERMINED_TAG = 0;
 		public static final byte COMMENT_TAG = 1;// <!..
@@ -582,17 +579,21 @@ public abstract class ElementList implements Serializable {
 		private byte type = UNDETERMINED_TAG;
 
 		protected String tagname;
-		protected Properties attributes;
+		protected LinkedHashMap<XmlTextElement, XmlTextElement> attributes;
 		protected Tag correspondingTag;
 
 		private StringBuffer nameCollector = new StringBuffer();
 		private StringBuffer valueCollector;
 
+		private XmlTextElement currentAttributeName;
+
 		protected int lineNr;
+		protected int lastLineNr;
 
 
-		private Tag(int lineNr, byte type, String tagname, Properties attributes, Tag correspondingTag) {
+		private Tag(int lineNr, byte type, String tagname, LinkedHashMap<XmlTextElement, XmlTextElement> attributes, Tag correspondingTag) {
 			this.lineNr = lineNr;
+			this.lastLineNr = lineNr;
 			this.type = type;
 			this.tagname = tagname;
 			this.attributes = attributes;
@@ -601,6 +602,7 @@ public abstract class ElementList implements Serializable {
 
 		protected Tag(int lineNr, String contents) throws ParseException {
 			this.lineNr = lineNr;
+
 			char firstCharacter = contents.charAt(0);
 			int contentsLength = contents.length();
 			char lastCharacter = contents.charAt(contentsLength - 1);
@@ -621,6 +623,9 @@ public abstract class ElementList implements Serializable {
 
 				while (position < contentsLength) {
 					currentChar = contents.charAt(position);
+					if(currentChar == '\n') {
+						this.lastLineNr++;
+					}
 					if (collectingName) {
 						if (Character.isWhitespace(currentChar)) {
 							collectingName = false;
@@ -632,6 +637,7 @@ public abstract class ElementList implements Serializable {
 						}
 					} else if (collectingAttrName) {
 						if (currentChar == '=') {
+							currentAttributeName = new XmlTextElement(nameCollector.toString().trim(), lastLineNr, lastLineNr);
 							collectingAttrName = false;
 						} else if (!Character.isWhitespace(currentChar)) {
 							//TODO check for invalid characters
@@ -640,11 +646,12 @@ public abstract class ElementList implements Serializable {
 					} else {
 						if (valueCollector == null) {
 							valueCollector = new StringBuffer();
-							attributes = new Properties();
+							attributes = new LinkedHashMap<XmlTextElement, XmlTextElement>();
 						}
 						if (currentChar == '"') {
 							if (insideQuotes) {
-								appendAttribute(nameCollector.toString().trim(), valueCollector.toString());
+								appendAttribute(currentAttributeName, new XmlTextElement(valueCollector.toString(), lastLineNr, lastLineNr));
+//								appendAttribute(nameCollector.toString().trim(), valueCollector.toString());
 								nameCollector.delete(0, nameCollector.length());
 								valueCollector.delete(0, valueCollector.length());
 								insideQuotes = false;
@@ -654,7 +661,7 @@ public abstract class ElementList implements Serializable {
 							}
 						} else if (Character.isWhitespace(currentChar)) {
 							if (!insideQuotes && valueCollector.length() > 0) {
-								appendAttribute(nameCollector.toString(), valueCollector.toString());
+								appendAttribute(currentAttributeName, new XmlTextElement(valueCollector.toString(), lastLineNr, lastLineNr));
 								nameCollector.delete(0, nameCollector.length());
 								valueCollector.delete(0, valueCollector.length());
 								insideQuotes = false;
@@ -671,7 +678,7 @@ public abstract class ElementList implements Serializable {
 				if (collectingName && nameCollector.length() > 0) {
 					tagname = nameCollector.toString();
 				} else if (nameCollector.length() > 0 && valueCollector != null && valueCollector.length() > 0) {
-					appendAttribute(nameCollector.toString(), valueCollector.toString());
+					appendAttribute(currentAttributeName, new XmlTextElement(valueCollector.toString(), lastLineNr, lastLineNr));
 				}
 				//TODO sanity checks;
 			}
@@ -707,15 +714,23 @@ public abstract class ElementList implements Serializable {
 			return type;
 		}
 
-		private void appendAttribute(String key, Object value) {
+		private void appendAttribute(XmlTextElement key, XmlTextElement value) {
 			if (attributes == null) {
-				attributes = new Properties();
+				attributes = new LinkedHashMap<XmlTextElement, XmlTextElement>();
 			}
 			attributes.put(key, value);
 		}
 
-		public Properties getAttributes() {
+		public LinkedHashMap<XmlTextElement, XmlTextElement> getAttributes() {
 			return attributes;
+		}
+
+		public String getAttribute(String key) {
+			XmlTextElement textElement = attributes.get(new XmlTextElement(key, 0, 0));
+			if(textElement != null) {
+				return textElement.toString();
+			}
+			return null;
 		}
 
 		public String toString() {
@@ -730,17 +745,31 @@ public abstract class ElementList implements Serializable {
 					return '<' + tagname + contextToNodeAttributes(attributes) + (type == SINGLE_TAG ? " /" : "") + '>';
 			}
 		}
+
+		public int getStartLineNr() {
+			return this.lineNr;
+		}
+
+		public int getEndLineNr() {
+			return this.lastLineNr;
+		}
+
+		public int getNrofLines() {
+			return this.lastLineNr - this.lineNr + 1;
+		}
+
 	}
 
-	public static String contextToNodeAttributes(Properties propertyBundle) {
+
+	public static String contextToNodeAttributes(LinkedHashMap<XmlTextElement, XmlTextElement> propertyBundle) {
 		if (propertyBundle == null) {
 			return "";
 		}
 		StringBuffer retval = new StringBuffer();
-		Iterator i = propertyBundle.keySet().iterator();
+		Iterator<XmlTextElement> i = propertyBundle.keySet().iterator();
 		while (i.hasNext()) {
-			String p = (String) i.next();
-			retval.append(' ').append(p).append("=\"").append(propertyBundle.getProperty(p)).append('\"');
+			XmlTextElement key = i.next();
+			retval.append(' ').append(key.toString()).append("=\"").append(propertyBundle.get(key).toString()).append('\"');
 		}
 		return retval.toString();
 	}
@@ -868,7 +897,7 @@ public abstract class ElementList implements Serializable {
 													Tag insertedEndTag = new Tag(examinedTag.lineNr, Tag.END_TAG, examinedTag.tagname, null, examinedTag.correspondingTag);
 													splitContents.add(currentStartTagPos, insertedEndTag);
 													//start new node
-													Tag insertedStartTag = new Tag(examinedTag.lineNr, Tag.START_TAG, examinedTag.tagname, new Properties(examinedTag.correspondingTag.attributes), examinedTag);
+													Tag insertedStartTag = new Tag(examinedTag.lineNr, Tag.START_TAG, examinedTag.tagname, new LinkedHashMap<XmlTextElement, XmlTextElement>(examinedTag.correspondingTag.attributes), examinedTag);
 													splitContents.add(currentStartTagPos + 2, insertedStartTag);
 													//fix references
 													examinedTag.correspondingTag.correspondingTag = insertedEndTag;
@@ -884,7 +913,7 @@ public abstract class ElementList implements Serializable {
 													Tag insertedEndTag = new Tag(startTag.lineNr, Tag.END_TAG, startTag.tagname, null, startTag);
 													splitContents.add(i, insertedEndTag);
 													//start new node
-													Tag insertedStartTag = new Tag(startTag.lineNr, Tag.START_TAG, startTag.tagname, new Properties(startTag.attributes), tag);
+													Tag insertedStartTag = new Tag(startTag.lineNr, Tag.START_TAG, startTag.tagname, new LinkedHashMap<XmlTextElement, XmlTextElement>(startTag.attributes), tag);
 													splitContents.add(i + 2, insertedStartTag);
 													//fix references
 													startTag.correspondingTag = insertedEndTag;
@@ -926,6 +955,7 @@ public abstract class ElementList implements Serializable {
 							//endtag without a start tag encounterd
 							if (!strict/* || interpreteAsXHTML*/) {
 								//remove loose end tags
+								//System.out.println("LET: " + splitContents.get(splitContents.size() - 1));
 								splitContents.remove(splitContents.size() - 1);
 							} else {
 								//TODO line nr (count enters)
@@ -937,7 +967,7 @@ public abstract class ElementList implements Serializable {
 				//text inside tag is collected, now proceed outside tag
 				insideTag = false;
 			} else {
-				splitContents.add(text);
+				splitContents.add(new XmlTextElement(text, currentLineNr, currentLineNr + StringSupport.count(text, "\n")));
 				//text inbetween tags is collected, now proceed inside next tag
 				insideTag = true;
 			}
@@ -1013,7 +1043,7 @@ public abstract class ElementList implements Serializable {
 		LOOP:
 		for(Object o : contents) {
 
-			if (o instanceof String || o instanceof Tag) {
+			if (o instanceof XmlTextElement || o instanceof Tag) {
 				String text = o.toString();
 				result.append(text);
 			} else if (o instanceof Node) {
@@ -1053,9 +1083,9 @@ public abstract class ElementList implements Serializable {
 			LOOP:
 			while (i.hasNext()) {
 				o = i.next();
-				if (o instanceof String || o instanceof Tag) {
+				if (o instanceof XmlTextElement || o instanceof Tag) {
 					String text = o.toString();
-					if (o instanceof String/* && isPartOfText()*/) {
+					if (o instanceof XmlTextElement/* && isPartOfText()*/) {
 						if (formattingStyle != LEAVE_AS_IS) {
 							if (text.trim().length() == 0) {
 								continue LOOP;
@@ -1159,7 +1189,7 @@ public abstract class ElementList implements Serializable {
 			LOOP:
 			while (i.hasNext()) {
 				o = i.next();
-				if (o instanceof String) {
+				if (o instanceof XmlTextElement) {
 					String text = o.toString();
 					if (text.trim().length() == 0) {
 						continue LOOP;

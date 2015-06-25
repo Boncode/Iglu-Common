@@ -21,24 +21,19 @@ package org.ijsberg.iglu.util.xml;
 import org.ijsberg.iglu.util.io.FileSupport;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Recursive XML element defined by XML tags
  * A node is capable of reading an XML document from a text
  * It's also capable of reading and converting pseudo-XML (such as HTML)
  */
-public class Node extends ElementList {
+public class Node extends ElementList implements XmlElement {
 
 	protected String tagname;
 	protected boolean isSingleTag;
 	protected Node parentNode;
 
-	int startLineNr = -1;
-	int endLineNr = -1;
 
 	/**
 	 * Constructs an empty node without a name
@@ -157,15 +152,19 @@ public class Node extends ElementList {
 		if (nodeAttributes == null) {
 			return null;
 		}
-		return nodeAttributes.getProperty(key);
+		XmlTextElement textElement = nodeAttributes.get(new XmlTextElement(key, 0, 0));
+		if(textElement != null) {
+			return textElement.toString();
+		}
+		return null;
 	}
 
 	/**
 	 * @return attributes as defined in the tag
 	 */
-	public Properties getAttributes() {
+	public LinkedHashMap<XmlTextElement, XmlTextElement> getAttributes() {
 		if (nodeAttributes == null) {
-			nodeAttributes = new Properties();
+			nodeAttributes = new LinkedHashMap<XmlTextElement, XmlTextElement>();
 		}
 		return nodeAttributes;
 	}
@@ -182,9 +181,9 @@ public class Node extends ElementList {
 			sortedAttributes.add(key);
 		}*/
 		if (nodeAttributes == null) {
-			nodeAttributes = new Properties();
+			nodeAttributes = new LinkedHashMap<XmlTextElement, XmlTextElement>();
 		}
-		nodeAttributes.setProperty(key, value);
+		nodeAttributes.put(new XmlTextElement(key, startLineNr, startLineNr), new XmlTextElement(value, startLineNr, startLineNr));
 	}
 
 
@@ -293,7 +292,7 @@ public class Node extends ElementList {
 	}
 
 	/**
-	 * @return the XML node as a formatted text
+	 * @return the XML node as a formatted text     i
 	 */
 	public String toHtmlString(String lineFeed, int minimumLineSize) {
 		if (tagname == null) {
@@ -332,7 +331,7 @@ public class Node extends ElementList {
 		Node node = new Node(tagname);
 		node.interpreteAsXHTML = interpreteAsXHTML;
 
-		node.nodeAttributes = new Properties(nodeAttributes);
+		node.nodeAttributes = new LinkedHashMap<XmlTextElement, XmlTextElement>(nodeAttributes);
 		return node;
 	}
 
@@ -344,14 +343,14 @@ public class Node extends ElementList {
 		Node node = new Node(tagname);
 		node.interpreteAsXHTML = interpreteAsXHTML;
 		if (nodeAttributes != null) {
-			node.nodeAttributes = new Properties(nodeAttributes);
-			for (Object key : nodeAttributes.keySet()) {
+			node.nodeAttributes = new LinkedHashMap<XmlTextElement, XmlTextElement>(nodeAttributes);
+			for (XmlTextElement key : nodeAttributes.keySet()) {
 				node.nodeAttributes.put(key, nodeAttributes.get(key));
 			}
 		}
-		Iterator i = contents.iterator();
+		Iterator<XmlElement> i = contents.iterator();
 		while (i.hasNext()) {
-			Object o = i.next();
+			XmlElement o = i.next();
 			if (o instanceof Node) {
 				node.addNode(((Node) o).cloneFull());
 			} else {
@@ -382,17 +381,16 @@ public class Node extends ElementList {
 		return this.startLineNr;
 	}
 
+	public int getEndLineNr() {
+		return this.endLineNr;
+	}
+
 	public int getNrofLines() {
 		return this.endLineNr - this.startLineNr + 1;
 	}
 
 
-	public static void main(String[] args) {
-		List<File> files = FileSupport.getFilesInDirectoryTree("/Users/jmeetsma/development/directory-scan/src/", "*ijsberg*.java");
-		System.out.println(files.size());
-		for (File file : files) {
-			System.out.print(file.getName() + ", ");
-		}
+	public boolean isSingleTag() {
+		return isSingleTag;
 	}
-
 }
