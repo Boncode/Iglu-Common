@@ -567,7 +567,7 @@ public abstract class ElementList implements Serializable {
 	}
 
 
-	protected static class Tag implements XmlElement {
+	public static class Tag implements XmlElement {
 		protected String contents;
 		public static final byte UNDETERMINED_TAG = 0;
 		public static final byte COMMENT_TAG = 1;// <!..
