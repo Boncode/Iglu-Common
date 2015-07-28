@@ -169,6 +169,16 @@ public class Node extends ElementList implements XmlElement {
 		return nodeAttributes;
 	}
 
+	public Map<String, String> getAttributesAsStrings() {
+		LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+		if (nodeAttributes != null) {
+			for (XmlTextElement element : nodeAttributes.keySet()) {
+				result.put(element.toString(), nodeAttributes.get(element).toString());
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * Sets a name-value pair that appears as attribute in the opening tag
 	 *
