@@ -252,7 +252,12 @@ public class Document extends ElementList {
 		if (xmlInput == null) {
 			throw new IllegalArgumentException("input can not be null");
 		}
-		ArrayList splitContents = split(xmlInput, interpreteAsXHTML, true);
+		ArrayList splitContents;
+		try {
+			splitContents = split(xmlInput, interpreteAsXHTML, true);
+		} catch (Exception e) {
+			throw new ParseException("exception while parsing " + (file != null ? file.getName() : name), e);
+		}
 
 		//System.out.println("====> " + splitContents);
 

@@ -92,7 +92,8 @@ public abstract class ElementList implements Serializable {
 								contents.add(newNode);
 							}
 						} else {
-							throw new ParseException("starttag (" + subtag.tagname + ") without endtag found");
+							System.out.println("========> " + subtag.contents);
+							throw new ParseException("starttag (" + subtag.tagname + ") without endtag found at line " + subtag.getStartLineNr());
 						}
 					}
 				} else if (subtag.type == Tag.SINGLE_TAG) {
@@ -706,6 +707,9 @@ public abstract class ElementList implements Serializable {
 					} else {
 						type = START_TAG;
 					}
+			}
+			if(contents.contains("ActivityTimeout_FunctionalError")) {
+				System.out.println("===================> " + contents + " === " + type);
 			}
 			return contentsLength;
 		}
