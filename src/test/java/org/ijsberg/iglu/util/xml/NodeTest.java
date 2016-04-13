@@ -44,11 +44,11 @@ public class NodeTest {
 		node.parse(xmlString);
 
 		assertEquals("test1", node.getFirstNodeByNameInTree("article").getAttribute("name"));
-		assertEquals("test1", node.getFirstNodeByNameInTree("article").getAttributes().get("name"));
+		assertEquals("test1", node.getFirstNodeByNameInTree("article").getAttributesAsStrings().get("name"));
 
 		Node clone = node.cloneFull();
 
 		assertEquals("test1", clone.getFirstNodeByNameInTree("article").getAttribute("name"));
-		assertEquals("test1", clone.getFirstNodeByNameInTree("article").getAttributes().get("name"));
+		assertEquals("test1", clone.getFirstNodeByNameInTree("article").getAttributesAsStrings().get("name"));
 	}
 }
