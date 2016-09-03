@@ -32,6 +32,8 @@ public interface UserManager {
 
 	void addAccount(User user, String password);
 
+	void resetPassword(String userId, String oldPassword, String newPassword);
+
 	void removeAccount(String userId);
 
 	boolean setGroup(String userId, String groupId);

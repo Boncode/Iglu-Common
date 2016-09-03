@@ -195,6 +195,17 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		save();
 	}
 
+	@Override
+	public void resetPassword(String userId, String oldPassword, String newPassword) {
+		Account account = accounts.get(userId);
+		if(account != null && passwordsMatch(oldPassword, account.getHashedPassword())) {
+			account.setHashedPassword(getHash(newPassword));
+			save();
+		} else {
+			throw new AuthenticationException();
+		}
+	}
+
 	private void load() {
 		try {
 			File file = new File(storageFileName);

@@ -78,8 +78,6 @@ public class IndentedConfigReaderMapping implements Mapping {
 		if (file.exists()) {
 			timeLastModified = file.lastModified();
 		}
-
-
 		this.assembly = assembly;
 	}
 
