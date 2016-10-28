@@ -42,6 +42,8 @@ public class SimpleFileLogger implements Logger, Startable {
 	private String dateFormat = LogEntry.DEFAULT_DATE_FORMAT;
 	private int entryOriginStackTraceDepth = 0;
 
+	private boolean printOrigin = true;
+
 	private PrintStream originalSystemOut;
 	private PrintStream filteredSystemOut;
 	protected PrintStream logFilePrintStream;
@@ -63,7 +65,6 @@ public class SimpleFileLogger implements Logger, Startable {
 			logFilePrintStream = new PrintStream(new FileOutputStream(FileSupport.createFile(fileName + ".log")));
 		} catch (IOException e) {
 			throw new ResourceException("unable to open new logfile '" + fileName + ".log'", e);
-
 		}
 	}
 
@@ -93,8 +94,7 @@ public class SimpleFileLogger implements Logger, Startable {
 	}
 
 	public void writeEntry(LogEntry entry) {
-		logFilePrintStream.println(entry.getLevel().getShortDescription() + " " +
-				new SimpleDateFormat(dateFormat).format(new Date(entry.getTimeInMillis())) +
+		logFilePrintStream.println(getPrefix(entry) +
 				(entry.getMessage() != null ? " " + entry.getMessage() : ""));
 
 		if (entry.getData() != null) {
@@ -107,6 +107,17 @@ public class SimpleFileLogger implements Logger, Startable {
 		if (entryOriginStackTraceDepth > 0) {
 			printStackTrace(getStackTracePart(4, entryOriginStackTraceDepth));
 		}
+	}
+
+	private String getPrefix(LogEntry entry) {
+		String originToPrint = "";
+		if(printOrigin) {
+			StackTraceElement element = getStackTracePart(4, 1)[0];
+			originToPrint = "[" + element.getClassName() + "] ";
+		}
+
+		return originToPrint + entry.getLevel().getShortDescription() + " " +
+				new SimpleDateFormat(dateFormat).format(new Date(entry.getTimeInMillis()));
 	}
 
 	private void printStackTrace(StackTraceElement[] stackTrace) {
