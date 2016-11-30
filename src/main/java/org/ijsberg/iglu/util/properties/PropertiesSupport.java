@@ -122,7 +122,7 @@ public class PropertiesSupport {
 	public static Properties getCommandLineProperties(String... args) {
 		Properties retval = new Properties();
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith("-") && args[i].length() > 1) {
+			if (args[i] != null && args[i].startsWith("-") && args[i].length() > 1) {
 				String key = args[i].substring(1);
 				String value = "";
 				if (i + 1 < args.length && !args[i + 1].startsWith("-")) {

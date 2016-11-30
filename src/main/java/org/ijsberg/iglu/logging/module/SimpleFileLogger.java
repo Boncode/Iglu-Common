@@ -27,6 +27,7 @@ import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.util.io.FileSupport;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -42,7 +43,7 @@ public class SimpleFileLogger implements Logger, Startable {
 	private String dateFormat = LogEntry.DEFAULT_DATE_FORMAT;
 	private int entryOriginStackTraceDepth = 0;
 
-	private boolean printOrigin = true;
+	private boolean printOrigin = false;
 
 	private PrintStream originalSystemOut;
 	private PrintStream filteredSystemOut;
@@ -53,6 +54,10 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	protected List<Logger> appenders;
 
+	public void setPrintOrigin(boolean printOrigin) {
+		this.printOrigin = printOrigin;
+	}
+
 	public SimpleFileLogger(String fileName) {
 		this.fileName = fileName;
 		originalSystemOut = System.out;
@@ -62,8 +67,14 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	protected void openLogStream() {
 		try {
-			logFilePrintStream = new PrintStream(new FileOutputStream(FileSupport.createFile(fileName + ".log")));
-		} catch (IOException e) {
+			File file = new File(fileName + ".log");
+			if(file.exists() && file.canWrite()) {
+				logFilePrintStream = new PrintStream(file);
+			} else {
+				logFilePrintStream = new PrintStream(new FileOutputStream(FileSupport.createFile(fileName + ".log")));
+			}
+		}
+		catch (IOException e) {
 			throw new ResourceException("unable to open new logfile '" + fileName + ".log'", e);
 		}
 	}
@@ -112,7 +123,7 @@ public class SimpleFileLogger implements Logger, Startable {
 	private String getPrefix(LogEntry entry) {
 		String originToPrint = "";
 		if(printOrigin) {
-			StackTraceElement element = getStackTracePart(4, 1)[0];
+			StackTraceElement element = getStackTracePart(7, 1)[0];
 			originToPrint = "[" + element.getClassName() + "] ";
 		}
 
@@ -217,7 +228,7 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	@Override
 	public void removeAppender(Logger appender) {
-		if(appenders == null) {
+		if(appenders != null) {
 			appenders.remove(appender);
 		}
 	}
