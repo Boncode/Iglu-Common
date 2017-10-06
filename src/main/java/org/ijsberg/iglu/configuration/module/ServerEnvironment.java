@@ -96,6 +96,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		System.arraycopy(args, 1, assemblyArgs, 0, args.length - 1);
 		String className = args[0];
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
+		this.settings = settings;
 		assembly = instantiateAssembly(className, settings);
 		assembly.initialize(assemblyArgs);
 		Component rootConsole = new StandardComponent(new RootConsole(assembly));
