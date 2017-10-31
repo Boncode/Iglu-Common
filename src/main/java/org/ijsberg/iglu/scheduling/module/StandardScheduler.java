@@ -202,7 +202,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 									public Object execute() {
 										try {
 											pageable.onPageEvent(officialTime);
-										} catch (Exception e) {//pageable is not a trusted component
+										} catch (Throwable e) {//pageable is not a trusted component
 											//TODO keep history
 											System.out.println(new LogEntry(Level.CRITICAL, "exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e));
 										}
@@ -214,7 +214,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 									pageable.onPageEvent(officialTime);
 								} catch (UndeclaredThrowableException e) {
 									System.out.println(new LogEntry(Level.CRITICAL, "undeclared exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e.getCause()));
-								} catch (Exception e) {//pageable is not a trusted component
+								} catch (Throwable e) {//pageable is not a trusted component
 									System.out.println(new LogEntry(Level.CRITICAL, "exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e));
 								}
 							}
