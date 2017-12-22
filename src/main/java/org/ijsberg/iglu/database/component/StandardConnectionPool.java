@@ -664,7 +664,7 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 				driverInfo += "driver " + count + ": " + driver.getMajorVersion() + '.' + driver.getMinorVersion() + "\n";
 			}
 		} catch (ClassNotFoundException cnfe) {
-			throw new ConfigurationException("ERROR: Driver \"" + dbDriver + "\" not found...");
+			throw new ConfigurationException("ERROR: Driver \"" + dbDriver + "\" not found...", cnfe);
 		}
 		resetStatistics();
 	}

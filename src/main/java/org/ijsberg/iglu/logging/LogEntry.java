@@ -83,7 +83,7 @@ public class LogEntry implements Serializable {
 		if (data instanceof Throwable) {
 			Throwable cause = (Throwable) data;
 			while (cause != null) {
-				retval.append("\n" + StringSupport.getRootStackTrace(cause, 20) + "\n");
+				retval.append("\n" + StringSupport.getStackTrace(cause, 20) + "\n");
 				cause = cause.getCause();
 			}
 		}
