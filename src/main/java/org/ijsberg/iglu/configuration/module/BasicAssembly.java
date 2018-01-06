@@ -39,7 +39,7 @@ public abstract class BasicAssembly implements Assembly {
 
 	private Map<Component, String> propertyFileNamesByComponents = new HashMap<Component, String>();
 	protected String configDir = "conf";
-	protected static Cluster core;
+	protected Cluster core;
 
 
 	public void setProperties(Component component, String fileName) {
@@ -87,7 +87,7 @@ public abstract class BasicAssembly implements Assembly {
 	}
 
 
-	public static void savePropertiesForComponent(Class<?> componentInterface) throws IOException {
+	public void savePropertiesForComponent(Class<?> componentInterface) throws IOException {
 		for(Component component : core.getInternalComponents().values()) {
 			if(component.implementsInterface(Assembly.class)) {
 				component.getProxy(Assembly.class).saveProperties(componentInterface);
