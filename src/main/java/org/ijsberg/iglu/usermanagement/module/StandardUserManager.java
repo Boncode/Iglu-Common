@@ -29,6 +29,7 @@ import org.ijsberg.iglu.usermanagement.domain.SimpleAccount;
 import org.ijsberg.iglu.util.formatting.PatternMatchingSupport;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
+import org.ijsberg.iglu.util.misc.EncryptionSupport;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -238,4 +239,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	public void setProperties(Properties properties) {
 		storageFileName = properties.getProperty("storage_file_name", storageFileName);
 	}
+
+
+	// ./invoke.sh "core.WebApp.addAccount(username,password)"
 }

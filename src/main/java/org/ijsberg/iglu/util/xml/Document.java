@@ -45,7 +45,7 @@ public class Document extends ElementList {
 
 	private File file;
 
-    //TODO add ?xml? header
+	//TODO add ?xml? header
 /*	private String doctype;
 	private String xmlVersion;
 	private String encoding;
@@ -331,6 +331,8 @@ public class Document extends ElementList {
 		return name;
 	}
 }
+
+
 
 
 

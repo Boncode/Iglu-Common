@@ -27,6 +27,7 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.execution.Executable;
 import org.ijsberg.iglu.util.execution.TimeOutException;
+import org.ijsberg.iglu.util.misc.EncodingSupport;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -116,6 +117,8 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 
 	private boolean isStarted = false;
 
+	private String passwordXorEncodingKey;
+
 	/**
 	 * Default log writer is System.out.
 	 *
@@ -124,6 +127,10 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 	private PrintWriter logWriter = new PrintWriter(System.out);
 
 	public StandardConnectionPool() {
+	}
+
+	public StandardConnectionPool(String passwordXorEncodingKey) {
+		this.passwordXorEncodingKey = passwordXorEncodingKey;
 	}
 
 	public int getPageIntervalInMinutes() {
@@ -632,7 +639,7 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 
 		dbUrl = properties.getProperty("dburl").toString();
 		dbUsername = properties.getProperty("dbusername").toString();
-		dbUserpassword = properties.getProperty("dbuserpassword").toString();
+		dbUserpassword = getDbUserPassword(properties);
 
 		if (properties.getProperty("nrof_connections") != null) {
 			initialNrofConnections = Integer.valueOf(properties.getProperty("nrof_connections"));
@@ -667,6 +674,13 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 			throw new ConfigurationException("ERROR: Driver \"" + dbDriver + "\" not found...", cnfe);
 		}
 		resetStatistics();
+	}
+
+	protected String getDbUserPassword(Properties properties) {
+		if(passwordXorEncodingKey != null) {
+			return EncodingSupport.decodeXor(properties.getProperty("dbuserpassword"), passwordXorEncodingKey);
+		}
+		return properties.getProperty("dbuserpassword");
 	}
 
 	private void resetStatistics() {

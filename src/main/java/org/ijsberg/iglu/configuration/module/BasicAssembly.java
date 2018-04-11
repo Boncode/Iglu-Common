@@ -83,9 +83,7 @@ public abstract class BasicAssembly implements Assembly {
 		} else {
 			System.out.println(new LogEntry(Level.VERBOSE, "setting -configdir not found: working directory is " + new File(configDir).getAbsolutePath()));
 		}
-
 	}
-
 
 	public void savePropertiesForComponent(Class<?> componentInterface) throws IOException {
 		for(Component component : core.getInternalComponents().values()) {
