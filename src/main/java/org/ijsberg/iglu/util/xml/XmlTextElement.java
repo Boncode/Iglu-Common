@@ -3,18 +3,18 @@ package org.ijsberg.iglu.util.xml;
 /**
  */
 public class XmlTextElement implements XmlElement {
-	private String contents;
+	private int contents;
 	private int startLineNr;
 	private int endLineNr;
 
 	public XmlTextElement(String contents, int startLineNr, int endLineNr) {
-		this.contents = contents;
+		this.contents = StringCache.storeString(contents);
 		this.startLineNr = startLineNr;
 		this.endLineNr = endLineNr;
 	}
 
 	public String getContents() {
-		return contents;
+		return StringCache.getString(contents);
 	}
 
 	public int getStartLineNr() {
@@ -31,14 +31,14 @@ public class XmlTextElement implements XmlElement {
 
 
 	public String toString() {
-		return contents;
+		return StringCache.getString(contents);
 	}
 
 	public int hashCode() {
-		return contents.hashCode();
+		return contents;
 	}
 
 	public boolean equals(Object other) {
-		return other instanceof XmlTextElement && ((XmlTextElement)other).contents.equals(contents);
+		return other instanceof XmlTextElement && ((XmlTextElement)other).contents == contents;
 	}
 }
