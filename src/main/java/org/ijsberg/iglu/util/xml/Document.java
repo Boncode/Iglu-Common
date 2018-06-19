@@ -106,6 +106,9 @@ public class Document extends ElementList {
 
 
 	public Document load(String input) throws ParseException {
+		if("".equals(input)) {
+			throw new IllegalArgumentException("empty input");
+		}
 		BufferedReader reader = new BufferedReader(new StringReader(input));
 		try {
 			load(reader);
@@ -249,7 +252,7 @@ public class Document extends ElementList {
 	 */
 	public void parse(String xmlInput, boolean strict) throws ParseException {
 
-		if (xmlInput == null) {
+		if (xmlInput == null || "".equals(xmlInput)) {
 			throw new IllegalArgumentException("input can not be null");
 		}
 		ArrayList splitContents;
