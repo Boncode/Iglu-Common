@@ -86,7 +86,7 @@ public class PropertiesSupport {
 	 * @return
 	 */
 	public static Map<String, Properties> getSubsections(Properties properties) {
-		Map<String, Properties> retval = new HashMap<String, Properties>();
+		Map<String, Properties> retval = new TreeMap<>();
 		for (Object keyObj : properties.keySet()) {
 			String key = (String) keyObj;
 			if (key.indexOf(KEY_SEPARATOR) != -1) {
