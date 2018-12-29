@@ -126,6 +126,7 @@ public class Document extends ElementList {
 
 		FileReader fileReader = new FileReader(file);
 		encoding = fileReader.getEncoding();
+		fileReader.close();
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
