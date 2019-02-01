@@ -69,7 +69,7 @@ public class SimpleFileLogger implements Logger, Startable {
 		try {
 			File file = new File(fileName + ".log");
 			if(file.exists() && file.canWrite()) {
-				logFilePrintStream = new PrintStream(file);
+				logFilePrintStream = new PrintStream(new FileOutputStream(file, true));
 			} else {
 				logFilePrintStream = new PrintStream(new FileOutputStream(FileSupport.createFile(fileName + ".log")));
 			}
