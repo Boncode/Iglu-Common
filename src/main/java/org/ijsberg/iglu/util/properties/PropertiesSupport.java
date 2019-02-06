@@ -137,6 +137,7 @@ public class PropertiesSupport {
 	public static Properties loadProperties(String fileName) {
 
 		Properties retval = new Properties();
+		File basefile = new File(fileName);
 		try {
 			File file = new File(fileName);
 			InputStream fis = null;
@@ -160,7 +161,8 @@ public class PropertiesSupport {
 			retval.load(fis);
 			fis.close();
 		} catch (IOException ioe) {
-			throw new ResourceException("can not load properties from file '" + fileName + "'", ioe);
+			throw new ResourceException("can not load properties from file '" + fileName + "'" +
+					" (full path: " + basefile.getAbsolutePath() + ")", ioe);
 		}
 		return retval;
 	}
