@@ -153,9 +153,13 @@ public class ResultSetCopy implements Serializable {
 		for (int i = 0; i < colCount; i++) {
 			colType[i] = meta.getColumnType(i + 1);
 			colTypeNames[i][0] = meta.getColumnClassName(i + 1);
-			colTypeNames[i][1] = meta.getColumnName(i + 1).toLowerCase();
-			colNames.put(meta.getColumnName(i + 1).toLowerCase(), new Integer(i + 1));
-			colName[i] = meta.getColumnName(i + 1);
+			String colName2 = meta.getColumnName(i + 1).toLowerCase();
+			if(colNames.containsKey(colName2)) {
+				colName2 = colName2 + "_" + (i + 1);
+			}
+			colTypeNames[i][1] = colName2;
+			colNames.put(colName2, new Integer(i + 1));
+			colName[i] = colName2;//meta.getColumnName(i + 1);
 		}
 
 		while (rs.next()) {
