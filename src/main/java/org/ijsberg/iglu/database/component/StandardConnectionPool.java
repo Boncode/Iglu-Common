@@ -66,7 +66,6 @@ import java.util.logging.Logger;
  * <li>astray_connection_timeout_check_interval: interval in seconds to check for connections gone astray</li>
  * </ul>
  */
-
 public class StandardConnectionPool implements Startable, Pageable, DataSource {
 
 	public static final List<String> isolationLevelStrings = Arrays.asList(new String[]{
