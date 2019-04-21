@@ -60,7 +60,7 @@ public class PropertiesSupport {
 	 * @return a list of keys of subsections (of type String) defined by the first part of a composed property key
 	 */
 	public static Set<String> getSubsectionKeys(Properties properties) {
-		Set<String> retval = new HashSet<String>();
+		Set<String> retval = new LinkedHashSet<>();
 		for (Object keyObj : properties.keySet()) {
 			String key = (String) keyObj;
 			if (key.indexOf(KEY_SEPARATOR) != -1) {
