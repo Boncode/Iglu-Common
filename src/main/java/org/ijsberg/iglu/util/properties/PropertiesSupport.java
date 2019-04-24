@@ -141,7 +141,7 @@ public class PropertiesSupport {
 		try {
 			File file = new File(fileName);
 			InputStream fis = null;
-			if (file.exists() && file.length() != 0) {
+			if (file.exists() /*&& file.length() != 0*/) {
 				try {
 					FileSupport.copyFile(file, file.getAbsolutePath() + ".bak", true);
 				} catch(IOException e) {
