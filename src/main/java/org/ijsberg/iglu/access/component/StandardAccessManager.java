@@ -52,7 +52,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	private int sessionTimeout = 1800;//sec
 	private Authenticator authenticator;
 
-	private Cluster serviceCluster;
+//	private Cluster serviceCluster;
 
 	public static final String defaultAdminAccountName = "admin";
 	private String defaultAdminPassword = "admin";
@@ -66,14 +66,6 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	public StandardAccessManager() {
 	}
 
-	/**
-	 * Used for injection
-	 *
-	 * @param serviceCluster
-	 */
-	public void setServiceCluster(Cluster serviceCluster) {
-		this.serviceCluster = serviceCluster;
-	}
 
 	/**
 	 * @return number of concurrent requests and sessions
@@ -266,10 +258,10 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 
 	@Override
 	public Component createAgent(String id) {
-		if (serviceCluster == null) {
+/*		if (serviceCluster == null) {
 			throw new ConfigurationException("access manager has no 'ServiceCluster' to connect agent to, please provide one to connect agent " + id + " to");
 		}
-		AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
+*/		AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
 		if (agentFactory == null) {
 			throw new ConfigurationException("no AgentFactory for agents with id " + id + " present, register one in cluster");
 		}
@@ -277,13 +269,14 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 		Component component = new StandardComponent(implementation);
 		component.setProperties(agentFactory.getAgentProperties());
 		//connect component anonymously
-		serviceCluster.getFacade().connect(component);
+		agentFactory.getCluster().getFacade().connect(component);
 		return component;
 	}
 
 	@Override
-	public void removeAgent(Component agent) {
-		serviceCluster.getFacade().disconnect(agent);
+	public void removeAgent(String id, Component agent) {
+		AgentFactory factory = agentFactoriesByAgentId.get(id);
+		factory.getCluster().getFacade().disconnect(agent);
 	}
 
 	/**

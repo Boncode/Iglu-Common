@@ -19,6 +19,8 @@
 
 package org.ijsberg.iglu.access;
 
+import org.ijsberg.iglu.configuration.Cluster;
+
 import java.util.Properties;
 
 /**
@@ -31,6 +33,8 @@ public interface AgentFactory<T> {
 	String getAgentId();
 
 	T createAgentImpl();
+
+	Cluster getCluster();
 
 	Properties getAgentProperties();
 }

@@ -19,6 +19,8 @@
 
 package org.ijsberg.iglu.access;
 
+import org.ijsberg.iglu.configuration.Cluster;
+
 import java.util.Properties;
 
 /**
@@ -27,12 +29,14 @@ public abstract class BasicAgentFactory<T> implements AgentFactory<T> {
 
 	private String agentId;
 	private Properties properties;
+	private Cluster cluster;
 
-	public BasicAgentFactory(String agentId) {
-		this(agentId, new Properties());
+	public BasicAgentFactory(Cluster cluster, String agentId) {
+		this(cluster, agentId, new Properties());
 	}
 
-	public BasicAgentFactory(String agentId, Properties properties) {
+	public BasicAgentFactory(Cluster cluster, String agentId, Properties properties) {
+		this.cluster = cluster;
 		this.agentId = agentId;
 		this.properties = properties;
 	}
@@ -48,6 +52,10 @@ public abstract class BasicAgentFactory<T> implements AgentFactory<T> {
 	@Override
 	public Properties getAgentProperties() {
 		return properties;
+	}
+
+	public Cluster getCluster() {
+		return cluster;
 	}
 
 }

@@ -191,7 +191,8 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	public void onDestruction() {
 		//Iterator i = new ArrayList(agents.values()).iterator();
 
-		for (Component component : agentComponents.values()) {
+		for (String id : agentComponents.keySet()) {
+			Component component = agentComponents.get(id);
 			System.out.println(component + " " + Arrays.asList(component.getInterfaces()).contains(SessionDestructionListener.class));
 			if(Arrays.asList(component.getInterfaces()).contains(SessionDestructionListener.class)) {
 				try {
@@ -202,7 +203,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 					throw new ConfigurationException(e);
 				}
 			}
-			accessManager.removeAgent(component);
+			accessManager.removeAgent(id, component);
 		}
 		//close receivers
 		/*	Iterator receiverIterator = getReceivers().iterator();
