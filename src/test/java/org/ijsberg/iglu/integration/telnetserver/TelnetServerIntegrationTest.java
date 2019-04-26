@@ -40,7 +40,6 @@ import static junit.framework.Assert.assertTrue;
  */
 public class TelnetServerIntegrationTest extends BasicAssembly {
 
-	private HashMap<String, Cluster> clusterMap = new HashMap<String, Cluster>();
 	private TestObject testObject;
 
 	@Test
@@ -71,21 +70,11 @@ public class TelnetServerIntegrationTest extends BasicAssembly {
 	}
 
 	private void initializeAssembly() {
-		Cluster cluster = new StandardCluster();
+		Cluster cluster = createCluster("myCluster");
 		testObject = new TestObject("Hi ");
 		cluster.connect("myModule", new StandardComponent(testObject));
-		clusterMap.put("myCluster", cluster);
 	}
 
-	@Override
-	public Map<String, Cluster> getClusters() {
-		return clusterMap;
-	}
-
-	@Override
-	public Cluster getCoreCluster() {
-		return null;
-	}
 
 	@Override
 	public void initialize(String[] args) {

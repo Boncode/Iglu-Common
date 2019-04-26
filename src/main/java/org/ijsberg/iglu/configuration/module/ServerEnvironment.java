@@ -19,6 +19,7 @@
 
 package org.ijsberg.iglu.configuration.module;
 
+import org.ijsberg.iglu.Application;
 import org.ijsberg.iglu.configuration.*;
 import org.ijsberg.iglu.configuration.classloading.ExtendedClassPathClassLoader;
 import org.ijsberg.iglu.exception.ResourceException;
@@ -53,7 +54,7 @@ import java.util.zip.ZipFile;
  * @see Assembly
  * @see ComponentStarter
  */
-public class ServerEnvironment extends ComponentStarter implements Runnable, SystemUpdater {
+public class ServerEnvironment extends ComponentStarter implements Runnable, SystemUpdater, Application {
 
 	private Thread shutdownHook;
 	private boolean isRunning;
@@ -75,7 +76,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 	}
 
 	private void initializeShutdownHook() {
-		shutdownHook = new Thread(new ShutdownProcess());
+		shutdownHook = new Thread(new ShutdownProcess(this));
 		Runtime.getRuntime().addShutdownHook(shutdownHook);
 	}
 
@@ -175,31 +176,13 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 	}
 
 
-	/**
-	 * Performs a (forced) shutdown sequence.
-	 */
-	private class ShutdownProcess implements Runnable {
-
-		/**
-		 * Invokes shutdown when startup is completed.
-		 */
-		public void run() {
-			System.out.println(new LogEntry("starting" + (isRunning ? " forced" : "")
-					+ " application shutdown process..."));
-			if (isStarted) {
-				try {
-					stop();
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-			System.out.println(new LogEntry("Application shutdown process completed..."));
-		}
-	}
-
 	@Override
 	public synchronized void start() {
-		super.start();
+		if(assembly instanceof BasicAssembly) {
+			((BasicAssembly)assembly).start();
+		} else {
+			super.start();
+		}
 		if (!isRunning) {
 			new Thread(this).start();
 		}
@@ -207,7 +190,11 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 
 	@Override
 	public synchronized void stop() {
-		super.stop();
+		if(assembly instanceof BasicAssembly) {
+			((BasicAssembly)assembly).stop();
+		} else {
+			super.stop();
+		}
 		isRunning = false;
 	}
 
@@ -336,5 +323,10 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean isRunning() {
+		return isRunning;
 	}
 }

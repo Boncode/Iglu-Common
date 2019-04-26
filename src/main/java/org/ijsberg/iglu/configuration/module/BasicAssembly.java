@@ -19,10 +19,7 @@
 
 package org.ijsberg.iglu.configuration.module;
 
-import org.ijsberg.iglu.configuration.Assembly;
-import org.ijsberg.iglu.configuration.Cluster;
-import org.ijsberg.iglu.configuration.Component;
-import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.configuration.*;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
@@ -30,17 +27,25 @@ import org.ijsberg.iglu.util.properties.PropertiesSupport;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
 /**
  */
-public abstract class BasicAssembly implements Assembly {
+public abstract class BasicAssembly implements Assembly, Startable {
 
 	private Map<Component, String> propertyFileNamesByComponents = new HashMap<Component, String>();
 	protected String configDir = "conf";
-	protected Cluster core;
+	protected Cluster core = new StandardCluster();
+	protected Map<String, Cluster> clusters = new LinkedHashMap<String, Cluster>();
 
+	private ComponentStarter assemblyStarter = new ComponentStarter();
+	private Component assemblyStarterComponent = new StandardComponent(assemblyStarter);
+
+	public BasicAssembly() {
+		clusters.put("core", core);
+	}
 
 	public void setProperties(Component component, String fileName) {
 		System.out.println(new LogEntry("loading properties for component " + component + " from " + fileName));
@@ -91,5 +96,41 @@ public abstract class BasicAssembly implements Assembly {
 				component.getProxy(Assembly.class).saveProperties(componentInterface);
 			}
 		}
+	}
+
+	public final Map<String, Cluster> getClusters() {
+		return clusters;
+	}
+
+	protected Cluster createCluster(String name) {
+		if(clusters.containsKey(name)) {
+			throw new ConfigurationException("cluster with name " + name + " already registered");
+		}
+		Cluster cluster = new StandardCluster();
+		clusters.put(name, cluster);
+		cluster.connect("AssemblyStarter", assemblyStarterComponent);
+		core.connect(name, new StandardComponent(cluster));
+		return cluster;
+	}
+
+
+	@Override
+	public final Cluster getCoreCluster() {
+		return core;
+	}
+
+	@Override
+	public void start() {
+		assemblyStarter.start();
+	}
+
+	@Override
+	public boolean isStarted() {
+		return assemblyStarter.isStarted;
+	}
+
+	@Override
+	public void stop() {
+		assemblyStarter.stop();
 	}
 }

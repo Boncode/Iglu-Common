@@ -267,7 +267,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	@Override
 	public Component createAgent(String id) {
 		if (serviceCluster == null) {
-			throw new ConfigurationException("access manager has no 'ServiceCluster' to connect agent to, please provide one");
+			throw new ConfigurationException("access manager has no 'ServiceCluster' to connect agent to, please provide one to connect agent " + id + " to");
 		}
 		AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
 		if (agentFactory == null) {

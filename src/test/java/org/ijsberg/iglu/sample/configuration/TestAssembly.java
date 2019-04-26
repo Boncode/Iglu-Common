@@ -30,12 +30,9 @@ import java.util.Map;
  */
 public class TestAssembly extends BasicAssembly {
 
-	Cluster core;
 
 	public TestAssembly() {
 		super();
-		core = new StandardCluster();
-		clusters.put("core", core);
 	}
 
 	private Map<String, Cluster> clusters = new HashMap<String, Cluster>();
@@ -44,17 +41,4 @@ public class TestAssembly extends BasicAssembly {
 		clusters.put(clusterId, cluster);
 	}
 
-	@Override
-	public Map<String, Cluster> getClusters() {
-		return clusters;
-	}
-
-	@Override
-	public Cluster getCoreCluster() {
-		return core;
-	}
-
-	@Override
-	public void initialize(String[] args) {
-	}
 }

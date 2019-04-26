@@ -134,6 +134,11 @@ public class PropertiesSupport {
 		return retval;
 	}
 
+	public static boolean propertiesExist(String fileName) {
+		File file = new File(fileName);
+		return file.exists() || FileSupport.class.getClassLoader().getResourceAsStream(fileName) != null;
+	}
+
 	public static Properties loadProperties(String fileName) {
 
 		Properties retval = new Properties();
