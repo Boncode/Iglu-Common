@@ -27,10 +27,14 @@ import java.io.*;
 import java.util.*;
 
 
-public class PropertiesSupport {
+public class PropertiesSupport extends Properties {
 
 	public static char KEY_SEPARATOR = '.';
 
+	public PropertiesSupport set(String key, String value) {
+		super.setProperty(key, value);
+		return this;
+	}
 
 	/**
 	 * @param properties
@@ -138,6 +142,8 @@ public class PropertiesSupport {
 		File file = new File(fileName);
 		return file.exists() || FileSupport.class.getClassLoader().getResourceAsStream(fileName) != null;
 	}
+
+
 
 	public static Properties loadProperties(String fileName) {
 

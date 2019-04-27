@@ -33,17 +33,18 @@ import java.util.Properties;
 
 /**
  */
-public abstract class BasicAssembly implements Assembly, Startable {
+public class BasicAssembly implements Assembly, Startable {
 
 	private Map<Component, String> propertyFileNamesByComponents = new HashMap<Component, String>();
 	protected String configDir = "conf";
-	protected Cluster core = new StandardCluster();
+	protected Cluster core;// = new StandardCluster();
 	protected Map<String, Cluster> clusters = new LinkedHashMap<String, Cluster>();
 
 	private ComponentStarter assemblyStarter = new ComponentStarter();
 	private Component assemblyStarterComponent = new StandardComponent(assemblyStarter);
 
 	public BasicAssembly() {
+		core = createCluster("core");
 		clusters.put("core", core);
 	}
 
@@ -80,7 +81,7 @@ public abstract class BasicAssembly implements Assembly, Startable {
 		PropertiesSupport.saveProperties(component.getProperties(), fileName);
 	}
 
-	public void initialize(String[] args) {
+/*	public void initialize(String[] args) {
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
 		if(settings.containsKey("configdir")) {
 			configDir = settings.getProperty("configdir");
@@ -88,7 +89,7 @@ public abstract class BasicAssembly implements Assembly, Startable {
 		} else {
 			System.out.println(new LogEntry(Level.VERBOSE, "setting -configdir not found: working directory is " + new File(configDir).getAbsolutePath()));
 		}
-	}
+	}*/
 
 	public void savePropertiesForComponent(Class<?> componentInterface) throws IOException {
 		for(Component component : core.getInternalComponents().values()) {
@@ -109,7 +110,9 @@ public abstract class BasicAssembly implements Assembly, Startable {
 		Cluster cluster = new StandardCluster();
 		clusters.put(name, cluster);
 		cluster.connect("AssemblyStarter", assemblyStarterComponent);
-		core.connect(name, new StandardComponent(cluster));
+		if(core != null) {
+			core.connect(name, new StandardComponent(cluster));
+		}
 		return cluster;
 	}
 

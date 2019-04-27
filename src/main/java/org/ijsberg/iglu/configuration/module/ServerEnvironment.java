@@ -99,7 +99,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
 		this.settings = settings;
 		assembly = instantiateAssembly(className, settings);
-		assembly.initialize(assemblyArgs);
+		//assembly.initialize(assemblyArgs);
 		Component rootConsole = new StandardComponent(new RootConsole(assembly));
 		assembly.getCoreCluster().connect("RootConsole", rootConsole);
 		Component serverComponent = new StandardComponent(this);
@@ -158,7 +158,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 
 		try {
 			assembly = instantiateAssembly(className, settings);
-			assembly.initialize(assemblyArgs);
+			//assembly.initialize(assemblyArgs);
 			Component rootConsole = new StandardComponent(new RootConsole(assembly));
 			assembly.getCoreCluster().connect("RootConsole", rootConsole);
 			Component serverComponent = new StandardComponent(this);

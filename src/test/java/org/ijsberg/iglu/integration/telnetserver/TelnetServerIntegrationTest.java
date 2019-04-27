@@ -75,8 +75,4 @@ public class TelnetServerIntegrationTest extends BasicAssembly {
 		cluster.connect("myModule", new StandardComponent(testObject));
 	}
 
-
-	@Override
-	public void initialize(String[] args) {
-	}
 }

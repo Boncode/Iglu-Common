@@ -41,12 +41,7 @@ public interface Assembly {
 	 */
 	Cluster getCoreCluster();
 
-	/**
-	 * Creates the assembly.
-	 *
-	 * @param args command line arguments
-	 */
-	void initialize(String[] args);
+	//void initialize(String[] args);
 
 	@ExposeInConsole(description = "saves properties of components registered with", paramDesc = {})
 	void saveProperties() throws IOException;

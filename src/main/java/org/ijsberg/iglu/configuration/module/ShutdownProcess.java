@@ -15,7 +15,7 @@ public class ShutdownProcess implements Runnable {
     }
 
     /**
-     * Invokes shutdown when startup is completed.
+     * Invokes shutdown if startup is completed.
      */
     public void run() {
         System.out.println(new LogEntry("starting" + (application.isRunning() ? " forced" : "")
