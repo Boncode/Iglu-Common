@@ -27,7 +27,7 @@ import org.ijsberg.iglu.invocation.RootConsole;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.FileSupport;
-import org.ijsberg.iglu.util.properties.PropertiesSupport;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.io.File;
@@ -96,7 +96,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		this.assemblyArgs = new String[args.length - 1];
 		System.arraycopy(args, 1, assemblyArgs, 0, args.length - 1);
 		String className = args[0];
-		Properties settings = PropertiesSupport.getCommandLineProperties(args);
+		Properties settings = IgluProperties.getCommandLineProperties(args);
 		this.settings = settings;
 		assembly = instantiateAssembly(className, settings);
 		//assembly.initialize(assemblyArgs);

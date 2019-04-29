@@ -29,7 +29,7 @@ import org.ijsberg.iglu.mvc.RequestMapper;
 import org.ijsberg.iglu.mvc.mapping.Process;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
-import org.ijsberg.iglu.util.properties.PropertiesSupport;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 
 import java.io.Serializable;
 import java.util.*;
@@ -170,7 +170,7 @@ public class StandardRequestMapper implements RequestMapper, Startable {
 /*		strict = section.getValue("strict", new GenericValue(strict), "abort mapping loading on errors").toBoolean().booleanValue();
         Environment.System.out.println("checking mapping strictly: " + strict);*/
 
-		mappingFilesMap = PropertiesSupport.getSubsection(properties, "mapping");
+		mappingFilesMap = IgluProperties.getSubsection(properties, "mapping");
 	}
 
 

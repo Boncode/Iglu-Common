@@ -25,6 +25,7 @@ import org.ijsberg.iglu.configuration.module.StandardCluster;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  */
@@ -32,7 +33,7 @@ public class TestAssembly extends BasicAssembly {
 
 
 	public TestAssembly() {
-		super();
+		super(new Properties());
 	}
 
 	private Map<String, Cluster> clusters = new HashMap<String, Cluster>();

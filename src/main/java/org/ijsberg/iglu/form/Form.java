@@ -22,7 +22,7 @@ package org.ijsberg.iglu.form;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.content.module.StandardTextProvider;
 import org.ijsberg.iglu.util.formatting.PatternMatchingSupport;
-import org.ijsberg.iglu.util.properties.PropertiesSupport;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
 import org.ijsberg.iglu.util.types.Converter;
 
@@ -63,7 +63,7 @@ public class Form extends StandardTextProvider {
 	public Form(Properties allFormsProperties, String formKey) {
 		super();
 		this.allFormsProperties = allFormsProperties;
-		copy(PropertiesSupport.getSubsection(allFormsProperties, formKey));
+		copy(IgluProperties.getSubsection(allFormsProperties, formKey));
 	}
 
 
@@ -74,7 +74,7 @@ public class Form extends StandardTextProvider {
 	}
 
 	public Collection getKeys(String subFormKey) {
-		return PropertiesSupport.getSubsectionKeys(PropertiesSupport.getSubsection(defaultTexts, subFormKey));
+		return IgluProperties.getSubsectionKeys(IgluProperties.getSubsection(defaultTexts, subFormKey));
 	}
 
 
@@ -115,9 +115,9 @@ public class Form extends StandardTextProvider {
 		convertedValues = new Properties();
 		validationMessages = new Properties();
 
-		Properties fieldProperties = PropertiesSupport.getSubsection(defaultTexts, FIELD);
+		Properties fieldProperties = IgluProperties.getSubsection(defaultTexts, FIELD);
 
-		Set<String> fieldKeys = PropertiesSupport.getSubsectionKeys(fieldProperties);
+		Set<String> fieldKeys = IgluProperties.getSubsectionKeys(fieldProperties);
 
 		for (String fieldKey : fieldKeys) {
 			String strValue = fieldProperties.getProperty(fieldKey + "." + VALUE);

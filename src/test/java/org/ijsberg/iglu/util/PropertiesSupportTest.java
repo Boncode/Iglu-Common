@@ -19,9 +19,11 @@
 
 package org.ijsberg.iglu.util;
 
-import org.ijsberg.iglu.util.properties.PropertiesSupport;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
@@ -52,35 +54,43 @@ public class PropertiesSupportTest {
 	@Test
 	public void testGetCommandLineProperties() {
 
-		Properties properties = PropertiesSupport.getCommandLineProperties("-test", "true");
+		Properties properties = IgluProperties.getCommandLineProperties("-test", "true");
 		assertEquals(1, properties.size());
 		assertEquals("true", properties.getProperty("test"));
 
-		properties = PropertiesSupport.getCommandLineProperties("-test", "true", "-key", "value");
+		properties = IgluProperties.getCommandLineProperties("-test", "true", "-key", "value");
 		assertEquals(2, properties.size());
 		assertEquals("true", properties.getProperty("test"));
 		assertEquals("value", properties.getProperty("key"));
 
-		properties = PropertiesSupport.getCommandLineProperties("-test", "true", "-key");
+		properties = IgluProperties.getCommandLineProperties("-test", "true", "-key");
 		assertEquals(2, properties.size());
 		assertEquals("true", properties.getProperty("test"));
 		assertEquals("", properties.getProperty("key"));
 
-		properties = PropertiesSupport.getCommandLineProperties("-test", "-key", "value");
+		properties = IgluProperties.getCommandLineProperties("-test", "-key", "value");
 		assertEquals(2, properties.size());
 		assertEquals("", properties.getProperty("test"));
 		assertEquals("value", properties.getProperty("key"));
 
-		properties = PropertiesSupport.getCommandLineProperties("-test", "true", "-key", "value", "dummy");
+		properties = IgluProperties.getCommandLineProperties("-test", "true", "-key", "value", "dummy");
 		assertEquals(2, properties.size());
 		assertEquals("true", properties.getProperty("test"));
 		assertEquals("value", properties.getProperty("key"));
 
-		properties = PropertiesSupport.getCommandLineProperties("dummy1", "-test", "true", "-key", "value", "dummy2");
+		properties = IgluProperties.getCommandLineProperties("dummy1", "-test", "true", "-key", "value", "dummy2");
 		assertEquals(2, properties.size());
 		assertEquals("true", properties.getProperty("test"));
 		assertEquals("value", properties.getProperty("key"));
 	}
 
+	@Test
+	public void testLoadProperties() throws Exception {
+		IgluProperties properties = IgluProperties.loadProperties("test/IJsberg.Iglu.properties");
+		System.out.println(properties.stringPropertyNames());
+		List<String> keys = new ArrayList<>(properties.stringPropertyNames());
+		assertEquals("java.configuration.menu.contextMenu.extra.submenu.item1.css_class_name", keys.get(keys.size() - 1));
+		assertEquals(23, keys.size());
+	}
 
 }

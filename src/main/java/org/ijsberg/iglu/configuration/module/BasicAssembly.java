@@ -22,7 +22,7 @@ package org.ijsberg.iglu.configuration.module;
 import org.ijsberg.iglu.configuration.*;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.util.properties.PropertiesSupport;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,14 +43,21 @@ public class BasicAssembly implements Assembly, Startable {
 	private ComponentStarter assemblyStarter = new ComponentStarter();
 	private Component assemblyStarterComponent = new StandardComponent(assemblyStarter);
 
-	public BasicAssembly() {
+	protected Properties properties;
+
+	public BasicAssembly(Properties properties) {
+
+		this.properties = properties;
+
+		configDir = properties.getProperty("configDir", configDir);
+		System.out.println(new LogEntry(Level.VERBOSE, "working directory is " + new File(configDir).getAbsolutePath()));
 		core = createCluster("core");
 		clusters.put("core", core);
 	}
 
 	public void setProperties(Component component, String fileName) {
 		System.out.println(new LogEntry("loading properties for component " + component + " from " + fileName));
-		Properties properties = PropertiesSupport.loadProperties(fileName);
+		Properties properties = IgluProperties.loadProperties(configDir + "/" + fileName);
 		if(properties == null) {
 			throw new ConfigurationException("properties file " + fileName + " not found");
 		}
@@ -78,18 +85,8 @@ public class BasicAssembly implements Assembly, Startable {
 		String fileName = propertyFileNamesByComponents.get(component);
 		System.out.println(new LogEntry("" + propertyFileNamesByComponents));
 		System.out.println(new LogEntry("saving properties to " + fileName));
-		PropertiesSupport.saveProperties(component.getProperties(), fileName);
+		IgluProperties.saveProperties(component.getProperties(), configDir + "/" + fileName);
 	}
-
-/*	public void initialize(String[] args) {
-		Properties settings = PropertiesSupport.getCommandLineProperties(args);
-		if(settings.containsKey("configdir")) {
-			configDir = settings.getProperty("configdir");
-			System.out.println(new LogEntry(Level.VERBOSE, "working directory is " + new File(configDir).getAbsolutePath()));
-		} else {
-			System.out.println(new LogEntry(Level.VERBOSE, "setting -configdir not found: working directory is " + new File(configDir).getAbsolutePath()));
-		}
-	}*/
 
 	public void savePropertiesForComponent(Class<?> componentInterface) throws IOException {
 		for(Component component : core.getInternalComponents().values()) {

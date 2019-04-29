@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -41,6 +42,10 @@ import static junit.framework.Assert.assertTrue;
 public class TelnetServerIntegrationTest extends BasicAssembly {
 
 	private TestObject testObject;
+
+	public TelnetServerIntegrationTest() {
+		super(new Properties());
+	}
 
 	@Test
 	public void testTelnetServer() throws Exception {

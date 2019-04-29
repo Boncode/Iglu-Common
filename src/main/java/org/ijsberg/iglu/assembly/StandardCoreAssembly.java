@@ -1,24 +1,22 @@
 package org.ijsberg.iglu.assembly;
 
-import org.ijsberg.iglu.configuration.Assembly;
-import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.invocation.RootConsole;
 import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.logging.module.RotatingFileLogger;
-import org.ijsberg.iglu.util.properties.PropertiesSupport;
+import org.ijsberg.iglu.logging.module.StandardOutLogger;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.Properties;
 
 public class StandardCoreAssembly extends BasicAssembly {
 
     protected RotatingFileLogger logger;
 
-    public StandardCoreAssembly() {
-
+    public StandardCoreAssembly(Properties properties) {
+        super(properties);
         createInfraLayer();
     }
 
@@ -26,7 +24,12 @@ public class StandardCoreAssembly extends BasicAssembly {
         logger = new RotatingFileLogger("logs/" + this.getClass().getSimpleName());
         Component loggerComponent = new StandardComponent(logger);
         core.connect("Logger", loggerComponent);
-        loggerComponent.setProperties(PropertiesSupport.loadProperties("conf/logger.properties"));
+        Properties loggerProperties = IgluProperties.loadProperties(configDir + "/logger.properties");
+        loggerComponent.setProperties(loggerProperties);
+
+        if(loggerProperties.getProperty("log_to_standard_out") != null) {
+            logger.addAppender(new StandardOutLogger());
+        }
 
         Component rootConsole = new StandardComponent(new RootConsole(this));
         core.connect("RootConsole", rootConsole);

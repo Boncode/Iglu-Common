@@ -1,0 +1,323 @@
+/*
+ * Copyright 2011-2014 Jeroen Meetsma - IJsberg Automatisering BV
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.ijsberg.iglu.util.properties;
+
+import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.util.collection.CollectionSupport;
+import org.ijsberg.iglu.util.collection.ListHashMap;
+import org.ijsberg.iglu.util.collection.ListMap;
+import org.ijsberg.iglu.util.io.FileSupport;
+import org.ijsberg.iglu.util.misc.Line;
+
+import java.io.*;
+import java.util.*;
+
+/**
+ * Iglu properties adds a number of features to Properties such as order preserving and subsection retrieval
+ */
+public class IgluProperties extends Properties {
+
+	public static char KEY_SEPARATOR = '.';
+
+	private Set<String> orderedPropertyNames = new LinkedHashSet();
+
+	private ListMap<String,String> linesOfComment = new ListHashMap<>();
+
+	private List<String> linesGathered = new ArrayList<>();
+
+	public static IgluProperties copy(Properties properties) {
+		IgluProperties igluProperties = new IgluProperties();
+		for(String key : properties.stringPropertyNames()) {
+			igluProperties.set(key, properties.getProperty(key));
+		}
+		return igluProperties;
+	}
+
+	public static void throwIfKeysMissing(Properties properties, String ... keys) {
+		List<String> missingKeys = new ArrayList<>();
+		for(String key : keys) {
+			if(properties.getProperty(key) == null) {
+				missingKeys.add(key);
+			}
+		}
+		if(!missingKeys.isEmpty()) {
+			throw new ConfigurationException("please provide missing properties " + CollectionSupport.format(missingKeys, ", "));
+		}
+	}
+
+	public IgluProperties set(String key, String value) {
+		setProperty(key, value);
+		return this;
+	}
+
+	public Object setProperty(String key, String value) {
+		Object retval = super.setProperty(key, value);
+		orderedPropertyNames.add(key);
+		return retval;
+	}
+
+	/**
+	 * @param properties
+	 * @param sectionKey
+	 * @return
+	 */
+	public static Properties getSubsection(Properties properties, String sectionKey) {
+
+		IgluProperties retval = new IgluProperties();
+
+		for (String key : properties.stringPropertyNames()) {
+			if (key.startsWith(sectionKey + KEY_SEPARATOR)) {
+				String subkey = key.substring(sectionKey.length() + 1);
+				retval.setProperty(subkey, properties.getProperty(key));
+			}
+		}
+		return retval;
+	}
+
+	public IgluProperties getSubsection(String sectionKey) {
+		return (IgluProperties) getSubsection(this, sectionKey);
+	}
+
+	/**
+	 * Property trees consists of properties at different levels, names and subnames are separated by dots (.).
+	 * If property keys contain dots they are assumed to be composed keys, consisting of subsection names and
+	 * a property name.
+	 * <p/>
+	 * If a property key is composed, such as "settings.username", this method assumes there's a subsection
+	 * "settings" containing a property "user name"
+	 *
+	 * @return a list of keys of subsections (of type String) defined by the first part of a composed property key
+	 */
+	public static Set<String> getSubsectionKeys(Properties properties) {
+		Set<String> retval = new LinkedHashSet<>();
+		for (String key : properties.stringPropertyNames()) {
+			if (key.indexOf(KEY_SEPARATOR) != -1) {
+				retval.add(key.substring(0, key.indexOf(KEY_SEPARATOR)));
+			}
+		}
+		return retval;
+	}
+
+	public Set<String> getSubsectionKeys() {
+		return getSubsectionKeys(this);
+	}
+
+
+	public static Set<String> getRootKeys(Properties properties) {
+		Set<String> retval = new HashSet<String>();
+		for (String key : properties.stringPropertyNames()) {
+			if (key.indexOf(KEY_SEPARATOR) == -1) {
+				retval.add(key);
+			}
+		}
+		return retval;
+	}
+
+	public Set<String> getRootKeys() {
+		return getRootKeys(this);
+	}
+
+	/**
+	 * @param properties
+	 * @return
+	 */
+	public static <T extends Properties> Map<String, T> getSubsections(T properties) {
+		Map<String, Properties> retval = new LinkedHashMap<>();
+		for (Object keyObj : properties.keySet()) {
+			String key = (String) keyObj;
+			if (key.indexOf(KEY_SEPARATOR) != -1) {
+				String subsectionkey = key.substring(0, key.indexOf(KEY_SEPARATOR));
+				String subkey = key.substring(subsectionkey.length() + 1);
+				Properties props = retval.get(subsectionkey);
+				if (props == null) {
+					props = new IgluProperties();
+					retval.put(subsectionkey, props);
+				}
+				props.setProperty(subkey, properties.getProperty(key));
+			}
+		}
+		return (Map<String, T>) retval;
+	}
+
+	public Map<String, IgluProperties> getSubsections() {
+		return getSubsections(this);
+	}
+
+	/**
+	 * @param properties
+	 * @param sectionkey
+	 * @return
+	 */
+	public static Map<String, Properties> getSubsections(Properties properties, String sectionkey) {
+		return getSubsections(getSubsection(properties, sectionkey));
+	}
+
+	/**
+	 * Collects command line properties of the following form:
+	 * java Command -key value
+	 *
+	 * @param args
+	 * @return
+	 */
+	public static IgluProperties getCommandLineProperties(String... args) {
+		IgluProperties retval = new IgluProperties();
+		for (int i = 0; i < args.length; i++) {
+			if (args[i] != null && args[i].startsWith("-") && args[i].length() > 1) {
+				String key = args[i].substring(1);
+				String value = "";
+				if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
+					value = args[++i];
+				}
+				retval.setProperty(key, value);
+			}
+		}
+		return retval;
+	}
+
+	public static boolean propertiesExist(String fileName) {
+		File file = new File(fileName);
+		return file.exists() || FileSupport.class.getClassLoader().getResourceAsStream(fileName) != null;
+	}
+
+
+
+	public static IgluProperties loadProperties(String fileName) {
+
+		IgluProperties retval = new IgluProperties();
+		File basefile = new File(fileName);
+		try {
+			InputStream fis = getInputStream(fileName);
+			retval.load(fileName, fis);
+			fis.close();
+		} catch (IOException ioe) {
+			throw new ResourceException("can not load properties from file '" + fileName + "'" +
+					" (full path: " + basefile.getAbsolutePath() + ")", ioe);
+		}
+		return retval;
+	}
+
+	public static InputStream getInputStream(String fileName) throws IOException {
+
+		File file = new File(fileName);
+		InputStream fis = null;
+		if (file.exists() /*&& file.length() != 0*/) {
+			try {
+				FileSupport.copyFile(file, file.getAbsolutePath() + ".bak", true);
+			} catch(IOException e) {
+				//process may not have write permission
+				System.out.println("creation of backup file " + file.getAbsolutePath() + ".bak failed with message: " + e.getMessage());
+			}
+			fis = new FileInputStream(file);
+		} else {
+			file = new File(file.getAbsolutePath() + ".bak");
+			if(file.exists() && file.length() != 0) {
+				FileSupport.copyFile(file, fileName, true);
+				fis = new FileInputStream(file);
+			} else {
+				fis = FileSupport.getInputStreamFromClassLoader(fileName);
+			}
+		}
+		return fis;
+	}
+
+	public void load(String fileName, InputStream inputStream) throws IOException {
+		orderedPropertyNames.clear();
+		linesOfComment.clear();
+		linesGathered.clear();
+
+		super.load(inputStream);
+		InputStream txtInputStream = getInputStream(fileName);
+		List<Line> lines = FileSupport.getLinesFromText(fileName, new InputStreamReader(txtInputStream));
+		txtInputStream.close();
+		for(Line line : lines) {
+			processCommentAndEmpty(line);
+			String key = getKey(line);
+			if(key != null) {
+				orderedPropertyNames.add(key);
+				linesOfComment.put(key, new ArrayList<>(linesGathered));
+				linesGathered.clear();
+			}
+		}
+	}
+
+	public Set<String> stringPropertyNames() {
+		LinkedHashSet<String> retval = new LinkedHashSet<>(orderedPropertyNames);
+		return retval;
+	}
+
+	private void processCommentAndEmpty(Line line) {
+		String s = line.getLine();
+		if(s.trim().startsWith("#") || "".equals(s.trim())) {
+			linesGathered.add(line.getLine());
+		}
+	}
+
+	private static String getKey(Line line) {
+		String s = line.getLine();
+		if(!s.trim().startsWith("#") && s.contains("=")) {
+			return s.substring(0, s.indexOf("=")).trim();
+		}
+		return null;
+	}
+
+	public static void saveProperties(Properties properties, String fileName) throws IOException {
+		FileOutputStream outputStream = new FileOutputStream(fileName);
+		properties.store(outputStream, null);
+		outputStream.close();
+	}
+
+	public void store(OutputStream outputStream, String comments) {
+		PrintStream printStream = new PrintStream(outputStream);
+		for(String propertyName : stringPropertyNames()) {
+			printComment(printStream, linesOfComment.get(propertyName));
+			printStream.println(propertyName + "=" + getProperty(propertyName));
+		}
+		printComment(printStream, linesGathered);
+		printStream.close();
+	}
+
+	private void printComment(PrintStream printStream, List<String> lines) {
+		if(lines != null) {
+			for (String line : lines) {
+				printStream.println(line);
+			}
+		}
+	}
+
+	public Object remove(Object key) {
+		orderedPropertyNames.remove(key);
+		return super.remove(key);
+	}
+
+	public static Properties removeSubSection(Properties properties, String sectionKey) {
+		Properties subsection = getSubsection(properties, sectionKey);
+		for(String subsectionKey : subsection.stringPropertyNames()) {
+			properties.remove(sectionKey + KEY_SEPARATOR + subsectionKey);
+		}
+		return subsection;
+	}
+
+	public static void addSubsection(Properties properties, String sectionKey, Properties subsection) {
+		for(String subsectionKey : subsection.stringPropertyNames()) {
+			properties.setProperty(sectionKey + KEY_SEPARATOR + subsectionKey, subsection.getProperty(subsectionKey));
+		}
+	}
+}

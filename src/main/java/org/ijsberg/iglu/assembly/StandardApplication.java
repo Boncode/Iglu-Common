@@ -5,8 +5,10 @@ import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.ShutdownProcess;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 
 import java.util.LinkedHashMap;
+import java.util.Properties;
 
 public class StandardApplication implements Application {
 
@@ -54,4 +56,10 @@ public class StandardApplication implements Application {
     public void stop() {
         coreAssembly.stop();
     }
+
+
+    public StandardApplication(Properties properties) {
+        IgluProperties igluProperties = IgluProperties.copy(properties);
+    }
+
 }
