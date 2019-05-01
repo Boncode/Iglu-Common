@@ -9,6 +9,7 @@ import org.ijsberg.iglu.logging.module.RotatingFileLogger;
 import org.ijsberg.iglu.logging.module.StandardOutLogger;
 import org.ijsberg.iglu.util.properties.IgluProperties;
 
+import java.io.IOException;
 import java.util.Properties;
 
 public class StandardCoreAssembly extends BasicAssembly {
@@ -24,7 +25,19 @@ public class StandardCoreAssembly extends BasicAssembly {
         logger = new RotatingFileLogger("logs/" + this.getClass().getSimpleName());
         Component loggerComponent = new StandardComponent(logger);
         core.connect("Logger", loggerComponent);
-        Properties loggerProperties = IgluProperties.loadProperties(configDir + "/logger.properties");
+        Properties loggerProperties;
+        if(IgluProperties.propertiesExist(configDir + "/logger.properties")) {
+            loggerProperties = IgluProperties.loadProperties(configDir + "/logger.properties");
+        } else {
+            loggerProperties = new IgluProperties();
+            loggerProperties.setProperty("log_level", "DEBUG");
+            loggerProperties.setProperty("log_to_standard_out", "true");
+            try {
+                IgluProperties.saveProperties(loggerProperties, configDir + "/logger.properties");
+            } catch (IOException e) {
+                System.err.println("could not save logger.properties with message: " + e.getMessage());
+            }
+        }
         loggerComponent.setProperties(loggerProperties);
 
         if(loggerProperties.getProperty("log_to_standard_out") != null) {
