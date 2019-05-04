@@ -98,8 +98,8 @@ public class BasicUser implements User {
 	/**
 	 * @param roleId id of the rule a user must have,
 	 *               a '*' makes the method return 'true',
-	 *               which can be used to check wether a user is at least authenticated
-	 * @return true if a user has, or fullfills the role
+	 *               which can be used to check whether a user is at least authenticated
+	 * @return true if a user has, or fulfills the role
 	 * @see User#hasRole(String)
 	 */
 	public boolean hasRole(String roleId) {
