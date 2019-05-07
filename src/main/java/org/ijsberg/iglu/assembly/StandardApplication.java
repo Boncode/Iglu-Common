@@ -110,4 +110,8 @@ dashboard.properties.port=17684
         IgluProperties igluProperties = IgluProperties.copy(properties);
     }
 
+    public Assembly getCoreAssembly() {
+        return coreAssembly;
+    }
+
 }
