@@ -30,6 +30,7 @@ import org.ijsberg.iglu.util.formatting.PatternMatchingSupport;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
 import org.ijsberg.iglu.util.misc.EncryptionSupport;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -39,10 +40,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  */
@@ -115,7 +113,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		if (account != null) {
 			String password = getPasswordFromCredentials(credentials);
 			if (passwordsMatch(password, account.getHashedPassword())) {
-				BasicUser user = new BasicUser(account.getUserId(), account.getProperties());
+				BasicUser user = new BasicUser(account.getUserId(), IgluProperties.copy(account.getProperties()));
 				if(account.getProperties().containsKey("group")) {
 					user.setGroup(new UserGroup(account.getProperties().getProperty("group"), ""));
 				}
@@ -188,9 +186,12 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		return retval;
 	}
 
+	public Map<String, Account> getAccounts() {
+		return new HashMap<>(accounts);
+	}
+
 	@Override
 	public void addAccount(User user, String password) {
-
 		Account account = new SimpleAccount(user.getId(), getHash(password), user.getSettings());
 		accounts.put(user.getId(), account);
 		save();

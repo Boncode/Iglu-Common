@@ -89,6 +89,8 @@ public class LogEntry implements Serializable {
 		}
 
 
+
+
 		return retval.toString();
 		//TODO make stacktracedepth configurable
 	}
