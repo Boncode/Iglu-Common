@@ -44,10 +44,12 @@ public class BasicAssembly implements Assembly, Startable {
 	private Component assemblyStarterComponent = new StandardComponent(assemblyStarter);
 
 	protected Properties properties;
+	protected String home;
 
 	public BasicAssembly(Properties properties) {
 
 		this.properties = properties;
+		home = properties.getProperty("home", ".");
 
 		configDir = properties.getProperty("configDir", configDir);
 		System.out.println(new LogEntry(Level.VERBOSE, "working directory is " + new File(configDir).getAbsolutePath()));
@@ -57,7 +59,7 @@ public class BasicAssembly implements Assembly, Startable {
 
 	public void setProperties(Component component, String fileName) {
 		System.out.println(new LogEntry("loading properties for component " + component + " from " + fileName));
-		Properties properties = IgluProperties.loadProperties(configDir + "/" + fileName);
+		Properties properties = IgluProperties.loadProperties(home + '/' + configDir + "/" + fileName);
 		if(properties == null) {
 			throw new ConfigurationException("properties file " + fileName + " not found");
 		}
