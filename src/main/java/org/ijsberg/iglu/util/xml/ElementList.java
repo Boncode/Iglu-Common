@@ -207,7 +207,7 @@ public abstract class ElementList implements Serializable {
 	 * @param recurse indicates whether to regard all subnodes or just the nodes this node is parent of
 	 * @return the first node with a certain name encountered
 	 */
-	public Node getFirstNodeByName(String name, boolean recurse)//TODO make all recursive methods like this
+	public Node getFirstNodeByName(String name, boolean recurse)
 	{
 		Iterator i = contents.iterator();
 		Node node = null;
