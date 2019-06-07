@@ -32,6 +32,10 @@ public interface UserManager {
 
 	void addAccount(User user, String password);
 
+	void updateAccount(User user);
+
+	void resetPassword(String userId, String newPassword);
+
 	void resetPassword(String userId, String oldPassword, String newPassword);
 
 	void removeAccount(String userId);

@@ -36,4 +36,6 @@ public interface Account extends Serializable {
 	void putProperty(String key, String value);
 
 	void removeProperty(String key);
+
+    void setProperties(Properties settings);
 }

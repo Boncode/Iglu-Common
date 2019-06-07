@@ -76,4 +76,9 @@ public class SimpleAccount implements Account {
 	public void removeProperty(String key) {
 		properties.remove(key);
 	}
+
+	@Override
+	public void setProperties(Properties settings) {
+		this.properties = settings;
+	}
 }

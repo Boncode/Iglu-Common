@@ -57,10 +57,22 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	private HashMap<String, Account> accounts;
 
-	public static String getHash(String password) {
+	private static byte[] salt;
+
+	static {
+		try {
+			salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LENGTH);
+		} catch (NoSuchAlgorithmException e) {
+			throw new ConfigurationException("unable to generate salt", e);
+		}
+	}
+
+	public StandardUserManager() {
+	}
+
+	public String getHash(String password) {
 
 		try {
-			byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LENGTH);
 			return EncodingSupport.encodeBase64(salt) + "$" + hash(password, salt);
 		} catch (NoSuchAlgorithmException e) {
 			throw new ConfigurationException("unable to hash password", e);
@@ -198,6 +210,20 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	}
 
 	@Override
+	public void updateAccount(User user) {
+		Account account = accounts.get(user.getId());
+		account.setProperties(user.getSettings());
+		save();
+	}
+
+	@Override
+	public void resetPassword(String userId, String newPassword) {
+		Account account = accounts.get(userId);
+		account.setHashedPassword(getHash(newPassword));
+		save();
+	}
+
+	@Override
 	public void resetPassword(String userId, String oldPassword, String newPassword) {
 		Account account = accounts.get(userId);
 		if(account != null && passwordsMatch(oldPassword, account.getHashedPassword())) {
@@ -208,32 +234,41 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		}
 	}
 
+
 	private void load() {
-		try {
-			File file = new File(storageFileName);
-			if (file.exists()) {
-				accounts = (HashMap<String, Account>) FileSupport.readSerializable(storageFileName);
-			} else {
-				accounts = new HashMap<String, Account>();
-				addAccount("admin", "admin");
+		synchronized (lock) {
+			try {
+				File file = new File(storageFileName);
+				if (file.exists()) {
+					accounts = (HashMap<String, Account>) FileSupport.readSerializable(storageFileName);
+				} else {
+					accounts = new HashMap<String, Account>();
+					addAccount("admin", "admin");
+				}
+			} catch (ClassNotFoundException e) {
+				throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);
+			} catch (IOException e) {
+				throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);
 			}
-		} catch (ClassNotFoundException e) {
-			throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);
-		} catch (IOException e) {
-			throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);
 		}
 	}
 
+	private final Object lock = new Object();
+
 	private void save() {
-		try {
-			File file = new File(storageFileName);
-			if (!file.exists()) {
-				FileSupport.createFile(storageFileName);
+	    System.out.println(new LogEntry("about to save accounts"));
+		synchronized (lock) {
+			try {
+				File file = new File(storageFileName);
+				if (!file.exists()) {
+					FileSupport.createFile(storageFileName);
+				}
+				FileSupport.saveSerializable(accounts, storageFileName);
+			} catch (IOException e) {
+				throw new ConfigurationException("unable to save account data to '" + storageFileName + "'", e);
 			}
-			FileSupport.saveSerializable(accounts, storageFileName);
-		} catch (IOException e) {
-			throw new ConfigurationException("unable to save account data to '" + storageFileName + "'", e);
 		}
+        System.out.println(new LogEntry("accounts saved"));
 	}
 
 
