@@ -32,17 +32,6 @@ public class StandardApplication implements Application {
         initializeShutdownHook();
     }
 
-/*
-core.class=org.ijsberg.iglu.server.http.HttpAdminCoreAssembly
-core.properties.home=core/modules/core
-core.properties.port=17681
-datahub.class=nl.ijsberg.datahubdapi.assembly.DataHubApiAssembly
-datahub.properties.home=core/modules/datahub
-datahub.properties.port=17682
-dashboard.class=nl.ijsberg.dashboardapi.assembly.DashboardApiAssembly
-dashboard.properties.home=core/modules/dashboard
-dashboard.properties.port=17684
-*/
     private BasicAssembly instantiateAssembly(String className, Properties properties) {
         BasicAssembly assembly;
         try {
@@ -55,10 +44,8 @@ dashboard.properties.port=17684
         } catch (InstantiationException e) {
             throw new ConfigurationException("cannot instantiate assembly", e);
         }
-
         return assembly;
     }
-
 
     public StandardApplication(String configFile) {
         IgluProperties properties = IgluProperties.loadProperties(configFile);
@@ -72,8 +59,6 @@ dashboard.properties.port=17684
             }
         }
     }
-
-
 
     public void addAssembly(String name, Assembly assembly) {
         coreAssembly.getCoreCluster().connect(name, new StandardComponent(assembly));
