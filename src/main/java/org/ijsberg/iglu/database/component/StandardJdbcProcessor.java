@@ -247,6 +247,8 @@ public class StandardJdbcProcessor implements JdbcProcessor {
 			System.out.println(new LogEntry(result != null ? " (return type: " + result.getClass().getName() + ')' : ""));
 			return result;
 		} catch (SQLException sqle) {
+			System.out.println(new LogEntry(sqle));
+			throw new SQLException(sqle.getMessage() + '(' + statementDescription + ')');
 			//some SQL errors occur due to:
 			// -communication problems -> reset connection(pool) / retry
 			// -deadlock or other internal database problems - retry
@@ -256,8 +258,6 @@ public class StandardJdbcProcessor implements JdbcProcessor {
 			//TODO resetconnection must immediately return the freshly made connection
 			//reset connection, try again, that's it (no list)
 //			StandardEventTimer.abortTimingEvent(sqle.getMessage() + '(' + statementDescription + ')');
-			System.out.println(new LogEntry(sqle));
-			throw new SQLException(sqle.getMessage() + '(' + statementDescription + ')');
 		} catch (IOException ioe) {
 //			StandardEventTimer.abortTimingEvent("failed to read input stream with message: " + ioe.getMessage() + '(' + statement + ')');
 			System.out.println(new LogEntry("failed to read input stream", ioe));
