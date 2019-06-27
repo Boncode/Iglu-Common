@@ -19,7 +19,7 @@
 package org.ijsberg.iglu.database.component;
 
 
-import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.util.ResourceException;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;

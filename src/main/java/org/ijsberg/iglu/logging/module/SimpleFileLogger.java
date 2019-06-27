@@ -20,7 +20,7 @@
 package org.ijsberg.iglu.logging.module;
 
 import org.ijsberg.iglu.configuration.Startable;
-import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.LogPrintStream;

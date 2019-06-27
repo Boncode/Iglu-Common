@@ -20,7 +20,7 @@
 package org.ijsberg.iglu.util.properties;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
-import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
@@ -59,7 +59,7 @@ public class IgluProperties extends Properties {
 			}
 		}
 		if(!missingKeys.isEmpty()) {
-			throw new ConfigurationException("please provide missing properties " + CollectionSupport.format(missingKeys, ", "));
+			throw new ConfigurationException("please provide missing properties (" + CollectionSupport.format(missingKeys, ", ") + ")");
 		}
 	}
 

@@ -19,7 +19,7 @@
 
 package org.ijsberg.iglu.configuration.classloading;
 
-import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.io.StreamSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;

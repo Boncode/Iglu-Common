@@ -21,7 +21,7 @@ package org.ijsberg.iglu.database.component;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.database.*;
-import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import javax.sql.DataSource;
