@@ -29,12 +29,7 @@ public class DummyLogger implements Logger {
 		lastEntry = entry;
 	}
 
-	@Override
-	public String getStatus() {
-		return null;
-	}
-
-	@Override
+    @Override
 	public void addAppender(Logger appender) {
 
 	}

@@ -99,11 +99,6 @@ public class SimpleFileLogger implements Logger, Startable {
 		}
 	}
 
-	@Override
-	public String getStatus() {
-		return "nr appenders: " + (appenders == null ? "NONE" : appenders.size());
-	}
-
 	public void writeEntry(LogEntry entry) {
 		logFilePrintStream.println(getPrefix(entry) +
 				(entry.getMessage() != null ? " " + entry.getMessage() : ""));
@@ -219,7 +214,7 @@ public class SimpleFileLogger implements Logger, Startable {
 
 
 	@Override
-	public void addAppender(Logger appender) {
+	public void  addAppender(Logger appender) {
 		if(appenders == null) {
 			appenders = new ArrayList<Logger>();
 		}

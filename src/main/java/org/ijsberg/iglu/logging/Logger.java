@@ -25,10 +25,7 @@ public interface Logger {
 
 	void log(LogEntry entry);
 
-	String getStatus();
-
 	void addAppender(Logger appender);
 
 	void removeAppender(Logger appender);
-
 }

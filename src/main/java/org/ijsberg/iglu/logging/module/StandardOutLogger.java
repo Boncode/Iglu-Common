@@ -31,12 +31,7 @@ public class StandardOutLogger implements Logger {
 		System.out.println(entry.toString());
 	}
 
-	@Override
-	public String getStatus() {
-		return null;
-	}
-
-	@Override
+    @Override
 	public void addAppender(Logger appender) {
 
 	}
