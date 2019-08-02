@@ -45,10 +45,22 @@ public class IgluProperties extends Properties {
 
 	public static IgluProperties copy(Properties properties) {
 		IgluProperties igluProperties = new IgluProperties();
-		for(String key : properties.stringPropertyNames()) {
-			igluProperties.set(key, properties.getProperty(key));
-		}
+		igluProperties.merge(properties);
 		return igluProperties;
+	}
+
+	public void merge(Properties properties) {
+		for(String key : properties.stringPropertyNames()) {
+			set(key, properties.getProperty(key));
+		}
+	}
+
+	public LinkedHashMap<String, String> toOrderedMap() {
+		LinkedHashMap result = new LinkedHashMap();
+		for(String propertyName : orderedPropertyNames) {
+			result.put(propertyName, getProperty(propertyName));
+		}
+		return result;
 	}
 
 	public static void throwIfKeysMissing(Properties properties, String ... keys) {
@@ -122,7 +134,7 @@ public class IgluProperties extends Properties {
 
 
 	public static Set<String> getRootKeys(Properties properties) {
-		Set<String> retval = new HashSet<String>();
+		LinkedHashSet<String> retval = new LinkedHashSet<String>();
 		for (String key : properties.stringPropertyNames()) {
 			if (key.indexOf(KEY_SEPARATOR) == -1) {
 				retval.add(key);
@@ -198,15 +210,40 @@ public class IgluProperties extends Properties {
 	}
 
 
+	public static IgluProperties loadPropertiesFromText(String text) {
+
+		IgluProperties retval = new IgluProperties();
+		try {
+			InputStream isSuper = new ByteArrayInputStream(text.getBytes());
+			InputStream isThis = new ByteArrayInputStream(text.getBytes());
+			retval.load(isSuper, isThis);
+			isThis.close();
+			isSuper.close();
+		} catch (IOException ioe) {
+			throw new ResourceException("can not load properties from text '" + text + "'");
+		}
+		return retval;
+	}
+
+	public static IgluProperties loadPropertiesFromMap(Map<String, String> propertiesMap) {
+
+		IgluProperties retval = new IgluProperties();
+		for(String key : propertiesMap.keySet()) {
+			retval.set(key, propertiesMap.get(key));
+		}
+		return retval;
+	}
 
 	public static IgluProperties loadProperties(String fileName) {
 
 		IgluProperties retval = new IgluProperties();
 		File basefile = new File(fileName);
 		try {
-			InputStream fis = getInputStream(fileName);
-			retval.load(fileName, fis);
-			fis.close();
+			InputStream isSuper = getInputStream(fileName);
+			InputStream isThis = getInputStream(fileName);
+			retval.load(isSuper, isThis);
+			isThis.close();
+			isSuper.close();
 		} catch (IOException ioe) {
 			throw new ResourceException("can not load properties from file '" + fileName + "'" +
 					" (full path: " + basefile.getAbsolutePath() + ")", ioe);
@@ -238,15 +275,13 @@ public class IgluProperties extends Properties {
 		return fis;
 	}
 
-	public void load(String fileName, InputStream inputStream) throws IOException {
+	private void load(InputStream inputStreamForSuper, InputStream inputStreamForThis) throws IOException {
 		orderedPropertyNames.clear();
 		linesOfComment.clear();
 		linesGathered.clear();
 
-		super.load(inputStream);
-		InputStream txtInputStream = getInputStream(fileName);
-		List<Line> lines = FileSupport.getLinesFromText(fileName, new InputStreamReader(txtInputStream));
-		txtInputStream.close();
+		super.load(inputStreamForSuper);
+		List<Line> lines = FileSupport.getLinesFromText("bogus", new InputStreamReader(inputStreamForThis));
 		for(Line line : lines) {
 			processCommentAndEmpty(line);
 			String key = getKey(line);
@@ -319,5 +354,17 @@ public class IgluProperties extends Properties {
 		for(String subsectionKey : subsection.stringPropertyNames()) {
 			properties.setProperty(sectionKey + KEY_SEPARATOR + subsectionKey, subsection.getProperty(subsectionKey));
 		}
+	}
+
+	public void addSubsection(String sectionKey, Properties subsection) {
+		addSubsection(this, sectionKey, subsection);
+	}
+
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		for(String propertyName : this.stringPropertyNames()) {
+			result.append(propertyName + "=" + getProperty(propertyName) + "\n");
+		}
+		return result.toString();
 	}
 }
