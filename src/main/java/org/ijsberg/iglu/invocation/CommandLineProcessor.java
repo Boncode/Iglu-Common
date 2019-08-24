@@ -20,9 +20,12 @@
 package org.ijsberg.iglu.invocation;
 
 import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.server.invocation.AssemblyCommandLine;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 /**
  */
@@ -44,7 +47,14 @@ public class CommandLineProcessor {
 	}
 
 	protected Object invoke(String clusterId, String moduleId, String methodName, Object... arguments) throws InvocationTargetException, NoSuchMethodException {
-		//TODO provide more precise exception than NullPointers if statement fails
+		Cluster cluster = assembly.getClusters().get(clusterId);
+		if(cluster == null) {
+			throw new NullPointerException("cluster with id '" + clusterId + "' does not exist");
+		}
+		Component component = cluster.getInternalComponents().get(moduleId);
+		if(component == null) {
+			throw new NullPointerException("component with id '" + moduleId + "' does not exist");
+		}
 		return assembly.getClusters().get(clusterId).getInternalComponents().get(moduleId).invoke(methodName, arguments);
 	}
 }

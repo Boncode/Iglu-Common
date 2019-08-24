@@ -31,12 +31,9 @@ import java.util.Properties;
  */
 public class TestAssembly extends BasicAssembly {
 
-
 	public TestAssembly() {
 		super(new Properties());
 	}
-
-	private Map<String, Cluster> clusters = new HashMap<String, Cluster>();
 
 	public void addCluster(String clusterId, Cluster cluster) {
 		clusters.put(clusterId, cluster);

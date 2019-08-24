@@ -72,7 +72,7 @@ public class StandardSocketServer implements Runnable, SocketServer, Startable {
 		if (connectedClients.isEmpty()) {
 			sb.append("none...");
 		} else {
-			sb.append(CollectionSupport.format(new ArrayList<Connection>(connectedClients), "\n"));
+			sb.append(CollectionSupport.format(new ArrayList<>(connectedClients), "\n"));
 		}
 		return sb.toString();
 	}

@@ -37,7 +37,7 @@ public class DummyConnection implements Connection {
 	}
 
 	public String getInput() throws IOException {
-		return StringSupport.absorbInputStream(socket.getInputStream());
+		return StringSupport.readAvailableFromInputStream(socket.getInputStream());
 	}
 
 	@Override

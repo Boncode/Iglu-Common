@@ -45,7 +45,7 @@ public class StandardSocketServerTest {
 
 
 	@Test
-	public void testTelnetServer() throws Exception {
+	public void testSocketServer() throws Exception {
 
 		Cluster cluster = new StandardCluster();
 		StandardSocketServer socketServer = new StandardSocketServer();
