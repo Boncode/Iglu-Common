@@ -26,6 +26,7 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.util.io.FileSupport;
+import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -107,6 +108,13 @@ public class SimpleFileLogger implements Logger, Startable {
 			logFilePrintStream.println(entry.getData());
 			if (entry.getData() instanceof Throwable) {
 				printStackTrace(((Throwable) entry.getData()).getStackTrace());
+				Throwable cause = (Throwable)entry.getData();
+				while (cause != null) {
+					logFilePrintStream.println();
+					logFilePrintStream.println("caused by:");
+					printStackTrace(cause.getStackTrace());
+					cause = cause.getCause();
+				}
 			}
 		}
 

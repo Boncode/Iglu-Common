@@ -18,7 +18,6 @@ public class StandardApplication implements Application {
     private boolean isRunning;
 
     private BasicAssembly coreAssembly;
-    //private BasicAssembly[] assemblies;
 
     private LinkedHashMap<String, Assembly> assemblies = new LinkedHashMap<>();
 
@@ -37,6 +36,9 @@ public class StandardApplication implements Application {
         try {
             String accessManagerProvider;
             if((accessManagerProvider = properties.getProperty("access_manager_provider")) != null) {
+                if(!assemblies.containsKey(accessManagerProvider)) {
+                    throw new ConfigurationException("accessManagerProvider '" + accessManagerProvider + "' not (yet) added");
+                }
                 assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, assemblies.get(accessManagerProvider).getCoreCluster().getInternalComponents().get("AccessManager"));
             } else {
                 assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties);

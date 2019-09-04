@@ -75,13 +75,14 @@ public class StandardSocketServerTest {
 
 
 		socket.getOutputStream().write("Anybody there?".getBytes());
+		socket.close();
+
 		//give async process time to finish
 		Thread.sleep(100);
 		assertEquals("Anybody there?", clientSocketFactory.getConnections().get(0).getInput());
 
 
-		Thread.sleep(100);
-		socket.close();
+//		Thread.sleep(100);
 
 		socketServer.stop();
 	}
