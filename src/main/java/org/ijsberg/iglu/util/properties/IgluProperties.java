@@ -26,6 +26,7 @@ import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.Line;
+import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.io.*;
 import java.util.*;
@@ -297,6 +298,23 @@ public class IgluProperties extends Properties {
 		LinkedHashSet<String> retval = new LinkedHashSet<>(orderedPropertyNames);
 		return retval;
 	}
+
+	public boolean isMarkedAsArray(String key) {
+		String value = getProperty(key);
+		return value != null && value.startsWith("[") && value.endsWith("]");
+	}
+
+	public String[] getPropertyAsArray(String key) {
+		String value = getProperty(key);
+		if(value == null) {
+			return null;
+		}
+		if(isMarkedAsArray(key)) {
+			value = value.substring(1, value.length() - 1);
+		}
+		return StringSupport.split(value, ",").toArray(new String[0]);
+	}
+
 
 	private void processCommentAndEmpty(Line line) {
 		String s = line.getLine();
