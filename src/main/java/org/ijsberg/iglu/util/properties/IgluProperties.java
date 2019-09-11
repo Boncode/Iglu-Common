@@ -312,7 +312,12 @@ public class IgluProperties extends Properties {
 		if(isMarkedAsArray(key)) {
 			value = value.substring(1, value.length() - 1);
 		}
-		return StringSupport.split(value, ",").toArray(new String[0]);
+		List<String> list = StringSupport.split(value, ",");
+		String[] retval = new String[list.size()];
+		for(int i = 0; i < list.size(); i++) {
+			retval[i] = list.get(i).trim();
+		}
+		return retval;
 	}
 
 
