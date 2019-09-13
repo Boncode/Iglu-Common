@@ -138,9 +138,9 @@ public class SimpleFileLoggerTest {
 	public void testSetLogLevel() throws Exception {
 		DummyOutputStream dummyLogStream = new DummyOutputStream();
 		SimpleFileLogger logger = new SimpleFileLogger(new PrintStream(dummyLogStream));
-		assertEquals(0, logger.getLogLevelOrdinal());
-		logger.setLogLevel("VERBOSE");
 		assertEquals(1, logger.getLogLevelOrdinal());
+		logger.setLogLevel("VERBOSE");
+		assertEquals(2, logger.getLogLevelOrdinal());
 	}
 
 
