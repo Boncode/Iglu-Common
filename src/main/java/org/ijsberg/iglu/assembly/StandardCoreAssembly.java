@@ -26,14 +26,14 @@ public class StandardCoreAssembly extends BasicAssembly {
         Component loggerComponent = new StandardComponent(logger);
         core.connect("Logger", loggerComponent);
         Properties loggerProperties;
-        if(IgluProperties.propertiesExist(configDir + "/logger.properties")) {
-            loggerProperties = IgluProperties.loadProperties(configDir + "/logger.properties");
+        if(IgluProperties.propertiesExist(home + "/" + configDir + "/logger.properties")) {
+            loggerProperties = IgluProperties.loadProperties(home + "/" + configDir + "/logger.properties");
         } else {
             loggerProperties = new IgluProperties();
             loggerProperties.setProperty("log_level", "DEBUG");
             loggerProperties.setProperty("log_to_standard_out", "true");
             try {
-                IgluProperties.saveProperties(loggerProperties, configDir + "/logger.properties");
+                IgluProperties.saveProperties(loggerProperties, home + "/" + configDir + "/logger.properties");
             } catch (IOException e) {
                 System.err.println("could not save logger.properties with message: " + e.getMessage());
             }

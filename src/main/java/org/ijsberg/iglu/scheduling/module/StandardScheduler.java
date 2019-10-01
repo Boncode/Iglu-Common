@@ -192,7 +192,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 						if (pageable.getPageIntervalInMinutes() <= 0) {
 							//log("scheduler can not page " + StringSupport.trim(pageable.toString() + "'", 50, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid");
 						} else if (SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes()) && pageable.isStarted()) {
-							System.out.println(new LogEntry("scheduler about to page " + StringSupport.trim(pageable.toString() + "'", 80, "...")));
+							System.out.println(new LogEntry(Level.TRACE, "scheduler about to page " + StringSupport.trim(pageable.toString() + "'", 80, "...")));
 							//the page method is invoked by a system session
 							//  so a developer may try to use it to outflank the security system
 							//another risk is that the invoked method consumes too much time
