@@ -97,7 +97,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 //			application.bindInternalProcess(schedulerThread, "scheduler");
 //			currentRequest.stopRepresentingRequest();
 			schedulerThread.start();
-			System.out.println(new LogEntry("scheduler thread started..."));
+			System.out.println(new LogEntry(this + ": thread started..."));
 		}
 	}
 
@@ -114,7 +114,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 //			application.releaseRequest(schedulerThread);
 			schedulerThread = null;
 
-			System.out.println(new LogEntry("scheduler thread stopped..."));
+			System.out.println(new LogEntry(this + " thread stopped..."));
 		}
 	}
 
@@ -140,9 +140,9 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 		System.out.println(pagedSystemObjectNames);
 		if (!pagedSystemObjectNames.contains(pageable.toString())) {
 			if (pageable.getPageIntervalInMinutes() <= 0) {
-				System.out.println(new LogEntry(Level.VERBOSE, "scheduler will not page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid"));
+				System.out.println(new LogEntry(Level.VERBOSE, this + " will not page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid"));
 			} else {
-				System.out.println(new LogEntry(Level.VERBOSE, "scheduler will page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + " every " + pageable.getPageIntervalInMinutes() + " minute(s)"));
+				System.out.println(new LogEntry(Level.VERBOSE, this + " will page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + " every " + pageable.getPageIntervalInMinutes() + " minute(s)"));
 			}
 			synchronized (pagedSystems) {
 				pagedSystems.add(pageable);

@@ -9,7 +9,9 @@ import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.util.properties.IgluProperties;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Properties;
 
 public class StandardApplication implements Application {
@@ -34,14 +36,26 @@ public class StandardApplication implements Application {
     private BasicAssembly instantiateAssembly(String className, Properties properties) {
         BasicAssembly assembly;
         try {
-            String accessManagerProvider;
-            if((accessManagerProvider = properties.getProperty("access_manager_provider")) != null) {
-                if(!assemblies.containsKey(accessManagerProvider)) {
-                    throw new ConfigurationException("accessManagerProvider '" + accessManagerProvider + "' not (yet) added");
+            String provider;
+            List<Object> initArgs = new ArrayList<>();
+            if((provider = properties.getProperty("access_manager_provider")) != null) {
+                if(!assemblies.containsKey(provider)) {
+                    throw new ConfigurationException("accessManagerProvider '" + provider + "' not (yet) added");
                 }
-                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, assemblies.get(accessManagerProvider).getCoreCluster().getInternalComponents().get("AccessManager"));
-            } else {
+                initArgs.add(assemblies.get(provider).getCoreCluster().getInternalComponents().get("AccessManager"));
+            }
+            if((provider = properties.getProperty("scheduler_provider")) != null) {
+                if(!assemblies.containsKey(provider)) {
+                    throw new ConfigurationException("scheduler '" + provider + "' not (yet) added");
+                }
+                initArgs.add(assemblies.get(provider).getCoreCluster().getInternalComponents().get("Scheduler"));
+            }
+            if(initArgs.size() == 0) {
                 assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties);
+            } else if (initArgs.size() == 1) {
+                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, initArgs.get(0));
+            } else {
+                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, initArgs.get(0), initArgs.get(1));
             }
         } catch (InstantiationException e) {
             throw new ConfigurationException("cannot instantiate assembly", e);
