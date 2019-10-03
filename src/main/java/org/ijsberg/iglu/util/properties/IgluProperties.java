@@ -305,11 +305,15 @@ public class IgluProperties extends Properties {
 	}
 
 	public String[] getPropertyAsArray(String key) {
-		String value = getProperty(key);
+		return getPropertyAsArray(key, null);
+	}
+
+	public String[] getPropertyAsArray(String key, String defaultVal) {
+		String value = getProperty(key, defaultVal);
 		if(value == null) {
 			return null;
 		}
-		if(isMarkedAsArray(key)) {
+		if(value.startsWith("[") && value.endsWith("]")) {
 			value = value.substring(1, value.length() - 1);
 		}
 		List<String> list = StringSupport.split(value, ",");
