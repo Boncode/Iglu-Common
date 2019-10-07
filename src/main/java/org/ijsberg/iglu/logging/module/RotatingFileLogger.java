@@ -19,10 +19,16 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
+import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -39,6 +45,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	public RotatingFileLogger(String fileName) {
 		super(fileName);
 	}
+
 
 
 	/**
@@ -67,16 +74,25 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		super.setProperties(properties);
 		nrofLogFilesToKeep = Integer.parseInt(properties.getProperty("nr_log_files_to_keep", "" + nrofLogFilesToKeep));
 		logRotateIntervalInHours = Integer.parseInt(properties.getProperty("rotate_interval_hours", "" + logRotateIntervalInHours));
+		rotateIfFileTooOldAtStartup();
 	}
+
 
 	@Override
 	public void onPageEvent(long officialTime) {
 		synchronized (lock) {
 			stop();
-			File file = new File(fileName + ".log");
-			file.renameTo(new File(getFileName(new Date(officialTime))));
-			openLogStream();
+
+			Date rotateDate = new Date(officialTime);
+			//save current log with date
+			LogEntry errorLogEntry = rotate(rotateDate);
+
+			//start with new log file
 			start();
+			clearOutdatedFiles();
+			if(errorLogEntry != null) {
+				log(errorLogEntry);
+			}
 		}
 
 		Date officialDate = new Date(officialTime - (nrofLogFilesToKeep * logRotateIntervalInHours * 60 * 60 * 1000));
@@ -86,6 +102,63 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 			obsoleteFile.delete();
 		}
 
+	}
+
+	private void clearOutdatedFiles() {
+		long now = System.currentTimeMillis();
+		long clearingDate = now - (nrofLogFilesToKeep * logRotateIntervalInHours * 60 * 60 * 1000);
+		File file = new File(fileName);
+		String dirName = file.getParent();
+		File dir = new File(dirName);
+		File[] files = dir.listFiles();
+		for(File fileInDir : files) {
+			if (fileInDir.getName().endsWith(".zip")) {
+				if(fileInDir.lastModified() < clearingDate) {
+					System.out.println(new LogEntry(Level.VERBOSE, "clearing outdated log file " + fileInDir));
+					fileInDir.delete();
+				}
+			}
+		}
+	}
+
+
+	public LogEntry rotate(Date rotateDate) {
+		LogEntry errorLogEntry = null;
+		File file = new File(fileName + ".log");
+		file.renameTo(new File(getFileName(rotateDate)));
+		file = new File(getFileName(rotateDate));
+		try {
+			FileSupport.zip(file);
+			file.delete();
+		} catch (IOException e) {
+			errorLogEntry = new LogEntry(Level.CRITICAL,"cannot zip file " + file, e);
+			e.printStackTrace();
+		}
+		return errorLogEntry;
+	}
+
+	private void rotateIfFileTooOldAtStartup() {
+
+		File file = new File(fileName + ".log");
+		try {
+			//VBS 20191003 06:34:11.227
+			String firstLine = FileSupport.getFirstLineInText(file);
+			Date prevDate = getDateFromLogLine(firstLine);
+			long now = System.currentTimeMillis();
+			if(prevDate.getTime() + logRotateIntervalInHours * 60 * 60 * 1000 < now) {
+				rotate(prevDate);
+			}
+			clearOutdatedFiles();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch(ParseException pe) {
+			pe.printStackTrace();
+		}
+	}
+
+	public static Date getDateFromLogLine(String logLine) throws ParseException {
+		String dateString = logLine.substring(4, 18);
+		return new SimpleDateFormat(LogEntry.DEFAULT_DATE_FORMAT).parse(dateString);
 	}
 
 

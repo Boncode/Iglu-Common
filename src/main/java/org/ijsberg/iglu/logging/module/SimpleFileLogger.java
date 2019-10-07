@@ -26,7 +26,6 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.util.io.FileSupport;
-import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,7 +40,7 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	private boolean isStarted = false;
 	private int logLevelOrdinal = Level.DEBUG.ordinal();
-	private String dateFormat = LogEntry.DEFAULT_DATE_FORMAT;
+	private String dateFormat = LogEntry.DEFAULT_TIMESTAMP_FORMAT;
 	private int entryOriginStackTraceDepth = 0;
 
 	private boolean printOrigin = false;
@@ -63,7 +62,6 @@ public class SimpleFileLogger implements Logger, Startable {
 		this.fileName = fileName;
 		originalSystemOut = System.out;
 		filteredSystemOut = new LogPrintStream(originalSystemOut, this);
-		openLogStream();
 	}
 
 	protected void openLogStream() {
@@ -107,12 +105,12 @@ public class SimpleFileLogger implements Logger, Startable {
 		if (entry.getData() != null) {
 			logFilePrintStream.println(entry.getData());
 			if (entry.getData() instanceof Throwable) {
-				printStackTrace(((Throwable) entry.getData()).getStackTrace());
-				Throwable cause = (Throwable)entry.getData();
+				printThrowable((Throwable) entry.getData());
+				Throwable cause = ((Throwable) entry.getData()).getCause();
 				while (cause != null) {
 					logFilePrintStream.println();
 					logFilePrintStream.println("caused by:");
-					printStackTrace(cause.getStackTrace());
+					printThrowable(cause);
 					cause = cause.getCause();
 				}
 			}
@@ -132,6 +130,11 @@ public class SimpleFileLogger implements Logger, Startable {
 
 		return originToPrint + entry.getLevel().getShortDescription() + " " +
 				new SimpleDateFormat(dateFormat).format(new Date(entry.getTimeInMillis()));
+	}
+
+	private void printThrowable(Throwable t) {
+		logFilePrintStream.println(t.getClass().getSimpleName() + " : " + t.getMessage());
+		printStackTrace(t.getStackTrace());
 	}
 
 	private void printStackTrace(StackTraceElement[] stackTrace) {
@@ -183,7 +186,8 @@ public class SimpleFileLogger implements Logger, Startable {
 	}
 
 
-	public synchronized void start() {
+	public void start() {
+		openLogStream();
 		System.out.println(new LogEntry("starting file logging to " + this.fileName));
 		synchronized (lock) {
 			System.setOut(filteredSystemOut);

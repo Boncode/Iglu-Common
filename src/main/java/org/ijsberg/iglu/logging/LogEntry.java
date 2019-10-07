@@ -33,7 +33,8 @@ public class LogEntry implements Serializable {
 	private String message;
 	private Serializable data;
 
-	public static String DEFAULT_DATE_FORMAT = "yyyyMMdd HH:mm:ss.SSS";
+	public static String DEFAULT_DATE_FORMAT = "yyyyMMdd HH:mm";
+	public static String DEFAULT_TIMESTAMP_FORMAT = DEFAULT_DATE_FORMAT + ":ss.SSS";
 	private long timeInMillis;
 
 	/*
@@ -76,7 +77,7 @@ public class LogEntry implements Serializable {
 	 */
 	public String toString() {
 		StringBuffer retval = new StringBuffer(level.getShortDescription() + " " +
-				new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date(timeInMillis)) +
+				new SimpleDateFormat(DEFAULT_TIMESTAMP_FORMAT).format(new Date(timeInMillis)) +
 				(message != null ? " " + message : "") + (data != null ? "\n" +
 				(data instanceof Throwable ? "" : data) + "\n" : ""));
 

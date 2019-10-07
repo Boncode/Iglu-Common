@@ -51,7 +51,7 @@ public class LogEntryTest {
 
 	private String getFormattedTimestamp(LogEntry entry) {
 		String formattedTimeStamp = new SimpleDateFormat(
-				LogEntry.DEFAULT_DATE_FORMAT).format(new Date(entry.getTimeInMillis()));
+				LogEntry.DEFAULT_TIMESTAMP_FORMAT).format(new Date(entry.getTimeInMillis()));
 		return formattedTimeStamp;
 	}
 
