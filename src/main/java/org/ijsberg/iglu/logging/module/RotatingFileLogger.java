@@ -140,19 +140,21 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	private void rotateIfFileTooOldAtStartup() {
 
 		File file = new File(fileName + ".log");
-		try {
-			//VBS 20191003 06:34:11.227
-			String firstLine = FileSupport.getFirstLineInText(file);
-			Date prevDate = getDateFromLogLine(firstLine);
-			long now = System.currentTimeMillis();
-			if(prevDate.getTime() + logRotateIntervalInHours * 60 * 60 * 1000 < now) {
-				rotate(prevDate);
+		if(file.exists()) {
+			try {
+				//VBS 20191003 06:34:11.227
+				String firstLine = FileSupport.getFirstLineInText(file);
+				Date prevDate = getDateFromLogLine(firstLine);
+				long now = System.currentTimeMillis();
+				if (prevDate.getTime() + logRotateIntervalInHours * 60 * 60 * 1000 < now) {
+					rotate(prevDate);
+				}
+				clearOutdatedFiles();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParseException pe) {
+				pe.printStackTrace();
 			}
-			clearOutdatedFiles();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch(ParseException pe) {
-			pe.printStackTrace();
 		}
 	}
 
