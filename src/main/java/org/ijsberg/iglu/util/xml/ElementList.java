@@ -92,7 +92,6 @@ public abstract class ElementList implements Serializable {
 								contents.add(newNode);
 							}
 						} else {
-							System.out.println("========> " + subtag.contents);
 							throw new ParseException("starttag (" + subtag.tagname + ") without endtag found at line " + subtag.getStartLineNr());
 						}
 					}
@@ -567,8 +566,26 @@ public abstract class ElementList implements Serializable {
 		return subNode;
 	}
 
+	public void deleteAttributeFromTree(String generalHash) {
+		//ArrayList<Node> result = new ArrayList<Node>();
+		Iterator i = contents.iterator();
 
-	public static class Tag implements XmlElement {
+		while (i.hasNext()) {
+			Object o = i.next();
+			if (o instanceof Node) {
+				Node subNode = (Node) o;
+				if (subNode.nodeAttributes != null && subNode.nodeAttributes.containsKey(generalHash)) {
+					subNode.removeAttribute(generalHash);
+				}
+//				if (all) {
+					subNode.deleteAttributeFromTree(generalHash);
+//				}
+			}
+		}
+	}
+
+
+    public static class Tag implements XmlElement {
 		protected String contents;
 		public static final byte UNDETERMINED_TAG = 0;
 		public static final byte COMMENT_TAG = 1;// <!..
@@ -1047,17 +1064,25 @@ public abstract class ElementList implements Serializable {
 		LOOP:
 		for(Object o : contents) {
 
+			String text;
 			if (o instanceof XmlTextElement || o instanceof Tag) {
-				String text = o.toString();
-				result.append(text);
+				text = o.toString();
+				if(!"".equals(text.trim())) {
+					result.append(text);
+				}
 			} else if (o instanceof Node) {
 //					result.append(((Node)o).toString(depth + 1, formattingStyle));
-				String text = ((Node) o).toStringFast(lineFeed + TAB);
-				result.append(text);
+				text = ((Node) o).toStringFast(lineFeed + TAB);
+				if(!"".equals(text.trim())) {
+					result.append(text);
+				}
 			} else {
 				throw new IllegalStateException("node " + getName() + " contains invalid element " + o.getClass().getName() + " -> " + o);
 			}
-			result.append(lineFeed);
+			String bla = text.trim();
+			if(!"".equals(text.trim())) {
+				result.append(lineFeed);
+			}
 		}
 		return result.toString();
 	}

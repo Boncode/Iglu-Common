@@ -167,7 +167,13 @@ public class Document extends ElementList {
 	}
 
 	public void save(File file) throws IOException {
-		save(file, STRETCH, 50);
+		FileOutputStream out = new FileOutputStream(file);
+		if (encoding != null) {
+			out.write(toStringFast().getBytes(encoding));
+		} else {
+			out.write(toStringFast().getBytes());
+		}
+		out.close();
 	}
 
 
