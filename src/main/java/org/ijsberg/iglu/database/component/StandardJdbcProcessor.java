@@ -318,7 +318,7 @@ public class StandardJdbcProcessor implements JdbcProcessor {
 					preparedStatement.setObject(i + paramCountCorrection, input.params[i]);
 				}
 			} catch (SQLException e) {
-				System.out.println(new LogEntry("Error while binding object (" + i + ':' + input.params[i] + ") to prepared statement", e));
+				System.out.println(new LogEntry(Level.CRITICAL, "Error while binding object (" + i + ':' + input.params[i] + ") to prepared statement", e));
 				errorOccurred = true;
 			}
 		}

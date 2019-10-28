@@ -247,6 +247,10 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 		return co;
 	}
 
+	public int getSize() {
+		return data.size();
+	}
+
 	/**
 	 * @return a set containing all object stored
 	 */
@@ -290,7 +294,7 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 		return co.isExpired(ttlInSeconds * 1000) && !isCachingPermanent();
 	}
 
-	private CachedObject<V> getCachedObject(K key) {
+	protected CachedObject<V> getCachedObject(K key) {
 		synchronized (data) {
 			return data.get(key);
 		}
@@ -345,6 +349,21 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 		return garbage;
 	}
 
+	protected K getOldestObject() {
+		CachedObject<V> cachedObject;
+		K oldestKey = null;
+		long lastAccessTime = System.currentTimeMillis();
+		synchronized (mirror) {
+			for (K key : mirror.keySet()) {
+				cachedObject = mirror.get(key);
+				if(cachedObject.getLastTimeAccessed() < lastAccessTime) {
+					oldestKey = key;
+					lastAccessTime = cachedObject.getLastTimeAccessed();
+				}
+			}
+		}
+		return oldestKey;
+	}
 
 	/**
 	 * Removes an object from cache.
