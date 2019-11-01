@@ -56,6 +56,15 @@ public class IgluProperties extends Properties {
 		}
 	}
 
+	public void replace(Properties properties) {
+		merge(properties);
+		for(String key : stringPropertyNames()) {
+			if(!properties.containsKey(key)) {
+				remove(key);
+			}
+		}
+	}
+
 	public LinkedHashMap<String, String> toOrderedMap() {
 		LinkedHashMap result = new LinkedHashMap();
 		for(String propertyName : orderedPropertyNames) {
