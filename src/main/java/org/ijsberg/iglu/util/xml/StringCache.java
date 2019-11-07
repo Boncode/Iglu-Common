@@ -57,6 +57,21 @@ public abstract class StringCache {
         }
     }
 
+    public static int getStringIndex(String string) {
+
+        synchronized (numberByString) {
+            // long start = System.currentTimeMillis();
+            //strings.indexOf(string);
+            // System.out.println(System.currentTimeMillis() - start);
+            Integer index = numberByString.get(string);
+            if(index == null) {
+                return -1;
+            } else {
+                return index;
+            }
+        }
+    }
+
     public static String getString(int number) {
         synchronized (numberByString) {
             return strings.get(number);
