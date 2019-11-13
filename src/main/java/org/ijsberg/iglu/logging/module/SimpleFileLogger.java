@@ -228,7 +228,7 @@ public class SimpleFileLogger implements Logger, Startable {
 	@Override
 	public void  addAppender(Logger appender) {
 		if(appenders == null) {
-			appenders = new ArrayList<Logger>();
+			appenders = new ArrayList<>();
 		}
 		appenders.add(appender);
 	}
