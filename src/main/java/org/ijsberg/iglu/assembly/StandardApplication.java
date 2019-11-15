@@ -106,11 +106,11 @@ public class StandardApplication implements Application {
         coreAssembly.stop();
     }
 
-
+/*
     public StandardApplication(Properties properties) {
         IgluProperties igluProperties = IgluProperties.copy(properties);
     }
-
+*/
     public Assembly getCoreAssembly() {
         return coreAssembly;
     }

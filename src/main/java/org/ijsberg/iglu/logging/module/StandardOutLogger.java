@@ -19,6 +19,7 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.Logger;
 
@@ -26,9 +27,21 @@ import org.ijsberg.iglu.logging.Logger;
  * Created by Jeroen on 24-2-14.
  */
 public class StandardOutLogger implements Logger {
+
+	private Level level = Level.TRACE;
+
+	public StandardOutLogger() {
+	}
+
+	public StandardOutLogger(Level level) {
+		this.level = level;
+	}
+
 	@Override
 	public void log(LogEntry entry) {
-		System.out.println(entry.toString());
+		if(entry.getLevel().ordinal() >= level.ordinal()) {
+			System.out.println(entry.toString());
+		}
 	}
 
     @Override
