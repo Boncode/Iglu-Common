@@ -115,7 +115,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		if(file.exists()) {
 			try {
 				ZipFile zipFile = new ZipFile(file);
-				FileSupport.unzip("../", zipFile);
+				FileSupport.unzip(zipFile, "../");
 				zipFile.close();
 				FileSupport.deleteFile(file);
 			} catch (Exception e) {
