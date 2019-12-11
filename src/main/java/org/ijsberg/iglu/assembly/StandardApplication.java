@@ -28,8 +28,10 @@ public class StandardApplication implements Application {
     }
 
     public void addCoreAssembly(BasicAssembly coreAssembly) {
+        System.out.println("adding core assembly " + coreAssembly.getClass().getSimpleName());
         this.coreAssembly = coreAssembly;
         coreAssembly.getCoreCluster().connect("CoreAssembly", new StandardComponent(coreAssembly));
+        System.out.println("core assembly connected to core cluster");
         initializeShutdownHook();
     }
 
@@ -67,6 +69,7 @@ public class StandardApplication implements Application {
         IgluProperties properties = IgluProperties.loadProperties(configFile);
         boolean regardAsCoreAssembly = true;
         for(String assemblyId : properties.getSubsectionKeys()) {
+            System.out.println("instantiating assembly " + assemblyId);
             if(regardAsCoreAssembly) {
                 addCoreAssembly(instantiateAssembly(properties.getProperty(assemblyId + ".class"), properties.getSubsection(assemblyId + ".properties")));
                 regardAsCoreAssembly = false;
@@ -77,7 +80,9 @@ public class StandardApplication implements Application {
     }
 
     public void addAssembly(String name, Assembly assembly) {
+        System.out.println("adding assembly " + name + " " + assembly.getClass().getSimpleName());
         coreAssembly.getCoreCluster().connect(name, new StandardComponent(assembly));
+        System.out.println("assembly " + name + " connected to core cluster");
         assemblies.put(name, assembly);
     }
 

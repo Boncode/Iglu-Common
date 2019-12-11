@@ -26,6 +26,8 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.usermanagement.Account;
 import org.ijsberg.iglu.usermanagement.UserManager;
 import org.ijsberg.iglu.usermanagement.domain.SimpleAccount;
+import org.ijsberg.iglu.util.ResourceException;
+import org.ijsberg.iglu.util.execution.Executable;
 import org.ijsberg.iglu.util.formatting.PatternMatchingSupport;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
@@ -41,6 +43,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
+
+import static org.ijsberg.iglu.logging.Level.CRITICAL;
 
 /**
  */
@@ -60,18 +64,29 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	private static byte[] salt;
 
 	static {
-		try {
-			salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LENGTH);
-		} catch (NoSuchAlgorithmException e) {
-			throw new ConfigurationException("unable to generate salt", e);
-		}
+		new Executable() {
+			@Override
+			protected Object execute() throws Throwable {
+				try {
+					//Note: this can be very slow on Linux
+					long start = System.currentTimeMillis();
+					salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LENGTH);
+					System.out.println(new LogEntry(CRITICAL, "salt created in " + (System.currentTimeMillis() - start) + " ms"));
+				} catch (NoSuchAlgorithmException e) {
+					System.out.println(new LogEntry(CRITICAL, "unable to generate salt", e));
+				}
+				return null;
+			}
+		}.executeAsync();
 	}
 
 	public StandardUserManager() {
 	}
 
 	public String getHash(String password) {
-
+		if(salt == null) {
+			throw new ResourceException("salt not yet created");
+		}
 		try {
 			return EncodingSupport.encodeBase64(salt) + "$" + hash(password, salt);
 		} catch (NoSuchAlgorithmException e) {

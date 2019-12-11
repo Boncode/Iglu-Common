@@ -189,8 +189,6 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 * Performs destruction of agents and closes message receivers.
 	 */
 	public void onDestruction() {
-		//Iterator i = new ArrayList(agents.values()).iterator();
-
 		for (String id : agentComponents.keySet()) {
 			Component component = agentComponents.get(id);
 			System.out.println(component + " " + Arrays.asList(component.getInterfaces()).contains(SessionDestructionListener.class));
@@ -205,13 +203,6 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 			}
 			accessManager.removeAgent(id, component);
 		}
-		//close receivers
-		/*	Iterator receiverIterator = getReceivers().iterator();
-		while (receiverIterator.hasNext())
-		{
-			ReceiverQueue r = (ReceiverQueue) receiverIterator.next();
-			r.close();
-		}*/
 		attributes.clear();
 	}
 
@@ -220,7 +211,6 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 */
 	public void logout() {
 		user = null;
-		//Object removed = usersByRealmId.remove(realmId);
 	}
 
 	/**
