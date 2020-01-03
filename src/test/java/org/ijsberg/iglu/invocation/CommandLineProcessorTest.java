@@ -118,9 +118,9 @@ public class CommandLineProcessorTest {
 		try {
 			processor.processCommandLine("cluster.object.getMessageInt(\"world?\")");
 			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException expected) {
+		} catch (NumberFormatException expected) {
 		}
-		;
+
 	}
 
 

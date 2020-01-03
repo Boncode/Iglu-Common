@@ -21,6 +21,7 @@ package org.ijsberg.iglu.configuration.module;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.logging.DummyOutputStream;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.PrintStream;
@@ -31,6 +32,7 @@ import static org.junit.Assert.*;
 public class ServerEnvironmentTest {
 
 	@Test
+	@Ignore
 	public void testInitialize() throws Exception {
 		ServerEnvironment env;// = new ServerEnvironment();
 		try {

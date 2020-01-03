@@ -24,6 +24,7 @@ import org.ijsberg.iglu.util.misc.StringSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -33,6 +34,7 @@ import static junit.framework.Assert.*;
 
 /**
  */
+@Ignore
 public class ExtendedClassPathClassLoaderTest {
 
 	private File tmpDir;
