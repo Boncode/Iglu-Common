@@ -184,6 +184,15 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		return user;
 	}
 
+	@Override
+	public User loginAsSystem() {
+		user = accessManager.getSystemUser();
+		if(user != null) {
+			userSettings = user.getSettings();
+		}
+		return user;
+	}
+
 
 	/**
 	 * Performs destruction of agents and closes message receivers.

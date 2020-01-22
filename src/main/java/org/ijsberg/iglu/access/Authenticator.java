@@ -43,4 +43,5 @@ public interface Authenticator {
 	 */
 	User authenticate(Credentials expiredCredentials, Credentials newCredentials) throws AuthenticationException;
 
+	User getSystemUser();
 }

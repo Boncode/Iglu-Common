@@ -52,8 +52,6 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	private int sessionTimeout = 1800;//sec
 	private Authenticator authenticator;
 
-//	private Cluster serviceCluster;
-
 	public static final String defaultAdminAccountName = "admin";
 	private String defaultAdminPassword = "admin";
 
@@ -426,6 +424,11 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	@Override
 	public User authenticate(Credentials expiredCredentials, Credentials newCredentials) throws AuthenticationException {
 		return authenticator.authenticate(expiredCredentials, newCredentials);
+	}
+
+	@Override
+	public User getSystemUser() {
+		return authenticator.getSystemUser();
 	}
 
 	/**

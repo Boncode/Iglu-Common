@@ -42,7 +42,15 @@ public interface Session {
 	 * @param credentials user credentials such as an object containing username and password
 	 * @return a successfully authenticated user
 	 */
-	User login(/*String realmId, */Credentials credentials);
+	User login(Credentials credentials);
+
+	/**
+	 * Meant for system threads that access protected resources or logic.
+	 * Whether this works depends ultimately on the implementation of the Authenticator being used.
+	 *
+	 * @return a system user i.e. administrator
+	 */
+	User loginAsSystem();
 
 	/**
 	 * Removes a user who was previously logged in.

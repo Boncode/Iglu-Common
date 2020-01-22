@@ -431,6 +431,10 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 		cumulatedResponseTime += System.currentTimeMillis() - start;
 		nrofConnectionsDistributed++;
 
+		if(conn == null) {
+			throw new SQLException("still no database Connection obtained");
+		}
+
 		return (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
 				new Class[]{Connection.class},
 				conn);

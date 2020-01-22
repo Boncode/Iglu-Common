@@ -432,10 +432,13 @@ public class StandardJdbcProcessor implements JdbcProcessor {
 			conn = dataSource.getConnection();
 		}
 		Statement s = conn.createStatement();
-		ResultSet rs = s.executeQuery(query);
-		result = new ResultSetCopy(rs, maxRowLog);
-		rs.close();
-		conn.close();
+		try {
+			ResultSet rs = s.executeQuery(query);
+			result = new ResultSetCopy(rs, maxRowLog);
+			rs.close();
+		} finally {
+			conn.close();
+		}
 		System.out.println(new LogEntry("", result));
 		return result;
 	}
@@ -452,8 +455,12 @@ public class StandardJdbcProcessor implements JdbcProcessor {
 		//TODO time execution time
 		Connection conn = dataSource.getConnection();
 		Statement s = conn.createStatement();
-		int result = s.executeUpdate(update);
-		conn.close();
+		int result;
+		try {
+			result = s.executeUpdate(update);
+		} finally {
+			conn.close();
+		}
 		System.out.println(new LogEntry(result + " rows affected"));
 		return result;
 	}

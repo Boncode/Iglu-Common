@@ -33,6 +33,7 @@ import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
 import org.ijsberg.iglu.util.misc.EncryptionSupport;
 import org.ijsberg.iglu.util.properties.IgluProperties;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -158,6 +159,11 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		account.setHashedPassword(getPasswordFromCredentials(newCredentials));
 		save();
 		return user;
+	}
+
+	@Override
+	public User getSystemUser() {
+		throw new NotImplementedException();
 	}
 
 	@Override
