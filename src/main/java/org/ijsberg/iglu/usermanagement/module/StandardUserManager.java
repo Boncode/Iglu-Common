@@ -62,9 +62,9 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	private HashMap<String, Account> accounts;
 
-	private static byte[] salt;
+	private static byte[] salt = "dakp[F(io3udsua.&*990adduX=".getBytes();
 
-	static {
+/*	static {
 		new Executable() {
 			@Override
 			protected Object execute() throws Throwable {
@@ -79,7 +79,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 				return null;
 			}
 		}.executeAsync();
-	}
+	}*/
 
 	public StandardUserManager() {
 	}
