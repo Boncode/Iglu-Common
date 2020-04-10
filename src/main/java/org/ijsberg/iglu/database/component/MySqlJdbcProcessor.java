@@ -138,8 +138,6 @@ public class MySqlJdbcProcessor extends StandardJdbcProcessor {
 		statement.deleteCharAt(statement.length() - 2);
 		statement.append(" WHERE " + columnName + "=?");
 
-		//System.out.println("==>" + columnName + "in: " + inputProperties);
-
 		input[count] = inputProperties.get(attrName);
 
 		try {

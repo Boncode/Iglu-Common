@@ -269,9 +269,6 @@ public class Document extends ElementList {
 			throw new ParseException("exception while parsing " + (file != null ? file.getName() : name), e);
 		}
 
-		//System.out.println("====> " + splitContents);
-
-
 		build(splitContents, interpreteAsXHTML);
 
 

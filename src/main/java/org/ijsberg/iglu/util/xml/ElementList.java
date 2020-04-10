@@ -976,7 +976,6 @@ public abstract class ElementList implements Serializable {
 							//endtag without a start tag encounterd
 							if (!strict/* || interpreteAsXHTML*/) {
 								//remove loose end tags
-								//System.out.println("LET: " + splitContents.get(splitContents.size() - 1));
 								splitContents.remove(splitContents.size() - 1);
 							} else {
 								//TODO line nr (count enters)
