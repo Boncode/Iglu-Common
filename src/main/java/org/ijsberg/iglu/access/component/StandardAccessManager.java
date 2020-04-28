@@ -25,6 +25,7 @@ import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
+import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
 
@@ -50,6 +51,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	private int pageInterval = 1;//min
 	//default session timeout
 	private int sessionTimeout = 1800;//sec
+	private int sessionTimeoutLoggedIn = 1800;//sec
 	private Authenticator authenticator;
 
 	public static final String defaultAdminAccountName = "admin";
@@ -87,6 +89,8 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 */
 	public void setProperties(Properties properties) {
 		sessionTimeout = Integer.valueOf(properties.getProperty("session_timeout", "" + sessionTimeout));
+		sessionTimeoutLoggedIn = Integer.valueOf(properties.getProperty("session_timeout_logged_in", "" + sessionTimeoutLoggedIn));
+		//session_timeout_logged_in
 		System.out.println(new LogEntry("session timeout set to " + sessionTimeout + " (sec)"));
 		defaultAdminPassword = properties.getProperty("default_admin_password", defaultAdminPassword);
 	}
@@ -185,7 +189,6 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 * @param authenticator
 	 */
 	public void setAuthenticator(Authenticator authenticator) {
-		System.out.println("AUTH : " + authenticator + " " + this);
 		this.authenticator = authenticator;
 	}
 
@@ -303,14 +306,14 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 * @return
 	 */
 	public StandardSession createSession(Properties defaultUserSettings) {
-		StandardSession session = new StandardSession(this, sessionTimeout, defaultUserSettings);
+		StandardSession session = new StandardSession(this, sessionTimeout, sessionTimeoutLoggedIn, defaultUserSettings);
 		synchronized (sessions) {
 			synchronized (sessionsMirror) {
 				sessions.put(session.getToken(), session);
 				sessionsMirror.put(session.getToken(), session);
 			}
 		}
-		System.out.println(new LogEntry("session " + session + " created"));
+		System.out.println(new LogEntry("session " + session + " created : total is " + sessions.size()));
 		return session;
 	}
 
@@ -351,6 +354,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 */
 	public void onPageEvent(long officialTime) {
 		//cleanup expired sessions
+		System.out.println(new LogEntry(Level.TRACE, "identifying expired sessions : current number " + sessionsMirror.size()));
 		ArrayList garbage = new ArrayList(sessionsMirror.size());
 		Iterator i;
 		StandardSession session;

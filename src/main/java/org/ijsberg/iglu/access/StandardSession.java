@@ -20,6 +20,7 @@ package org.ijsberg.iglu.access;
 
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.ReceiverQueue;
 import org.ijsberg.iglu.util.misc.KeyGenerator;
 
@@ -49,16 +50,11 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	//tme last accessed, needed for timeout determination
 	private long lastAccessedTime = System.currentTimeMillis();
 	//expiration timeout in milliseconds
-	private long expirationTimeout;//does not expire by default
-	//it's possible that a session is resolved via different entry Realms
-	//so a logged in user is stored by a realm id
-//	private HashMap usersByRealmId = new HashMap();
+	private long expirationTimeout;//expires straight away by default
+	private long expirationTimeoutLoggedIn;//expires straight away by default
 	private User user;
 
-
-//	private Application application;
-
-	private HashMap forms;
+//	private HashMap forms;
 
 	private AccessManager accessManager;
 
@@ -67,12 +63,13 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 *
 	 * @param expirationTimeout expiration timeout in seconds, 0 or less means that session will not expire
 	 */
-	public StandardSession(AccessManager accessManager, long expirationTimeout, Properties defaultUserSettings) {
+	public StandardSession(AccessManager accessManager, long expirationTimeout, long expirationTimeoutLoggedIn, Properties defaultUserSettings) {
 		//create an id that's unique and difficult to guess
 		token = KeyGenerator.generateKey();
 //		this.application = application;
 		//store as millis
 		this.expirationTimeout = expirationTimeout * 1000;
+		this.expirationTimeoutLoggedIn = expirationTimeoutLoggedIn * 1000;
 		this.accessManager = accessManager;
 		//copy settings
 //		userSettings = new GenericPropertyBundle("user settings");
@@ -233,7 +230,17 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 * @return true if this session should be considered expired based on the last-accessed-time and timeout value
 	 */
 	public boolean isExpired() {
-		return lastAccessedTime > 0 && lastAccessedTime + expirationTimeout < System.currentTimeMillis();
+
+		long usedTimeOut = expirationTimeout;
+		if(this.getUser() != null) {
+			usedTimeOut = expirationTimeoutLoggedIn;
+		}
+
+		boolean isExpired = lastAccessedTime > 0 && lastAccessedTime + usedTimeOut < System.currentTimeMillis();
+		System.out.println(new LogEntry("last Accessed:  " + lastAccessedTime + ":" + new Date(lastAccessedTime) + " timeout: " + usedTimeOut));
+		System.out.println(new LogEntry("session " + getToken() + " will expire in " + ((lastAccessedTime + usedTimeOut) - System.currentTimeMillis())));
+		System.out.println(new LogEntry("session " + getToken() + " will expire on " + new Date(lastAccessedTime + usedTimeOut)));
+		return isExpired;
 	}
 
 

@@ -704,7 +704,7 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 	 * Cleanup routine that is to be called regularly
 	 */
 	public void onPageEvent(long l) {
-		System.out.println(new LogEntry("connection pool cleanup run"));
+		System.out.println(new LogEntry(Level.TRACE, "connection pool cleanup run"));
 		cleanUpHangingConnections();
 		testConnection();
 	}
@@ -715,7 +715,7 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 	 */
 	private void testConnection() {
 		if(connectionTestStatement != null && !"".equals(connectionTestStatement)) {
-			System.out.println(new LogEntry("performing connection test"));
+			System.out.println(new LogEntry(Level.TRACE, "performing connection test"));
 			try {
 				connectionTester.executePreparedStatement(connectionTestStatement);
 			} catch (SQLException e) {

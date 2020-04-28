@@ -369,6 +369,7 @@ public class IndentedConfigReaderMapping implements Mapping {
 			if (file.exists()) {
 				input = new FileInputStream(file);
 			} else {
+				System.out.println(new LogEntry("could not find " + file.getAbsolutePath() + " on FS, trying class path"));
 				//load file from classpath
 				input = getClass().getClassLoader().getResourceAsStream(fileName);
 			}
