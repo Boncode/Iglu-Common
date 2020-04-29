@@ -237,9 +237,9 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		}
 
 		boolean isExpired = lastAccessedTime > 0 && lastAccessedTime + usedTimeOut < System.currentTimeMillis();
-		System.out.println(new LogEntry("last Accessed:  " + lastAccessedTime + ":" + new Date(lastAccessedTime) + " timeout: " + usedTimeOut));
-		System.out.println(new LogEntry("session " + getToken() + " will expire in " + ((lastAccessedTime + usedTimeOut) - System.currentTimeMillis())));
-		System.out.println(new LogEntry("session " + getToken() + " will expire on " + new Date(lastAccessedTime + usedTimeOut)));
+//		System.out.println(new LogEntry("last Accessed:  " + lastAccessedTime + ":" + new Date(lastAccessedTime) + " timeout: " + usedTimeOut));
+//		System.out.println(new LogEntry("session " + getToken() + " will expire in " + ((lastAccessedTime + usedTimeOut) - System.currentTimeMillis())));
+//		System.out.println(new LogEntry("session " + getToken() + " will expire on " + new Date(lastAccessedTime + usedTimeOut)));
 		return isExpired;
 	}
 
