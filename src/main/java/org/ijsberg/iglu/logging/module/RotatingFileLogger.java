@@ -101,7 +101,6 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		if (obsoleteFile.exists()) {
 			obsoleteFile.delete();
 		}
-
 	}
 
 	private void clearOutdatedFiles() {
