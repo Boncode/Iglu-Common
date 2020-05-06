@@ -31,6 +31,7 @@ import org.ijsberg.iglu.util.time.TimeSupport;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -189,10 +190,11 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 					while (i.hasNext()) {
 						final Pageable pageable = (Pageable) i.next();
 						//check if intervals within limits
+						//System.out.println(new LogEntry(Level.TRACE, "scheduler may page: " + StringSupport.trim(pageable.toString(), 80,"...") + " wm? " + SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes()) + " isStarted? " + pageable.isStarted() + ": " + new Date(officialTime) + ", " +  pageable.getPageIntervalInMinutes() + ", " + pageable.getPageOffsetInMinutes()));
 						if (pageable.getPageIntervalInMinutes() <= 0) {
 							//log("scheduler can not page " + StringSupport.trim(pageable.toString() + "'", 50, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid");
 						} else if (SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes()) && pageable.isStarted()) {
-							System.out.println(new LogEntry(Level.TRACE, "scheduler about to page " + StringSupport.trim(pageable.toString() + "'", 80, "...")));
+							System.out.println(new LogEntry(Level.TRACE, "scheduler about to page " + StringSupport.trim(pageable.toString(), 80, "...")));
 							//the page method is invoked by a system session
 							//  so a developer may try to use it to outflank the security system
 							//another risk is that the invoked method consumes too much time
