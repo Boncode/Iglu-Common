@@ -40,9 +40,22 @@ public class IgluProperties extends Properties {
 
 	private Set<String> orderedPropertyNames = new LinkedHashSet();
 
-	private ListMap<String,String> linesOfComment = new ListHashMap<>();
+	private ListHashMap<String,String> linesOfComment = new ListHashMap<>();
 
 	private List<String> linesGathered = new ArrayList<>();
+
+	public IgluProperties() {
+	}
+
+	public IgluProperties(Properties properties) {
+		if(properties instanceof IgluProperties) {
+			IgluProperties igluProperties = (IgluProperties)properties;
+			//this.orderedPropertyNames = new LinkedHashSet<>(igluProperties.orderedPropertyNames);
+			this.linesOfComment = new ListHashMap<>(igluProperties.linesOfComment);
+			//this.linesGathered = new ArrayList<>(igluProperties.linesGathered);
+		}
+		merge(properties);
+	}
 
 	public static IgluProperties copy(Properties properties) {
 		IgluProperties igluProperties = new IgluProperties();
@@ -396,11 +409,32 @@ public class IgluProperties extends Properties {
 		addSubsection(this, sectionKey, subsection);
 	}
 
-	public String toString() {
+/*	public String toString() {
 		StringBuffer result = new StringBuffer();
 		for(String propertyName : this.stringPropertyNames()) {
 			result.append(propertyName + "=" + getProperty(propertyName) + "\n");
 		}
 		return result.toString();
+	}*/
+	public String toString() {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		store(outputStream, null);
+		return outputStream.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof IgluProperties)) return false;
+		if (!super.equals(o)) return false;
+		IgluProperties that = (IgluProperties) o;
+		boolean opnEquals = Objects.equals(orderedPropertyNames, that.orderedPropertyNames);
+		boolean locEquals = Objects.equals(linesOfComment, that.linesOfComment);
+		return locEquals && opnEquals;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), orderedPropertyNames, linesOfComment);
 	}
 }

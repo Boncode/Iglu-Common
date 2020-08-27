@@ -71,6 +71,23 @@ public class IgluPropertiesTest {
         assertEquals(25, keys.size());
     }
 
+    @Test
+    public void testEquals() {
+        IgluProperties propertiesA = IgluProperties.loadProperties("test/IJsberg.Iglu.properties");
+        IgluProperties propertiesB = IgluProperties.loadProperties("test/IJsberg.Iglu.properties");
+        IgluProperties propertiesC = IgluProperties.loadProperties("test/IJsberg.Iglu.properties");
+
+        propertiesC.setProperty("x", "y");
+
+//        System.out.println(propertiesA.getProperty("test"));
+
+        assertTrue(propertiesA.equals(propertiesB));
+        assertFalse(propertiesA.equals(propertiesC));
+
+        IgluProperties propertiesD = new IgluProperties(propertiesA);
+        assertTrue(propertiesA.equals(propertiesD));
+    }
+
 /*
 
 
