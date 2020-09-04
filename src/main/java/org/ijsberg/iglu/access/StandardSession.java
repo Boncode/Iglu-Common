@@ -190,6 +190,12 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		return user;
 	}
 
+	@Override
+	public User loginAsSystem(long expirationTimeoutLoggedIn) {
+		this.expirationTimeoutLoggedIn = expirationTimeoutLoggedIn * 1000;
+		return loginAsSystem();
+	}
+
 
 	/**
 	 * Performs destruction of agents and closes message receivers.

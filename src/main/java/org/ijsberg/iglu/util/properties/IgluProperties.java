@@ -24,6 +24,7 @@ import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
+import org.ijsberg.iglu.util.io.FileData;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.Line;
 import org.ijsberg.iglu.util.misc.StringSupport;
@@ -63,7 +64,18 @@ public class IgluProperties extends Properties {
 		return igluProperties;
 	}
 
-	public void merge(Properties properties) {
+    public static Map<String, IgluProperties> getPropertiesFromDir(File propertiesDir) {
+        Map<String, IgluProperties> analysisPropertiesMap = new LinkedHashMap<>();
+        for(String fileName : propertiesDir.list()) {
+            if(fileName.endsWith(".properties")) {
+                IgluProperties analysisProperties = loadProperties(propertiesDir.getPath() + "/" + fileName);
+                analysisPropertiesMap.put(fileName, analysisProperties);
+            }
+        }
+        return analysisPropertiesMap;
+    }
+
+    public void merge(Properties properties) {
 		for(String key : properties.stringPropertyNames()) {
 			set(key, properties.getProperty(key));
 		}
@@ -363,9 +375,12 @@ public class IgluProperties extends Properties {
 	}
 
 	public static void saveProperties(Properties properties, String fileName) throws IOException {
-		FileOutputStream outputStream = new FileOutputStream(fileName);
+		FileData fileData = new FileData(fileName);
+		String tmpFileName = fileData.getPath() + "/." + System.currentTimeMillis() + "." + fileData.getFileName();
+		FileOutputStream outputStream = new FileOutputStream(tmpFileName);
 		properties.store(outputStream, null);
 		outputStream.close();
+		FileSupport.moveFile(tmpFileName, fileName, true);
 	}
 
 	public void store(OutputStream outputStream, String comments) {

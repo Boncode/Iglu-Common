@@ -53,6 +53,15 @@ public interface Session {
 	User loginAsSystem();
 
 	/**
+	 * Meant for system threads that access protected resources or logic.
+	 * Whether this works depends ultimately on the implementation of the Authenticator being used.
+	 *
+	 * @param expirationTimeoutLoggedIn alternative timeout in seconds
+	 * @return a system user i.e. administrator
+	 */
+	User loginAsSystem(long expirationTimeoutLoggedIn);
+
+	/**
 	 * Removes a user who was previously logged in.
 	 */
 	void logout();
