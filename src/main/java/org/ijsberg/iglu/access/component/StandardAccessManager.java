@@ -19,6 +19,7 @@
 package org.ijsberg.iglu.access.component;
 
 
+import org.ijsberg.iglu.FatalException;
 import org.ijsberg.iglu.access.*;
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
@@ -28,6 +29,7 @@ import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
+import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.util.*;
 
@@ -57,6 +59,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	public static final String defaultAdminAccountName = "admin";
 	private String defaultAdminPassword = "admin";
 
+	private Class<? extends StandardComponent> agentComponentType;
 
 	private HashMap<String, AgentFactory> agentFactoriesByAgentId = new HashMap();
 
@@ -66,6 +69,12 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	public StandardAccessManager() {
 	}
 
+	/**
+	 *
+	 */
+	public StandardAccessManager(Class<? extends StandardComponent> agentComponentType) {
+		this.agentComponentType = agentComponentType;
+	}
 
 	/**
 	 * @return number of concurrent requests and sessions
@@ -259,18 +268,31 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 
 	@Override
 	public Component createAgent(String id) {
-/*		if (serviceCluster == null) {
-			throw new ConfigurationException("access manager has no 'ServiceCluster' to connect agent to, please provide one to connect agent " + id + " to");
-		}
-*/		AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
+		AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
 		if (agentFactory == null) {
 			throw new ConfigurationException("no AgentFactory for agents with id " + id + " present, register one in cluster");
 		}
 		Object implementation = agentFactory.createAgentImpl();
-		Component component = new StandardComponent(implementation);
+
+		Component component = wrap(id, implementation);
+
 		component.setProperties(agentFactory.getAgentProperties());
 		//connect component anonymously
 		agentFactory.getCluster().getFacade().connect(component);
+		return component;
+	}
+
+	private Component wrap(String id, Object implementation) {
+		Component component;
+		if(agentComponentType != null) {
+			try {
+				component = ReflectionSupport.instantiateClass(agentComponentType, implementation);
+			} catch (InstantiationException e) {
+				throw new FatalException("cannot wrap created agent " + id + " in component type " + agentComponentType.getSimpleName(), e);
+			}
+		} else {
+			component = new StandardComponent(implementation);
+		}
 		return component;
 	}
 
