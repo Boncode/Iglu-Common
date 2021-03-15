@@ -193,32 +193,36 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 						//System.out.println(new LogEntry(Level.TRACE, "scheduler may page: " + StringSupport.trim(pageable.toString(), 80,"...") + " wm? " + SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes()) + " isStarted? " + pageable.isStarted() + ": " + new Date(officialTime) + ", " +  pageable.getPageIntervalInMinutes() + ", " + pageable.getPageOffsetInMinutes()));
 						if (pageable.getPageIntervalInMinutes() <= 0) {
 							//log("scheduler can not page " + StringSupport.trim(pageable.toString() + "'", 50, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid");
-						} else if (SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes()) && pageable.isStarted()) {
-							System.out.println(new LogEntry(Level.TRACE, "scheduler about to page " + StringSupport.trim(pageable.toString(), 80, "...")));
-							//the page method is invoked by a system session
-							//  so a developer may try to use it to outflank the security system
-							//another risk is that the invoked method consumes too much time
+						} else if (SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes())) {
+							if(pageable.isStarted()) {
+								System.out.println(new LogEntry(Level.TRACE, "scheduler about to page " + StringSupport.trim(pageable.toString(), 80, "...")));
+								//the page method is invoked by a system session
+								//  so a developer may try to use it to outflank the security system
+								//another risk is that the invoked method consumes too much time
 
-							if(runAsync) {
-								new Executable() {
-									public Object execute() {
-										try {
-											pageable.onPageEvent(officialTime);
-										} catch (Throwable e) {//pageable is not a trusted component
-											//TODO keep history
-											System.out.println(new LogEntry(Level.CRITICAL, "exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e));
+								if (runAsync) {
+									new Executable() {
+										public Object execute() {
+											try {
+												pageable.onPageEvent(officialTime);
+											} catch (Throwable e) {//pageable is not a trusted component
+												//TODO keep history
+												System.out.println(new LogEntry(Level.CRITICAL, "exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e));
+											}
+											return null;
 										}
-										return null;
+									}.executeAsync();
+								} else {
+									try {
+										pageable.onPageEvent(officialTime);
+									} catch (UndeclaredThrowableException e) {
+										System.out.println(new LogEntry(Level.CRITICAL, "undeclared exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e.getCause()));
+									} catch (Throwable e) {//pageable is not a trusted component
+										System.out.println(new LogEntry(Level.CRITICAL, "exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e));
 									}
-								}.executeAsync();
-							} else {
-								try {
-									pageable.onPageEvent(officialTime);
-								} catch (UndeclaredThrowableException e) {
-									System.out.println(new LogEntry(Level.CRITICAL, "undeclared exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e.getCause()));
-								} catch (Throwable e) {//pageable is not a trusted component
-									System.out.println(new LogEntry(Level.CRITICAL, "exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e));
 								}
+							} else {
+								System.out.println(new LogEntry(Level.DEBUG, "pageble NOT started: not paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "...")));
 							}
 						}
 					}
