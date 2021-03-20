@@ -96,6 +96,8 @@ public interface AccessManager extends Authenticator {
 	 */
 	StandardSession createSession(Properties initialUserSettings);
 
+	StandardSession createSession(String token, Properties defaultUserSettings);
+
 	/**
 	 * Unregisters current session from all collections so that it becomes eligible for garbage collection.
 	 * This method does not have to be protected since it affects the current user only.
