@@ -339,6 +339,18 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 		return session;
 	}
 
+	@Override
+	public StandardSession createSession(String token, Properties defaultUserSettings) {
+		StandardSession session = new StandardSession(token,this, sessionTimeout, sessionTimeoutLoggedIn, defaultUserSettings);
+		synchronized (sessions) {
+			synchronized (sessionsMirror) {
+				sessions.put(session.getToken(), session);
+				sessionsMirror.put(session.getToken(), session);
+			}
+		}
+		System.out.println(new LogEntry("session " + session + " created : total is " + sessions.size()));
+		return session;
+	}
 
 	/**
 	 * Destroys current session.

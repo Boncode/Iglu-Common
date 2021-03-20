@@ -27,6 +27,7 @@ import org.ijsberg.iglu.util.misc.EncodingSupport;
  * when BASIC authentication is performed.
  */
 public class Base64EncodedCredentials extends SimpleCredentials {
+
 	private String encodedCredentials;
 
 	/**

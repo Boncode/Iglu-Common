@@ -78,6 +78,21 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		userSettings = defaultUserSettings;
 	}
 
+	public StandardSession(String token, AccessManager accessManager, long expirationTimeout, long expirationTimeoutLoggedIn, Properties defaultUserSettings) {
+		//create an id that's unique and difficult to guess
+		this.token = token;
+//		this.application = application;
+		//store as millis
+		this.expirationTimeout = expirationTimeout * 1000;
+		this.expirationTimeoutLoggedIn = expirationTimeoutLoggedIn * 1000;
+		this.accessManager = accessManager;
+		//copy settings
+//		userSettings = new GenericPropertyBundle("user settings");
+//		userSettings.merge(defaultUserSettings);
+//		userSettings.setListener(this);
+		userSettings = defaultUserSettings;
+	}
+
 	/**
 	 * @return session token used to identify a session over a number of requests
 	 */
