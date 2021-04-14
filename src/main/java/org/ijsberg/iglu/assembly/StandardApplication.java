@@ -2,10 +2,15 @@ package org.ijsberg.iglu.assembly;
 
 import org.ijsberg.iglu.Application;
 import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.ShutdownProcess;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.properties.IgluProperties;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
@@ -76,6 +81,30 @@ public class StandardApplication implements Application {
             } else {
                 addAssembly(assemblyId, instantiateAssembly(properties.getProperty(assemblyId + ".class"), properties.getSubsection(assemblyId + ".properties")));
             }
+        }
+        writeAppReport();
+    }
+
+    private void writeAppReport() {
+        try {
+            StringBuffer data = new StringBuffer();
+            Cluster coreCluster = coreAssembly.getCoreCluster();
+            data.append(coreAssembly.getClass().getSimpleName() + ".coreCluster\n");
+            data.append("INTERNAL COMPONENTS\n");
+            for(String componentName : coreCluster.getInternalComponents().keySet()) {
+                Component component = coreCluster.getInternalComponents().get(componentName);
+                //((StandardComponent)component).get
+                data.append(componentName + " : " + component.getClass().getSimpleName() + "\n");
+            }
+            data.append("EXTERNAL COMPONENTS\n");
+            for(Component component : coreCluster.getExternalComponents()) {
+                data.append(component.getClass().getSimpleName() + "\n");
+            }
+
+            FileSupport.saveTextFile(data.toString(), "app_report.txt");
+
+        } catch (Exception e) {
+            System.out.println(new LogEntry(Level.CRITICAL,"cannot write application report", e));
         }
     }
 
