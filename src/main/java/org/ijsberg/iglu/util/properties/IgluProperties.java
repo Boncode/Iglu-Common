@@ -345,7 +345,7 @@ public class IgluProperties extends Properties {
 	public String[] getPropertyAsArray(String key, String defaultVal) {
 		String value = getProperty(key, defaultVal);
 		if(value == null) {
-			return null;
+			return new String[0];
 		}
 		if(value.startsWith("[") && value.endsWith("]")) {
 			value = value.substring(1, value.length() - 1);
