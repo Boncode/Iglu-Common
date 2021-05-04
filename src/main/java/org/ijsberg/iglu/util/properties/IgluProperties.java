@@ -344,6 +344,10 @@ public class IgluProperties extends Properties {
 
 	public String[] getPropertyAsArray(String key, String defaultVal) {
 		String value = getProperty(key, defaultVal);
+		return convertToArray(value);
+	}
+
+	public static String[] convertToArray(String value) {
 		if(value == null) {
 			return new String[0];
 		}
