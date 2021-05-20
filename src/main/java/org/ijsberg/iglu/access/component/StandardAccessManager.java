@@ -107,7 +107,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	/**
 	 * @return a collection of sessions sorted by creation date
 	 */
-	public Collection getSessions() {
+	public Collection<Session> getSessions() {
 		synchronized (sessionsMirror) {
 			return new TreeMap(sessionsMirror).values();
 		}
@@ -479,4 +479,24 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 		agentFactoriesByAgentId.put(agentFactory.getAgentId(), agentFactory);
 	}
 
+	@Override
+	public void dropMessage(String userId, UserMessage message) {
+		for(Session session : getSessions()) {
+			User user = session.getUser();
+			if(user != null && user.getId().equals(userId)) {
+				user.dropMessage(message);
+			}
+		}
+	}
+
+	@Override
+	public void dropMessageToCurrentUser(UserMessage message) {
+		Session session = getCurrentSession();
+		if(session != null) {
+			User user = session.getUser();
+			if(user != null) {
+				user.dropMessage(message);
+			}
+		}
+	}
 }

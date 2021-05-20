@@ -62,12 +62,17 @@ public class ComponentStarter implements BusyStartable {
 		System.out.println(new LogEntry("registering " + startable + " with " + this));
 		System.out.flush();
 		if (isStarted && !startable.isStarted()) {
+			System.out.println(new LogEntry("starting " + startable));
 			startable.start();
 		}
 		registeredStartables.put(startable.toString().hashCode(), startable);
 	}
 
 	public synchronized void unregister(Startable startable) {
+		if (startable.isStarted()) {
+			System.out.println(new LogEntry("stopping " + startable));
+			startable.stop();
+		}
 		registeredStartables.remove(startable.toString().hashCode());
 	}
 

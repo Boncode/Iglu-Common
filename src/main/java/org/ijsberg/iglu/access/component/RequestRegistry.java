@@ -20,10 +20,15 @@
 package org.ijsberg.iglu.access.component;
 
 import org.ijsberg.iglu.access.Request;
+import org.ijsberg.iglu.access.UserMessage;
 
 /**
  */
 public interface RequestRegistry {
 
 	Request getCurrentRequest();
+
+	void dropMessage(String userId, UserMessage message);
+
+	void dropMessageToCurrentUser(UserMessage message);
 }

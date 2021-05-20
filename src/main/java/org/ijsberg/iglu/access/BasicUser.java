@@ -38,6 +38,7 @@ public class BasicUser implements User {
 	private String userId;
 	private HashMap roles = new HashMap();
 	private UserGroup group;
+	private List<UserMessage> messageQueue;
 
 	/**
 	 * @param userId
@@ -140,6 +141,30 @@ public class BasicUser implements User {
 
 	public void setGroup(UserGroup group) {
 		this.group = group;
+	}
+
+	@Override
+	public void dropMessage(UserMessage message) {
+		if(messageQueue == null) {
+			messageQueue = new ArrayList<>();
+		}
+		messageQueue.add(message);
+	}
+
+	@Override
+	public UserMessage consumeLatestMessage() {
+		if(messageQueue != null && !messageQueue.isEmpty()) {
+			return messageQueue.remove(0);
+		}
+		return null;
+	}
+
+	@Override
+	public UserMessage getLatestMessage() {
+		if(messageQueue != null && !messageQueue.isEmpty()) {
+			return messageQueue.get(0);
+		}
+		return null;
 	}
 
 }

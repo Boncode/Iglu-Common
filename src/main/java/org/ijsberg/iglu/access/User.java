@@ -63,4 +63,10 @@ public interface User {
 	boolean isAccountBlocked();
 
 	UserGroup getGroup();
+
+    void dropMessage(UserMessage message);
+
+	UserMessage consumeLatestMessage();
+
+	UserMessage getLatestMessage();
 }
