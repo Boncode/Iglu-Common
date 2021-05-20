@@ -136,5 +136,8 @@ public interface AccessManager extends Authenticator {
 
 	void removeAgent(String id, Component agent);
 
+	void dropMessage(String userId, UserMessage message);
+
+	void dropMessageToCurrentUser(UserMessage message);
 
 }
