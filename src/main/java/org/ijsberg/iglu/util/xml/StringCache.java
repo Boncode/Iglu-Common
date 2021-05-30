@@ -1,7 +1,5 @@
 package org.ijsberg.iglu.util.xml;
 
-import javafx.collections.transformation.SortedList;
-
 import java.util.*;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;

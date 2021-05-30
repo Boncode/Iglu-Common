@@ -19,6 +19,7 @@
 
 package org.ijsberg.iglu.usermanagement.module;
 
+import org.ijsberg.iglu.FatalException;
 import org.ijsberg.iglu.access.*;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
@@ -33,7 +34,6 @@ import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
 import org.ijsberg.iglu.util.misc.EncryptionSupport;
 import org.ijsberg.iglu.util.properties.IgluProperties;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -163,7 +163,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	@Override
 	public User getSystemUser() {
-		throw new NotImplementedException();
+		throw new FatalException("not implemented");
 	}
 
 	@Override
