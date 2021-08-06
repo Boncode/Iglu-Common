@@ -20,7 +20,7 @@
 package org.ijsberg.iglu.access.component;
 
 import org.ijsberg.iglu.access.Request;
-import org.ijsberg.iglu.access.UserMessage;
+import org.ijsberg.iglu.access.UserConsumableMessage;
 
 /**
  */
@@ -28,7 +28,9 @@ public interface RequestRegistry {
 
 	Request getCurrentRequest();
 
-	void dropMessage(String userId, UserMessage message);
+	void dropMessage(String userId, UserConsumableMessage message);
 
-	void dropMessageToCurrentUser(UserMessage message);
+	void broadcastMessage(UserConsumableMessage message);
+
+	void dropMessageToCurrentUser(UserConsumableMessage message);
 }

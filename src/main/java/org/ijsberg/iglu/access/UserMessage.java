@@ -1,6 +1,6 @@
 package org.ijsberg.iglu.access;
 
-public class UserMessage {
+public class UserMessage implements UserConsumableMessage {
 
     private String messageText;
 
@@ -8,6 +8,8 @@ public class UserMessage {
         this.messageText = messageText;
     }
 
+
+    @Override
     public String getMessageText() {
         return messageText;
     }

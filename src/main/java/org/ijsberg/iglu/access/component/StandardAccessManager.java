@@ -21,7 +21,6 @@ package org.ijsberg.iglu.access.component;
 
 import org.ijsberg.iglu.FatalException;
 import org.ijsberg.iglu.access.*;
-import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
@@ -480,7 +479,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	}
 
 	@Override
-	public void dropMessage(String userId, UserMessage message) {
+	public void dropMessage(String userId, UserConsumableMessage message) {
 		for(Session session : getSessions()) {
 			User user = session.getUser();
 			if(user != null && user.getId().equals(userId)) {
@@ -490,7 +489,17 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	}
 
 	@Override
-	public void dropMessageToCurrentUser(UserMessage message) {
+	public void broadcastMessage(UserConsumableMessage message) {
+		for(Session session : getSessions()) {
+			User user = session.getUser();
+			if(user != null) {
+				user.dropMessage(message);
+			}
+		}
+	}
+
+	@Override
+	public void dropMessageToCurrentUser(UserConsumableMessage message) {
 		Session session = getCurrentSession();
 		if(session != null) {
 			User user = session.getUser();

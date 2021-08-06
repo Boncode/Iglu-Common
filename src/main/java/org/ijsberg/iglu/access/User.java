@@ -64,9 +64,9 @@ public interface User {
 
 	UserGroup getGroup();
 
-    void dropMessage(UserMessage message);
+    void dropMessage(UserConsumableMessage message);
 
-	UserMessage consumeLatestMessage();
+	UserConsumableMessage consumeLatestMessage();
 
-	UserMessage getLatestMessage();
+	UserConsumableMessage getLatestMessage();
 }
