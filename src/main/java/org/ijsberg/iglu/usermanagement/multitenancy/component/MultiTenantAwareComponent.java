@@ -23,7 +23,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
             System.out.println(new LogEntry("setting access manager"));
             this.accessManager = getProxyForComponentReference(RequestRegistry.class);
             if(this.accessManager == null) {
-                throw new ConfigurationException("implementation " + implementation.getClass().getSimpleName() + " must hava an injected reference to RequestRegistry");
+                throw new ConfigurationException("implementation " + implementation.getClass().getSimpleName() + " must have an injected reference to RequestRegistry");
             }
         }
         return accessManager;
@@ -67,6 +67,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
     public Object invoke(String methodName, Object... parameters) throws InvocationTargetException, NoSuchMethodException, IllegalArgumentException {
 
         //check input
+        checkInput(parameters);
 
         Object returnValue = super.invoke(methodName, parameters);
 
