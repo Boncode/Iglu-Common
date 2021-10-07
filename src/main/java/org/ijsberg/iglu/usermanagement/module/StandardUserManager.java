@@ -62,7 +62,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	private HashMap<String, Account> accounts;
 
-	private static byte[] salt = "dakp[F(io3udsua.&*990adduX=".getBytes();
+	private byte[] salt = new byte[0];
 
 /*	static {
 		new Executable() {
@@ -81,7 +81,8 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		}.executeAsync();
 	}*/
 
-	public StandardUserManager() {
+	public StandardUserManager(byte[] salt) {
+		this.salt = salt;
 	}
 
 	public String getHash(String password) {
@@ -297,6 +298,4 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		storageFileName = properties.getProperty("storage_file_name", storageFileName);
 	}
 
-
-	// ./invoke.sh "core.WebApp.addAccount(username,password)"
 }
