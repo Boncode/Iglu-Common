@@ -47,7 +47,7 @@ public class StandardCoreAssembly extends BasicAssembly {
         }
         loggerComponent.setProperties(loggerProperties);
 
-        if(loggerProperties.getProperty("log_to_standard_out") != null) {
+        if(Boolean.parseBoolean(loggerProperties.getProperty("log_to_standard_out", "false"))) {
             logger.addAppender(new StandardOutLogger());
         }
 
