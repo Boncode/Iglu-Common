@@ -28,11 +28,8 @@ import org.ijsberg.iglu.usermanagement.Account;
 import org.ijsberg.iglu.usermanagement.UserManager;
 import org.ijsberg.iglu.usermanagement.domain.SimpleAccount;
 import org.ijsberg.iglu.util.ResourceException;
-import org.ijsberg.iglu.util.execution.Executable;
-import org.ijsberg.iglu.util.formatting.PatternMatchingSupport;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
-import org.ijsberg.iglu.util.misc.EncryptionSupport;
 import org.ijsberg.iglu.util.properties.IgluProperties;
 
 import javax.crypto.SecretKey;
@@ -41,11 +38,8 @@ import javax.crypto.spec.PBEKeySpec;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-
-import static org.ijsberg.iglu.logging.Level.CRITICAL;
 
 /**
  */
@@ -56,13 +50,13 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	private static final int SALT_LENGTH = 32;
 	private static final int KEY_LENGTH = 256;
 
-	private static String passwordRegex = "\\w{4,10}";
+	private static final String passwordRegex = "\\w{4,10}";
 	protected String storageFileName = "./data/users.bin";
 	private boolean isStarted = false;
 
 	private HashMap<String, Account> accounts;
 
-	private byte[] salt = new byte[0];
+	private byte[] salt;
 
 /*	static {
 		new Executable() {
@@ -91,9 +85,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		}
 		try {
 			return EncodingSupport.encodeBase64(salt) + "$" + hash(password, salt);
-		} catch (NoSuchAlgorithmException e) {
-			throw new ConfigurationException("unable to hash password", e);
-		} catch (InvalidKeySpecException e) {
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new ConfigurationException("unable to hash password", e);
 		}
 	}
@@ -106,9 +98,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 			}
 			String hashOfInput = hash(password, EncodingSupport.decodeBase64(saltAndPassword[0]));
 			return hashOfInput.equals(saltAndPassword[1]);
-		} catch (NoSuchAlgorithmException e) {
-			throw new ConfigurationException("unable to hash password", e);
-		} catch (InvalidKeySpecException e) {
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new ConfigurationException("unable to hash password", e);
 		}
 	}
@@ -186,23 +176,23 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	@Override
 	public void addAccount(String userId, String password) {
-
 		Account account = new SimpleAccount(userId, getHash(password));
+		addAccount(account);
+	}
 
-		accounts.put(userId, account);
+	private void addAccount(Account account) {
+		accounts.put(account.getUserId(), account);
 		save();
 	}
 
 	@Override
 	public void removeAccount(String userId) {
-
 		accounts.remove(userId);
 		save();
 	}
 
 	@Override
 	public boolean setGroup(String userId, String groupId) {
-
 		Account account = accounts.get(userId);
 		if(account != null) {
 			account.putProperty("group", groupId);
@@ -213,7 +203,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	@Override
 	public List<String> listAccounts() {
-		List<String> retval = new ArrayList<String>();
+		List<String> retval = new ArrayList<>();
 		for(Account account : accounts.values()) {
 			retval.add(account.getUserId() + ":" + account.getProperties().getProperty("group"));
 		}
@@ -264,12 +254,12 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 				if (file.exists()) {
 					accounts = (HashMap<String, Account>) FileSupport.readSerializable(storageFileName);
 				} else {
-					accounts = new HashMap<String, Account>();
-					addAccount("admin", "admin");
+					accounts = new HashMap<>();
+					Account admin = new SimpleAccount("admin", getHash("admin"));
+					admin.putProperty("passwordChanged", "false");
+					addAccount(admin);
 				}
-			} catch (ClassNotFoundException e) {
-				throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);
-			} catch (IOException e) {
+			} catch (ClassNotFoundException | IOException e) {
 				throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);
 			}
 		}
