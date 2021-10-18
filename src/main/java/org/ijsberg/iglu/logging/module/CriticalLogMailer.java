@@ -5,22 +5,51 @@ import org.ijsberg.iglu.access.MailMessage;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.Logger;
+import org.ijsberg.iglu.util.StatusMonitor;
 
 public class CriticalLogMailer implements Logger {
 
 
+    private final StatusMonitor statusMonitor;
     private Level level = Level.CRITICAL;
     private AccessManager accessManager;
 
-    public CriticalLogMailer(AccessManager accessManager) {
+    public CriticalLogMailer(AccessManager accessManager, StatusMonitor statusMonitor) {
         this.accessManager = accessManager;
+        this.statusMonitor = statusMonitor;
     }
 
     @Override
     public void log(LogEntry entry) {
-        if(entry.getLevel().equals(level)) {
-            accessManager.dropMessage("System", new MailMessage("[CRT]", entry.getMessage()));
+        if(entry.getLevel().equals(level) && !statusMonitor.hasRecentlyCrashed()) {
+            accessManager.dropMessage("System", new MailMessage("[CRT]", entry.getMessage()
+                    + "\n\n" + getStackTraceFromLogEntry(entry)
+            ));
         }
+    }
+
+    private String getStackTraceFromLogEntry(LogEntry entry) {
+        if (entry.getData() != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(entry.getData());
+            if (entry.getData() instanceof Throwable) {
+                Throwable t = (Throwable) entry.getData();
+                sb.append("\n");
+                for (int i = 0; i < t.getStackTrace().length; i++) {
+                    sb.append("at " + t.getStackTrace()[i]);
+                    sb.append("\n");
+                }
+                Throwable cause = ((Throwable) entry.getData()).getCause();
+                while (cause != null) {
+                    sb.append("\n");
+                    sb.append("caused by:");
+                    sb.append(cause);
+                    cause = cause.getCause();
+                }
+            }
+            return sb.toString();
+        }
+        return "No stacktrace provided";
     }
 
     @Override
