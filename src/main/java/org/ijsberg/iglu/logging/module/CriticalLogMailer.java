@@ -5,26 +5,24 @@ import org.ijsberg.iglu.access.MailMessage;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.Logger;
-import org.ijsberg.iglu.util.StatusMonitor;
 
 public class CriticalLogMailer implements Logger {
 
-
-    private final StatusMonitor statusMonitor;
     private Level level = Level.CRITICAL;
     private AccessManager accessManager;
 
-    public CriticalLogMailer(AccessManager accessManager, StatusMonitor statusMonitor) {
+    public CriticalLogMailer(AccessManager accessManager) {
         this.accessManager = accessManager;
-        this.statusMonitor = statusMonitor;
     }
 
     @Override
     public void log(LogEntry entry) {
-        if(entry.getLevel().equals(level) && !statusMonitor.hasRecentlyCrashed()) {
-            accessManager.dropMessage("System", new MailMessage("[CRT]", entry.getMessage()
-                    + "\n\n" + getStackTraceFromLogEntry(entry)
-            ));
+        if(entry.getLevel().equals(level)) {
+            if(entry.getData() == null || !entry.getData().getClass().getSimpleName().equals("MessagingException")) {
+                accessManager.dropMessage("System", new MailMessage("[CRT]", entry.getMessage()
+                        + "\n\n" + getStackTraceFromLogEntry(entry)
+                ));
+            }
         }
     }
 
