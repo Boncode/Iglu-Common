@@ -39,6 +39,11 @@ public class DummyLogger implements Logger {
 
 	}
 
+	@Override
+	public int getLogLevelOrdinal() {
+		return Level.TRACE.ordinal();
+	}
+
 	public LogEntry getLastEntry() {
 		return lastEntry;
 	}

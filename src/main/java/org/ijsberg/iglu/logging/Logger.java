@@ -28,4 +28,6 @@ public interface Logger {
 	void addAppender(Logger appender);
 
 	void removeAppender(Logger appender);
+
+	int getLogLevelOrdinal();
 }
