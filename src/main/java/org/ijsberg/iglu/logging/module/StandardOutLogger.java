@@ -53,4 +53,9 @@ public class StandardOutLogger implements Logger {
 	public void removeAppender(Logger appender) {
 
 	}
+
+	@Override
+	public int getLogLevelOrdinal() {
+		return level.ordinal();
+	}
 }
