@@ -99,15 +99,25 @@ public class IgluProperties extends Properties {
 	}
 
 	public static void throwIfKeysMissing(Properties properties, String ... keys) {
+		List<String> missingKeys = getMissingKeys(properties, keys);
+		if(!missingKeys.isEmpty()) {
+			throw new ConfigurationException("please provide missing properties (" + CollectionSupport.format(missingKeys, ", ") + ")");
+		}
+	}
+
+	public static boolean checkKeysMissing(Properties properties, String ... keys) {
+		List<String> missingKeys = getMissingKeys(properties, keys);
+		return !missingKeys.isEmpty();
+	}
+
+	private static List<String> getMissingKeys(Properties properties, String[] keys) {
 		List<String> missingKeys = new ArrayList<>();
 		for(String key : keys) {
 			if(properties.getProperty(key) == null) {
 				missingKeys.add(key);
 			}
 		}
-		if(!missingKeys.isEmpty()) {
-			throw new ConfigurationException("please provide missing properties (" + CollectionSupport.format(missingKeys, ", ") + ")");
-		}
+		return missingKeys;
 	}
 
 	public IgluProperties set(String key, String value) {
