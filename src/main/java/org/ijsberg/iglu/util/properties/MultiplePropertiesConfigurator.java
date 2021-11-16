@@ -2,6 +2,7 @@ package org.ijsberg.iglu.util.properties;
 
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.util.ResourceException;
 
 import java.io.IOException;
 import java.util.*;
@@ -65,6 +66,7 @@ public class MultiplePropertiesConfigurator {
                     IgluProperties.saveProperties(fileProperties, fileName);
                 } catch (IOException e) {
                     System.out.println(new LogEntry(Level.CRITICAL, "failed to save portal configuration properties in file " + fileName, e));
+                    throw new ResourceException("failed to save portal configuration properties in file " + fileName, e);
                 }
             }
         }

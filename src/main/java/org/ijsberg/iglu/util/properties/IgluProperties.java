@@ -394,7 +394,7 @@ public class IgluProperties extends Properties {
 		FileOutputStream outputStream = new FileOutputStream(tmpFileName);
 		properties.store(outputStream, null);
 		outputStream.close();
-		FileSupport.moveFile(tmpFileName, fileName, true);
+		FileSupport.renameFile(tmpFileName, fileName, true);
 	}
 
 	public void store(OutputStream outputStream, String comments) {
