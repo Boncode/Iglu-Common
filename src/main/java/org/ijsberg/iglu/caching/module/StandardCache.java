@@ -177,8 +177,8 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 	 * @param timeout time in millis to wait for the first thread to retrieve an object from the original location
 	 * @return the cached object or null if it's not found
 	 */
-	public Object retrieve(K key, int timeout) {
-		Object retval = null;
+	public V retrieve(K key, int timeout) {
+		V retval = null;
 		if (isCachingEnabled()) {
 			CachedObject<V> co = getCachedObject(key);
 			if (co == null || isCachedObjectExpired(co)) {
