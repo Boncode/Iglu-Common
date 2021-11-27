@@ -62,7 +62,7 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 	 * @param ttl             time to live in seconds for cached objects
 	 * @param cleanupInterval cleanup interval in seconds
 	 */
-	protected StandardCache(int ttl, long cleanupInterval) {
+	public StandardCache(int ttl, long cleanupInterval) {
 		this.ttlInSeconds = ttl;
 		this.cleanupInterval = cleanupInterval;
 	}

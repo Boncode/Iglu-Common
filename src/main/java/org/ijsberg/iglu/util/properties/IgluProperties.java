@@ -358,19 +358,24 @@ public class IgluProperties extends Properties {
 	}
 
 	public static String[] convertToArray(String value) {
-		if(value == null) {
-			return new String[0];
-		}
-		if(value.startsWith("[") && value.endsWith("]")) {
-			value = value.substring(1, value.length() - 1);
-		}
-		List<String> list = StringSupport.split(value, ",");
+	 	List<String> list = convertToList(value);
 		String[] retval = new String[list.size()];
 		for(int i = 0; i < list.size(); i++) {
 			retval[i] = list.get(i).trim();
 		}
 		return retval;
 	}
+
+	public static List<String> convertToList(String value) {
+		if(value == null) {
+			return new ArrayList<>();
+		}
+		if(value.startsWith("[") && value.endsWith("]")) {
+			value = value.substring(1, value.length() - 1);
+		}
+		return StringSupport.split(value, ",");
+	}
+
 
 
 	private void processCommentAndEmpty(Line line) {
