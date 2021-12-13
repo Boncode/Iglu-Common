@@ -52,7 +52,7 @@ public interface Cache<K, V> {
 	 * @param timeout time to wait for the first thread to retrieve an object from the original location
 	 * @return the cached object or null if it's not found
 	 */
-	Object retrieve(K key, int timeout);
+	V retrieve(K key, int timeout);
 
 
 	/**
