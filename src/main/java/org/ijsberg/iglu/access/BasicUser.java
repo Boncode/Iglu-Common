@@ -38,7 +38,7 @@ public class BasicUser implements User {
 	private String userId;
 	private HashMap roles = new HashMap();
 	private UserGroup group;
-	private List<UserConsumableMessage> messageQueue;
+	private final List<UserConsumableMessage> messageQueue = new ArrayList<>();
 
 	/**
 	 * @param userId
@@ -145,24 +145,27 @@ public class BasicUser implements User {
 
 	@Override
 	public void dropMessage(UserConsumableMessage message) {
-		if(messageQueue == null) {
-			messageQueue = new ArrayList<>();
+		synchronized (messageQueue) {
+			messageQueue.add(message);
 		}
-		messageQueue.add(message);
 	}
 
 	@Override
 	public UserConsumableMessage consumeLatestMessage() {
-		if(messageQueue != null && !messageQueue.isEmpty()) {
-			return messageQueue.remove(0);
+		synchronized (messageQueue) {
+			if (!messageQueue.isEmpty()) {
+				return messageQueue.remove(0);
+			}
 		}
 		return null;
 	}
 
 	@Override
 	public UserConsumableMessage getLatestMessage() {
-		if(messageQueue != null && !messageQueue.isEmpty()) {
-			return messageQueue.get(0);
+		synchronized (messageQueue) {
+			if (!messageQueue.isEmpty()) {
+				return messageQueue.get(0);
+			}
 		}
 		return null;
 	}
