@@ -464,8 +464,8 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	}
 
 	@Override
-	public User getSystemUser() {
-		return authenticator.getSystemUser();
+	public User getSystemUser(String userId) {
+		return authenticator.getSystemUser(userId);
 	}
 
 	/**

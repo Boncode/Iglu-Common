@@ -20,7 +20,6 @@ package org.ijsberg.iglu.access;
 
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
-import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.ReceiverQueue;
 import org.ijsberg.iglu.util.misc.KeyGenerator;
 
@@ -197,8 +196,8 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	}
 
 	@Override
-	public User loginAsSystem() {
-		user = accessManager.getSystemUser();
+	public User loginAsSystem(String userId) {
+		user = accessManager.getSystemUser(userId);
 		if(user != null) {
 			userSettings = user.getSettings();
 		}
@@ -206,9 +205,9 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	}
 
 	@Override
-	public User loginAsSystem(long expirationTimeoutLoggedIn) {
+	public User loginAsSystem(String userId, long expirationTimeoutLoggedIn) {
 		this.expirationTimeoutLoggedIn = expirationTimeoutLoggedIn * 1000;
-		return loginAsSystem();
+		return loginAsSystem(userId);
 	}
 
 

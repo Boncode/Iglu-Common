@@ -39,6 +39,7 @@ public class ResourceUsageLogger implements Pageable, Startable {
         System.out.println(new LogEntry(Level.VERBOSE, "Memory use: " + new NumberFormatter('.',',').format((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024), 1) + " Mb"));
         System.out.println(new LogEntry(Level.VERBOSE, "System CPU load: " + new NumberFormatter('.',',').format(osBean.getSystemCpuLoad(), 1)));
         System.out.println(new LogEntry(Level.VERBOSE, "Free space: " + new NumberFormatter('.',',').format((new File("/").getFreeSpace()) / (1024 * 1024)) + " Mb"));
+        System.out.println(new LogEntry(Level.VERBOSE, "Free space in repository: " + new NumberFormatter('.',',').format((new File("/repository").getFreeSpace()) / (1024 * 1024)) + " Mb"));
     }
 
     @Override

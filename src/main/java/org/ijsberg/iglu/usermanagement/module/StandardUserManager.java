@@ -153,7 +153,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	}
 
 	@Override
-	public User getSystemUser() {
+	public User getSystemUser(String userId) {
 		throw new FatalException("not implemented");
 	}
 

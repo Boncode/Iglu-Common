@@ -13,4 +13,8 @@ public class UserMessage implements UserConsumableMessage {
     public String getMessageText() {
         return messageText;
     }
+
+    public String toString() {
+        return messageText;
+    }
 }

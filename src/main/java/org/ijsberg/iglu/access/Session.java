@@ -50,7 +50,7 @@ public interface Session {
 	 *
 	 * @return a system user i.e. administrator
 	 */
-	User loginAsSystem();
+	User loginAsSystem(String userId);
 
 	/**
 	 * Meant for system threads that access protected resources or logic.
@@ -59,7 +59,7 @@ public interface Session {
 	 * @param expirationTimeoutLoggedIn alternative timeout in seconds
 	 * @return a system user i.e. administrator
 	 */
-	User loginAsSystem(long expirationTimeoutLoggedIn);
+	User loginAsSystem(String userId, long expirationTimeoutLoggedIn);
 
 	/**
 	 * Removes a user who was previously logged in.
