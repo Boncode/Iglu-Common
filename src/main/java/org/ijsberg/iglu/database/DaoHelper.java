@@ -40,8 +40,8 @@ public abstract class DaoHelper {
         configConnectionPoolComponent.setProperties(IgluProperties.loadProperties(connPoolConfigFileName));
         cluster.connect(connPoolComponentName, configConnectionPoolComponent, Startable.class);
         T impl = ReflectionSupport.instantiateClass(daoClass, configConnectionPool);
-        Component configDbComponent = new StandardComponent(impl);
-        cluster.connect(daoComponentName, configDbComponent, expInterface);
+        Component issueDbComponent = new StandardComponent(impl);
+        cluster.connect(daoComponentName, issueDbComponent, expInterface);
         return impl;
     }
 
