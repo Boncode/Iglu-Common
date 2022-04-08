@@ -36,8 +36,8 @@ public class BasicUser implements User {
 	private Properties settings;
 
 	private String userId;
-	private HashMap roles = new HashMap();
-	private UserGroup group;
+	private HashMap<String, Role> roles = new HashMap();
+	private HashMap<String, UserGroup> groups = new HashMap<>();
 	private final List<UserConsumableMessage> messageQueue = new ArrayList<>();
 
 	/**
@@ -45,20 +45,33 @@ public class BasicUser implements User {
 	 * @param roles
 	 * @param settings
 	 */
-	public BasicUser(String userId, List<Role> roles, UserGroup group, Properties settings) {
+/*	public BasicUser(String userId, List<Role> roles, UserGroup group, Properties settings) {
 		this.userId = userId;
 		this.settings = settings;
 
-		Iterator i = roles.iterator();
-		while (i.hasNext()) {
-			Object o = i.next();
-			Role role;
-			String roleId;
-			role = (Role) o;
-			roleId = role.getId();
-			this.roles.put(roleId, role);
+		for(Role role : roles) {
+			this.roles.put(role.getId(), role);
 		}
-		this.group = group;
+		if(group != null) {
+			this.groups.put(group.getName(), group);
+		}
+	}
+*/
+	/**
+	 * @param userId
+	 * @param roles
+	 * @param settings
+	 */
+	public BasicUser(String userId, List<Role> roles, List<UserGroup> groups, Properties settings) {
+		this.userId = userId;
+		this.settings = settings;
+
+		for(Role role : roles) {
+			this.roles.put(role.getId(), role);
+		}
+		for(UserGroup group : groups) {
+			this.groups.put(group.getName().trim(), group);
+		}
 	}
 
 	public BasicUser(String userId, Properties settings) {
@@ -135,12 +148,15 @@ public class BasicUser implements User {
 	}
 
 	@Override
-	public UserGroup getGroup() {
-		return group;
+	public UserGroup getFirstGroup() {
+		if(!groups.isEmpty()) {
+			return groups.values().iterator().next();
+		}
+		return null;
 	}
 
-	public void setGroup(UserGroup group) {
-		this.group = group;
+	public void addGroup(UserGroup group) {
+		this.groups.put(group.getName().trim(), group);
 	}
 
 	@Override
@@ -168,6 +184,11 @@ public class BasicUser implements User {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public Set<String> getGroupNames() {
+		return groups.keySet();
 	}
 
 }

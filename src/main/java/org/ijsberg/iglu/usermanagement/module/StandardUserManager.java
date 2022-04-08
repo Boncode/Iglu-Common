@@ -134,7 +134,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 			if (passwordsMatch(password, account.getHashedPassword())) {
 				BasicUser user = new BasicUser(account.getUserId(), IgluProperties.copy(account.getProperties()));
 				if(account.getProperties().containsKey("group")) {
-					user.setGroup(new UserGroup(account.getProperties().getProperty("group"), ""));
+					user.addGroup(new UserGroup(account.getProperties().getProperty("group"), ""));
 				}
 				return user;
 			}

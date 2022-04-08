@@ -21,6 +21,7 @@ package org.ijsberg.iglu.access;
 
 import java.util.Collection;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Stands for an (authenticated) application user.
@@ -62,11 +63,13 @@ public interface User {
 	 */
 	boolean isAccountBlocked();
 
-	UserGroup getGroup();
+	UserGroup getFirstGroup();
 
     void dropMessage(UserConsumableMessage message);
 
 	UserConsumableMessage consumeLatestMessage();
 
 	UserConsumableMessage getLatestMessage();
+
+	Set<String> getGroupNames();
 }

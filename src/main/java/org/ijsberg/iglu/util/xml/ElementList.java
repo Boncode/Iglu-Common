@@ -725,9 +725,6 @@ public abstract class ElementList implements Serializable {
 						type = START_TAG;
 					}
 			}
-			if(contents.contains("ActivityTimeout_FunctionalError")) {
-				System.out.println("===================> " + contents + " === " + type);
-			}
 			return contentsLength;
 		}
 

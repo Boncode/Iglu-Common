@@ -9,6 +9,9 @@ import org.ijsberg.iglu.usermanagement.multitenancy.model.TenantAwareInput;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class MultiTenantAwareComponent extends StandardComponent {
 
@@ -34,8 +37,8 @@ public class MultiTenantAwareComponent extends StandardComponent {
         if(parameters != null) {
             for (Object parameter : parameters) {
                 if (parameter instanceof TenantAwareInput && !userIsAdmin()) {
-                    System.out.println(new LogEntry("=========     MultiTenantAwareComponent : Found TenantAwareInput, tenant: " + ((TenantAwareInput) parameter).getTenantId()) + " AGAINST " + getUserGroup());
-                    if(!getUserGroup().getName().equals(((TenantAwareInput) parameter).getTenantId())) {
+                    System.out.println(new LogEntry("=========     MultiTenantAwareComponent : Found TenantAwareInput, tenant: " + ((TenantAwareInput) parameter).getTenantId()) + " AGAINST " + getUserGroupNames());
+                    if(!getUserGroupNames().contains(((TenantAwareInput) parameter).getTenantId())) {
                         throw new SecurityException("user not allowed to interfere with other tenant");
                     }
                 }
@@ -57,7 +60,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
 */
         //check output
         if(returnValue instanceof TenantAwareInput && !userIsAdmin()) {
-            returnValue = ((TenantAwareInput)returnValue).filterOutOtherTenants(getUserGroup());
+            returnValue = ((TenantAwareInput)returnValue).filterOutOtherTenants(getUserGroupNames());
         }
 
         return returnValue;
@@ -73,7 +76,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
 
         //check output
         if(returnValue instanceof TenantAwareInput && !userIsAdmin()) {
-            returnValue = ((TenantAwareInput)returnValue).filterOutOtherTenants(getUserGroup());
+            returnValue = ((TenantAwareInput)returnValue).filterOutOtherTenants(getUserGroupNames());
         }
 
         return returnValue;
@@ -90,15 +93,15 @@ public class MultiTenantAwareComponent extends StandardComponent {
         return false;
     }
 
-    public UserGroup getUserGroup() {
+    public Set<String> getUserGroupNames() {
         Request request = getAccessManager().getCurrentRequest();
         if(request != null) {
             User user = request.getUser();
             if(user != null) {
-                return user.getGroup();
+                return user.getGroupNames();
             }
         }
-        return null;
+        return Collections.EMPTY_SET;
     }
 
 }
