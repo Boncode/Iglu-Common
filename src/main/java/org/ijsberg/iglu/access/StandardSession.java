@@ -64,7 +64,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 */
 	public StandardSession(AccessManager accessManager, long expirationTimeout, long expirationTimeoutLoggedIn, Properties defaultUserSettings) {
 		//create an id that's unique and difficult to guess
-		token = KeyGenerator.generateKey();
+		token = KeyGenerator.generateKey(60);
 //		this.application = application;
 		//store as millis
 		this.expirationTimeout = expirationTimeout * 1000;
