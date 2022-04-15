@@ -25,7 +25,6 @@ import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.server.invocation.AssemblyCommandLine;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 /**
  */

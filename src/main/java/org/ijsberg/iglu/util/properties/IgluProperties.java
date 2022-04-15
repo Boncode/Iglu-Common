@@ -23,7 +23,6 @@ import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.collection.ListHashMap;
-import org.ijsberg.iglu.util.collection.ListMap;
 import org.ijsberg.iglu.util.io.FileData;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.Line;

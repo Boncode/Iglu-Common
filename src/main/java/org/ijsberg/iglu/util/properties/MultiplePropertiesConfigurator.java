@@ -5,7 +5,8 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.ResourceException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class MultiplePropertiesConfigurator {
 

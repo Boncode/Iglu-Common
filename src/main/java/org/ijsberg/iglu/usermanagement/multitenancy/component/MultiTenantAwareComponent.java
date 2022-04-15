@@ -1,6 +1,8 @@
 package org.ijsberg.iglu.usermanagement.multitenancy.component;
 
-import org.ijsberg.iglu.access.*;
+import org.ijsberg.iglu.access.AccessConstants;
+import org.ijsberg.iglu.access.Request;
+import org.ijsberg.iglu.access.User;
 import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
@@ -10,7 +12,6 @@ import org.ijsberg.iglu.usermanagement.multitenancy.model.TenantAwareInput;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 public class MultiTenantAwareComponent extends StandardComponent {

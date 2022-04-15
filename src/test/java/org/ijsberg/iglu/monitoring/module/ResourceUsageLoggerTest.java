@@ -1,11 +1,10 @@
 package org.ijsberg.iglu.monitoring.module;
 
+import com.sun.management.OperatingSystemMXBean;
 import org.junit.Test;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
-import com.sun.management.OperatingSystemMXBean;
-import static org.junit.Assert.*;
 
 public class ResourceUsageLoggerTest {
 

@@ -31,7 +31,6 @@ import org.ijsberg.iglu.util.time.TimeSupport;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 

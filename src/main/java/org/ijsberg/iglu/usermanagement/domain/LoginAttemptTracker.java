@@ -3,7 +3,9 @@ package org.ijsberg.iglu.usermanagement.domain;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import static org.ijsberg.iglu.util.time.TimeSupport.*;
+
+import static org.ijsberg.iglu.util.time.TimeSupport.MINUTE_IN_MS;
+import static org.ijsberg.iglu.util.time.TimeSupport.nowMinus;
 
 public class LoginAttemptTracker {
 

@@ -1,7 +1,5 @@
 package org.ijsberg.iglu.usermanagement.multitenancy.model;
 
-import org.ijsberg.iglu.access.UserGroup;
-
 import java.util.Set;
 
 /**

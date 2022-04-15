@@ -1,6 +1,9 @@
 package org.ijsberg.iglu.util.xml;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 

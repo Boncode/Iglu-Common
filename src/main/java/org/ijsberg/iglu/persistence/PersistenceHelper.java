@@ -1,7 +1,6 @@
 package org.ijsberg.iglu.persistence;
 
 import org.ijsberg.iglu.util.ResourceException;
-import org.ijsberg.iglu.util.properties.MultiplePropertiesConfigurator;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

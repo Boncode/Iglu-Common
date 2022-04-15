@@ -2,8 +2,6 @@ package org.ijsberg.iglu.usermanagement.module;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class StandardUserManagerTest {
 
     @Test

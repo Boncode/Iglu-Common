@@ -22,8 +22,8 @@ import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.mvc.mapping.*;
 import org.ijsberg.iglu.mvc.mapping.Process;
+import org.ijsberg.iglu.mvc.mapping.*;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.io.*;

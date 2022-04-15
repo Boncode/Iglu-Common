@@ -5,11 +5,10 @@ import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
+import org.ijsberg.iglu.util.formatting.NumberFormatter;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
-import com.sun.management.OperatingSystemMXBean;
-import org.ijsberg.iglu.util.formatting.NumberFormatter;
 
 public class ResourceUsageLogger implements Pageable, Startable {
 

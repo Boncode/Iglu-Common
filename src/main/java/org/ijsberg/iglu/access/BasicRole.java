@@ -3,7 +3,6 @@ package org.ijsberg.iglu.access;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
-import java.util.Collection;
 import java.util.List;
 
 public class BasicRole implements Role {

@@ -21,10 +21,10 @@ package org.ijsberg.iglu.database.component;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
-import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
+import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.execution.Executable;
 import org.ijsberg.iglu.util.execution.TimeOutException;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
@@ -36,8 +36,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**

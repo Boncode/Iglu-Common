@@ -18,9 +18,6 @@
  */
 package org.ijsberg.iglu.util.xml;
 
-import org.ijsberg.iglu.util.io.FileSupport;
-
-import java.io.File;
 import java.util.*;
 
 /**
