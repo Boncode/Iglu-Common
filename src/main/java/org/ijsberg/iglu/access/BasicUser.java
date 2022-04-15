@@ -67,7 +67,7 @@ public class BasicUser implements User {
 		this.settings = settings;
 
 		for(Role role : roles) {
-			this.roles.put(role.getId(), role);
+			this.roles.put(role.getName(), role);
 		}
 		for(UserGroup group : groups) {
 			this.groups.put(group.getName().trim(), group);
@@ -129,14 +129,14 @@ public class BasicUser implements User {
 	 * @see User#getRoles()
 	 */
 	public Role getRole(String roleId) {
-		return (Role) roles.get(roleId);
+		return roles.get(roleId);
 	}
 
 	/**
 	 * @return
 	 * @see User#getRoles()
 	 */
-	public Collection getRoles() {
+	public Collection<Role> getRoles() {
 		return roles.values();
 	}
 

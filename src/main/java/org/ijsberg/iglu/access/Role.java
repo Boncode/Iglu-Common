@@ -26,7 +26,7 @@ public interface Role {
 	/**
 	 * @return role ID
 	 */
-	String getId();
+	String getName();
 
 	/**
 	 * @return a description meant for administrators
