@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.List;
 
 
 public class PersistenceHelperTest extends TestCase {
@@ -61,7 +62,7 @@ public class PersistenceHelperTest extends TestCase {
         assertEquals("Hello", persistedEntity.getName());
         assertFalse(persistedEntity.isBool());
 
-        assertEquals(4, persisterB.getSize());
+        assertEquals(1, persisterB.getSize());
 
         persistedEntity.setName("BLA");
         persisterB.update(persistedEntity);
@@ -72,7 +73,7 @@ public class PersistenceHelperTest extends TestCase {
         SomeEntity persistedEntity2 = persisterC.read(1);
         assertEquals("BLA", persistedEntity2.getName());
 
-        assertEquals(4, persisterC.getSize());
+        assertEquals(1, persisterC.getSize());
 
         persisterC.delete(1);
         assertEquals(0, persisterC.getSize());
@@ -81,6 +82,17 @@ public class PersistenceHelperTest extends TestCase {
                 tmpDir.getAbsolutePath(), SomeEntity.class, ENTITY_ID, FIELDS);
 
         assertEquals(0, persisterD.getSize());
+
+        persisterD.create(new SomeEntity("hop_1", 20, true));
+        persisterD.create(new SomeEntity("hop_2", 20, true));
+        persisterD.create(new SomeEntity("hop_3", 30, true));
+
+        List<SomeEntity> entities = persisterD.readByField("name", "hop_1");
+        assertEquals(1, entities.size());
+        assertEquals("hop_1", entities.get(0).getName());
+
+        entities = persisterD.readByField("value", 20);
+        assertEquals(2, entities.size());
     }
 
 

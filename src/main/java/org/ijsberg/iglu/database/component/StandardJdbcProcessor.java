@@ -18,6 +18,8 @@
  */
 package org.ijsberg.iglu.database.component;
 
+import org.ijsberg.iglu.FatalException;
+import org.ijsberg.iglu.access.BasicUser;
 import org.ijsberg.iglu.database.*;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
@@ -464,6 +466,4 @@ public class StandardJdbcProcessor implements JdbcProcessor {
 		System.out.println(new LogEntry(result + " rows affected"));
 		return result;
 	}
-
-
 }

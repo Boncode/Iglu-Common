@@ -23,10 +23,11 @@ package org.ijsberg.iglu.access;
  */
 public class UserGroup {
 
-	protected String name;
-	protected String description;
+	private long id;
+	private String name;
+	private String description;
 
-	protected UserGroup() {
+	public UserGroup() {
 	}
 
 	public UserGroup(String name, String description) {
@@ -34,6 +35,10 @@ public class UserGroup {
 		this.description = description;
 	}
 
+	public UserGroup(long id, String name, String description) {
+		this.name = name;
+		this.description = description;
+	}
 
 	public String getName() {
 		return name;

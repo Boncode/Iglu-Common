@@ -6,6 +6,15 @@ public class SomeEntity {
     private int value;
     private boolean bool = true;
 
+    public SomeEntity() {
+    }
+
+    public SomeEntity(String name, int value, boolean bool) {
+        this.name = name;
+        this.value = value;
+        this.bool = bool;
+    }
+
     public long getId() {
         return id;
     }

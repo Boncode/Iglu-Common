@@ -20,6 +20,8 @@ package org.ijsberg.iglu.access;
 
 import java.util.*;
 
+import static org.ijsberg.iglu.access.Permissions.FULL_CONTROL;
+
 /**
  * Is the transient counterpart of an account.
  * It makes the account settings available.
@@ -67,7 +69,7 @@ public class BasicUser implements User {
 		this.settings = settings;
 
 		for(Role role : roles) {
-			this.roles.put(role.getName(), role);
+			this.roles.put(role.getName().trim(), role);
 		}
 		for(UserGroup group : groups) {
 			this.groups.put(group.getName().trim(), group);
@@ -110,17 +112,29 @@ public class BasicUser implements User {
 	}
 
 	/**
-	 * @param roleId id of the rule a user must have,
+	 * @param roleName id of the rule a user must have,
 	 *               a '*' makes the method return 'true',
 	 *               which can be used to check whether a user is at least authenticated
 	 * @return true if a user has, or fulfills the role
 	 * @see User#hasRole(String)
 	 */
-	public boolean hasRole(String roleId) {
-		if ("*".equals(roleId)) {
+	public boolean hasRole(String roleName) {
+		if ("*".equals(roleName)) {
 			return true;
 		}
-		return roles.keySet().contains(roleId);
+		return roles.keySet().contains(roleName);
+	}
+
+	@Override
+	public boolean hasOneOfRights(String... rightsIds) {
+		for(String accessRightId : rightsIds) {
+			for (Role role : roles.values()) {
+				if (role.hasPermission(accessRightId)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -189,6 +203,37 @@ public class BasicUser implements User {
 	@Override
 	public Set<String> getGroupNames() {
 		return groups.keySet();
+	}
+
+	public Set<BasicPermission> getEffectivePermissions() {
+		Set<BasicPermission> permissions = new HashSet<>();
+		LOOP:
+		for (Role role : getRoles()) {
+			for (String permissionId : role.listPermissionIds()) {
+				if(permissionId.equals(FULL_CONTROL)) {
+					permissions.addAll(Permissions.all());
+					break LOOP;
+				}
+				permissions.add(Permissions.get(permissionId));
+			}
+		}
+		return permissions;
+	}
+
+	public Set<String> getEffectivePermissionNames() {
+		Set<String> retval = new HashSet<>();
+		for(BasicPermission permission : getEffectivePermissions()) {
+			retval.add(permission.getName());
+		}
+		return retval;
+	}
+
+	public Set<String> getEffectivePermissionIds() {
+		Set<String> retval = new HashSet<>();
+		for(BasicPermission permission : getEffectivePermissions()) {
+			retval.add(permission.getId());
+		}
+		return retval;
 	}
 
 }

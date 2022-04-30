@@ -221,7 +221,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 									}
 								}
 							} else {
-								System.out.println(new LogEntry(Level.DEBUG, "pageble NOT started: not paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "...")));
+								System.out.println(new LogEntry(Level.DEBUG, "pageable NOT started: not paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "...")));
 							}
 						}
 					}

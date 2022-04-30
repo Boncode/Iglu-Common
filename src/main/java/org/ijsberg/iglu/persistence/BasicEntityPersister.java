@@ -7,6 +7,8 @@ import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -19,15 +21,17 @@ public class BasicEntityPersister<T> {
     private String fileLocation;
     private Class<T> entityType;
     private String[] fieldNames;
+    private List<String> fieldNameList;
     private String idName;
 
     private long currentKey;
 
-    public BasicEntityPersister(String fileLocation, Class<T> entityType, String idName, String[] fieldNames) {
+    public BasicEntityPersister(String fileLocation, Class<T> entityType, String idName, String ... fieldNames) {
         this.fileLocation = fileLocation;
         this.entityType = entityType;
         this.idName = idName;
         this.fieldNames = fieldNames;
+        this.fieldNameList = Arrays.asList(fieldNames);
         load();
     }
 
@@ -41,18 +45,62 @@ public class BasicEntityPersister<T> {
         }
     }
 
+    public long insert(long key, T entity) {
+        synchronized (lock) {
+            PersistenceHelper.setEntityId(key, idName, entity);
+            repository.put(key, PersistenceHelper.convertToRecord(fieldNames, entity));
+            save();
+            currentKey = repository.descendingKeySet().first();
+            return key;
+        }
+    }
+
     public T read(long key) {
-        T entity = instantiateEntity();
+        T entity;
         int index = 0;
         synchronized (lock) {
             List row = repository.get(key);
+            if(row == null) {
+                return null;
+            }
+            entity = instantiateEntity();
             PersistenceHelper.setEntityId(key, idName, entity);
             PersistenceHelper.populateEntity(row, fieldNames, entity);
         }
-        save();
+        //save();
         return entity;
     }
 
+    public List<T> readByField(String fieldName, Object fieldValue) {
+        List<T> result = new ArrayList<>();
+        synchronized (lock) {
+            for(Long id : repository.keySet()) {
+                List row = repository.get(id);
+                Object value = row.get(fieldNameList.indexOf(fieldName));
+                if(fieldValue.equals(value)) {
+                    T entity = instantiateEntity();
+                    PersistenceHelper.setEntityId(id, idName, entity);
+                    PersistenceHelper.populateEntity(row, fieldNames, entity);
+                    result.add(entity);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<T> readAll() {
+        List<T> result = new ArrayList<>();
+        synchronized (lock) {
+            for(Long id : repository.keySet()) {
+                List row = repository.get(id);
+                T entity = instantiateEntity();
+                PersistenceHelper.setEntityId(id, idName, entity);
+                PersistenceHelper.populateEntity(row, fieldNames, entity);
+                result.add(entity);
+            }
+        }
+        return result;
+    }
 
     public void update(T entity) {
         synchronized (lock) {
@@ -73,7 +121,7 @@ public class BasicEntityPersister<T> {
         try {
             return ReflectionSupport.instantiateClass(entityType);
         } catch (InstantiationException e) {
-            throw new ResourceException("cannot instatiate entity " + entityType);
+            throw new ResourceException("cannot instantiate entity " + entityType, e);
         }
     }
 
@@ -81,11 +129,14 @@ public class BasicEntityPersister<T> {
     private void load() {
         try {
             FileSupport.createDirectory(fileLocation);
-            if(FileSupport.fileExists(fileLocation + "/" + entityType.getSimpleName() + ".bin")) {
-                repository = new ListTreeMap((TreeMap)FileSupport.readSerializable(fileLocation + "/" + entityType.getSimpleName() + ".bin"));
+            if(FileSupport.fileExists(getFileName())) {
+                repository = new ListTreeMap((TreeMap)FileSupport.readSerializable(getFileName()));
                 if(repository.keySet().size() > 0) {
                     currentKey = repository.descendingKeySet().first();
                 }
+            } else {
+                //create empty file
+                save();
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new ResourceException("cannot load entities from " + fileLocation + "/" + entityType.getSimpleName() + ".bin", e);
@@ -94,13 +145,17 @@ public class BasicEntityPersister<T> {
 
     private void save() {
         try {
-            FileSupport.saveSerializable((TreeMap)repository.getMap(), fileLocation + "/" + entityType.getSimpleName() + ".bin");
+            FileSupport.saveSerializable((TreeMap)repository.getMap(), getFileName());
         } catch (IOException e) {
             throw new ResourceException("cannot save entities to " + fileLocation + "/" + entityType.getSimpleName() + ".bin", e);
         }
     }
 
+    private String getFileName() {
+        return fileLocation + "/" + entityType.getSimpleName() + ".bin";
+    }
+
     public int getSize() {
-        return repository.size();
+        return repository.keySet().size();
     }
 }

@@ -4,13 +4,16 @@ import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BasicRole implements Role {
 
     private long id;
     private String name;
     private String description;
-    private String accessRightIds = "";
+    private String permissionIds = "";
+
+    public BasicRole() {}
 
     public BasicRole(String name, String description) {
         this.name = name;
@@ -23,11 +26,11 @@ public class BasicRole implements Role {
         this.description = description;
     }
 
-    public BasicRole with(AccessRight right) {
-        List<String> accessRightIdList = StringSupport.split(accessRightIds, ",");
-        if(!accessRightIdList.contains(right.getId())) {
-            accessRightIdList.add(right.getId());
-            accessRightIds = CollectionSupport.format(accessRightIdList, ",");
+    public BasicRole with(Permission permission) {
+        List<String> permissionIdList = StringSupport.split(permissionIds, ",");
+        if(!permissionIdList.contains(permission.getId())) {
+            permissionIdList.add(permission.getId());
+            permissionIds = CollectionSupport.format(permissionIdList, ",");
         }
         return this;
     }
@@ -46,8 +49,27 @@ public class BasicRole implements Role {
         return description;
     }
 
-    public boolean hasRight(String accessRightId) {
-        List<String> accessRightIdList = StringSupport.split(accessRightIds, ",");
-        return accessRightIdList.contains(accessRightId);
+    @Override
+    public boolean hasPermission(String permissionId) {
+        List<String> permissionIdList = StringSupport.split(permissionIds, ",");
+        return permissionIdList.contains(permissionId);
+    }
+
+    @Override
+    public List<String> listPermissionIds() {
+        return StringSupport.split(permissionIds, ",");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BasicRole basicRole = (BasicRole) o;
+        return id == basicRole.id && Objects.equals(name, basicRole.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

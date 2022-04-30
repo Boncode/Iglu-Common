@@ -48,6 +48,12 @@ public interface User {
 	boolean hasRole(String roleId);
 
 	/**
+	 * @param rightsIds rights IDs
+	 * @return true if a user has at least one role that possesses rights
+	 */
+	boolean hasOneOfRights(String ... rightsIds);
+
+	/**
 	 * @param roleId role ID
 	 * @return a role by the given ID
 	 */
@@ -72,4 +78,5 @@ public interface User {
 	UserConsumableMessage getLatestMessage();
 
 	Set<String> getGroupNames();
+
 }

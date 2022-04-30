@@ -19,6 +19,8 @@
 
 package org.ijsberg.iglu.access;
 
+import java.util.List;
+
 /**
  * Represents a role a user may assume.
  */
@@ -32,4 +34,8 @@ public interface Role {
 	 * @return a description meant for administrators
 	 */
 	String getDescription();
+
+	boolean hasPermission(String accessRightId);
+
+	List<String> listPermissionIds();
 }

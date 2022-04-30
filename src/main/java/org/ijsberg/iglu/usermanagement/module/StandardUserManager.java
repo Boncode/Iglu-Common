@@ -224,8 +224,10 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	@Override
 	public void updateAccount(User user) {
 		Account account = accounts.get(user.getId());
-		account.setProperties(user.getSettings());
-		save();
+		if(account != null) {
+			account.setProperties(user.getSettings());
+			save();
+		}
 	}
 
 	@Override
