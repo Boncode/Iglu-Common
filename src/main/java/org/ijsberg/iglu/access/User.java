@@ -42,10 +42,10 @@ public interface User {
 	Properties getSettings();
 
 	/**
-	 * @param roleId role ID
+	 * @param roleName role ID
 	 * @return true if a user has, or fulfills the role
 	 */
-	boolean hasRole(String roleId);
+	boolean hasRole(String roleName);
 
 	/**
 	 * @param rightsIds rights IDs
