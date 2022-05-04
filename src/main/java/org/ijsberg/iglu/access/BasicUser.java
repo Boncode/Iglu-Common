@@ -211,7 +211,6 @@ public class BasicUser implements User {
 	}
 
 	public Set<BasicPermission> getEffectivePermissions() {
-		new Exception().printStackTrace();
 		System.out.println(Permissions.all());
 		Set<BasicPermission> permissions = new HashSet<>();
 		LOOP:
