@@ -24,6 +24,8 @@ public class BasicEntityPersister<T> {
     private List<String> fieldNameList;
     private String idName;
 
+    private List<String> uniqueIndexNames = new ArrayList<>();
+
     private long currentKey;
 
     public BasicEntityPersister(String fileLocation, Class<T> entityType, String idName, String ... fieldNames) {
@@ -35,23 +37,43 @@ public class BasicEntityPersister<T> {
         load();
     }
 
-    public long create(T entity) {
+    public BasicEntityPersister withUniqueIndexOn(String fieldName) {
+        uniqueIndexNames.add(fieldName);
+        return this;
+    }
+
+    public T create(T entity) {
         synchronized (lock) {
             long nextKey = ++currentKey;
+            assertUniqueIndexes(entity, nextKey);
             PersistenceHelper.setEntityId(nextKey, idName, entity);
             repository.put(nextKey, PersistenceHelper.convertToRecord(fieldNames, entity));
             save();
-            return nextKey;
+            return entity;
         }
     }
 
     public long insert(long key, T entity) {
         synchronized (lock) {
+            assertUniqueIndexes(entity, key);
             PersistenceHelper.setEntityId(key, idName, entity);
-            repository.put(key, PersistenceHelper.convertToRecord(fieldNames, entity));
+            repository.replaceValues(key, PersistenceHelper.convertToRecord(fieldNames, entity));
             save();
             currentKey = repository.descendingKeySet().first();
             return key;
+        }
+    }
+
+    private void assertUniqueIndexes(T entity, long currentId) {
+        for(String uniqueIndexName : uniqueIndexNames) {
+            Object fieldValue = PersistenceHelper.getFieldValue(uniqueIndexName, entity);
+            List<T> existingEntity = readByField(uniqueIndexName, fieldValue);
+            if(!existingEntity.isEmpty()) {
+                if(PersistenceHelper.getId(idName, existingEntity.get(0)) != currentId) {
+                    throw new ResourceException("value " + fieldValue + " for field " + uniqueIndexName + " must be unique");
+                }
+            }
+
         }
     }
 
@@ -105,6 +127,7 @@ public class BasicEntityPersister<T> {
     public void update(T entity) {
         synchronized (lock) {
             long key = PersistenceHelper.getId(idName, entity);
+            assertUniqueIndexes(entity, key);
             repository.replaceValues(key, PersistenceHelper.convertToRecord(fieldNames, entity));
         }
         save();

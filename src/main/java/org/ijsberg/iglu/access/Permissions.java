@@ -23,9 +23,9 @@ public class Permissions {
 
     static {
         register(FULL_CONTROL, "full control", "administrator rights");
-        register(R, "read", "read");
-        register(W, "write", "write");
-        register(X, "execute", "execute");
+        register(R, "read", "Unix-style read access, typically for viewing content only");
+        register(W, "write", "Unix-style write access, typically for creating and modifying content");
+        register(X, "execute", "Unix-style execute access, typically for managing configurations");
     }
 
     public static BasicPermission get(String id) {
@@ -34,5 +34,9 @@ public class Permissions {
 
     public static Collection<BasicPermission> all() {
         return permissionMap.values();
+    }
+
+    public static boolean containsId(String id) {
+        return permissionMap.containsKey(id);
     }
 }

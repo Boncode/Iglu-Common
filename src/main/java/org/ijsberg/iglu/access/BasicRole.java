@@ -13,6 +13,9 @@ public class BasicRole implements Role {
     private String description;
     private String permissionIds = "";
 
+    private boolean isSystemRole = false;
+
+
     public BasicRole() {}
 
     public BasicRole(String name, String description) {
@@ -20,10 +23,11 @@ public class BasicRole implements Role {
         this.description = description;
     }
 
-    public BasicRole(long id, String name, String description) {
+    public BasicRole(long id, String name, String description, boolean isSystemRole) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.isSystemRole = isSystemRole;
     }
 
     public BasicRole with(Permission permission) {
@@ -60,6 +64,10 @@ public class BasicRole implements Role {
         return StringSupport.split(permissionIds, ",");
     }
 
+    public String getPermissionIds() {
+        return permissionIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,5 +79,17 @@ public class BasicRole implements Role {
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
+    }
+
+    public void addPermission(String permissionId) {
+        List<String> permissionIdList = listPermissionIds();
+        if(!permissionIdList.contains(permissionId)) {
+            permissionIdList.add(permissionId);
+            permissionIds = CollectionSupport.format(permissionIdList, ",");
+        }
+    }
+
+    public boolean isSystemRole() {
+        return isSystemRole;
     }
 }

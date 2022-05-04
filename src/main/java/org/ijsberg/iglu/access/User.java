@@ -64,6 +64,8 @@ public interface User {
 	 */
 	Collection<Role> getRoles();
 
+	void addRole(Role role);
+
 	/**
 	 * @return true if the user account is marked blocked
 	 */

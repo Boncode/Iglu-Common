@@ -154,7 +154,12 @@ public class BasicUser implements User {
 		return roles.values();
 	}
 
-	/**
+    @Override
+    public void addRole(Role role) {
+		this.roles.put(role.getName().trim(), role);
+    }
+
+    /**
 	 * @return false
 	 */
 	public boolean isAccountBlocked() {
@@ -206,15 +211,19 @@ public class BasicUser implements User {
 	}
 
 	public Set<BasicPermission> getEffectivePermissions() {
+		new Exception().printStackTrace();
+		System.out.println(Permissions.all());
 		Set<BasicPermission> permissions = new HashSet<>();
 		LOOP:
 		for (Role role : getRoles()) {
 			for (String permissionId : role.listPermissionIds()) {
-				if(permissionId.equals(FULL_CONTROL)) {
+				if(permissionId.equals(FULL_CONTROL)) { //or x
 					permissions.addAll(Permissions.all());
 					break LOOP;
 				}
-				permissions.add(Permissions.get(permissionId));
+				if(Permissions.containsId(permissionId)) {
+					permissions.add(Permissions.get(permissionId));
+				}
 			}
 		}
 		return permissions;
