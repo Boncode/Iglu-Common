@@ -38,7 +38,7 @@ public class IgluProperties extends Properties {
 
 	public static char KEY_SEPARATOR = '.';
 
-	private Set<String> orderedPropertyNames = new LinkedHashSet();
+	private LinkedHashSet<String> orderedPropertyNames = new LinkedHashSet<>();
 
 	private ListHashMap<String,String> linesOfComment = new ListHashMap<>();
 
@@ -126,7 +126,9 @@ public class IgluProperties extends Properties {
 
 	public Object setProperty(String key, String value) {
 		Object retval = super.setProperty(key, value);
-		orderedPropertyNames.add(key);
+//		if(!orderedPropertyNames.contains(key)) {
+			orderedPropertyNames.add(key);
+//		}
 		return retval;
 	}
 

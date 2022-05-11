@@ -1,5 +1,6 @@
 package org.ijsberg.iglu.util.properties;
 
+import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -11,7 +12,17 @@ import static org.junit.Assert.*;
 public class IgluPropertiesTest {
 
     @Test
-    public void testGetSubsection() throws Exception {
+    public void testSetProperty_check_order() {
+        IgluProperties igluProperties = new IgluProperties();
+        igluProperties.setProperty("A", "1");
+        igluProperties.setProperty("B", "2");
+        igluProperties.setProperty("C", "3");
+
+        assertEquals("A,B,C", CollectionSupport.format(igluProperties.getRootKeys(), ","));
+
+        igluProperties.setProperty("B", "5");
+
+        assertEquals("A,B,C", CollectionSupport.format(igluProperties.getRootKeys(), ","));
     }
 
     @Test
