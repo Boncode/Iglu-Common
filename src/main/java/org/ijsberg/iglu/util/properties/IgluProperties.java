@@ -137,7 +137,7 @@ public class IgluProperties extends Properties {
 	 * @param sectionKey
 	 * @return
 	 */
-	public static Properties getSubsection(Properties properties, String sectionKey) {
+	public static IgluProperties getSubsection(Properties properties, String sectionKey) {
 
 		IgluProperties retval = new IgluProperties();
 
