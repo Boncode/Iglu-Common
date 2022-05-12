@@ -475,6 +475,9 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 * @param <T>
 	 */
 	public <T> void register(AgentFactory<T> agentFactory) {
+		if(agentFactoriesByAgentId.containsKey(agentFactory.getAgentId())) { //fixme apparently there are duplicates being set here
+			System.out.println(new LogEntry(Level.CRITICAL, "AgentFactory for " + agentFactory.getAgentId() + " already exists."));
+		}
 		agentFactoriesByAgentId.put(agentFactory.getAgentId(), agentFactory);
 	}
 
