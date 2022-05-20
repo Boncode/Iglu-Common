@@ -27,9 +27,9 @@ import java.util.Properties;
  */
 public abstract class BasicAgentFactory<T> implements AgentFactory<T> {
 
-	private String agentId;
-	private Properties properties;
-	private Cluster cluster;
+	protected String agentId;
+	protected Properties properties;
+	protected Cluster cluster;
 
 	public BasicAgentFactory(Cluster cluster, String agentId) {
 		this(cluster, agentId, new Properties());
