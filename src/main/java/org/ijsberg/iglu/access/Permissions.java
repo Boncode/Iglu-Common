@@ -22,7 +22,7 @@ public class Permissions {
     }
 
     static {
-        register(FULL_CONTROL, "full control", "administrator rights");
+        register(FULL_CONTROL, "full control", "Administrator rights");
         register(R, "read", "Unix-style read access, typically for viewing content only");
         register(W, "write", "Unix-style write access, typically for creating and modifying content");
         register(X, "execute", "Unix-style execute access, typically for managing configurations");
