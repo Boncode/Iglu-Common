@@ -13,7 +13,7 @@ public class MultiplePropertiesConfigurator {
     private List<String> files;
     private List<String> configurableProperties;
 
-    private IgluProperties currentPortalConfigurationProperties;
+    private IgluProperties currentConfigurationProperties;
 
     public MultiplePropertiesConfigurator(IgluProperties properties) {
         files = Arrays.asList(properties.getPropertyAsArray("files", "[]"));
@@ -23,51 +23,51 @@ public class MultiplePropertiesConfigurator {
     }
 
     private void initializeConfigurableProperties() {
-        IgluProperties initialPortalConfigurationProperties = new IgluProperties();
+        IgluProperties initialConfigurationProperties = new IgluProperties();
 
         for(String fileName : files) {
             if(IgluProperties.propertiesExist(fileName)) {
                 IgluProperties fileProperties = IgluProperties.loadProperties(fileName);
                 for(String propertyKey : configurableProperties) {
                     if(fileProperties.containsKey(propertyKey)) {
-                        initialPortalConfigurationProperties.setProperty(propertyKey, fileProperties.getProperty(propertyKey));
+                        initialConfigurationProperties.setProperty(propertyKey, fileProperties.getProperty(propertyKey));
                     }
                 }
             } else {
-                System.out.println(new LogEntry(Level.CRITICAL, "Configurable portal settings not found: " + fileName));
+                System.out.println(new LogEntry(Level.CRITICAL, "Configurable settings not found: " + fileName));
             }
         }
-        currentPortalConfigurationProperties = initialPortalConfigurationProperties;
+        currentConfigurationProperties = initialConfigurationProperties;
     }
 
 
-    public IgluProperties getPortalConfigurationProperties() {
-        return currentPortalConfigurationProperties;
+    public IgluProperties getConfigurationProperties() {
+        return currentConfigurationProperties;
     }
 
-    public void setPortalConfigurationProperties(IgluProperties newProperties) {
-        for(String key : currentPortalConfigurationProperties.stringPropertyNames()) {
+    public void setConfigurationProperties(IgluProperties newProperties) {
+        for(String key : currentConfigurationProperties.stringPropertyNames()) {
             if(newProperties.containsKey(key)) {
-                currentPortalConfigurationProperties.setProperty(key, newProperties.getProperty(key));
+                currentConfigurationProperties.setProperty(key, newProperties.getProperty(key));
             }
         }
-        savePortalProperties();
+        saveConfigurationProperties();
     }
 
-    private void savePortalProperties() {
+    private void saveConfigurationProperties() {
         for(String fileName : files) {
             if (IgluProperties.propertiesExist(fileName)) {
                 IgluProperties fileProperties = IgluProperties.loadProperties(fileName);
-                for(String key : currentPortalConfigurationProperties.stringPropertyNames()) {
+                for(String key : currentConfigurationProperties.stringPropertyNames()) {
                     if(fileProperties.containsKey(key)) {
-                        fileProperties.setProperty(key, currentPortalConfigurationProperties.getProperty(key));
+                        fileProperties.setProperty(key, currentConfigurationProperties.getProperty(key));
                     }
                 }
                 try {
                     IgluProperties.saveProperties(fileProperties, fileName);
                 } catch (IOException e) {
-                    System.out.println(new LogEntry(Level.CRITICAL, "failed to save portal configuration properties in file " + fileName, e));
-                    throw new ResourceException("failed to save portal configuration properties in file " + fileName, e);
+                    System.out.println(new LogEntry(Level.CRITICAL, "failed to save configuration properties in file " + fileName, e));
+                    throw new ResourceException("failed to save configuration properties in file " + fileName, e);
                 }
             }
         }
