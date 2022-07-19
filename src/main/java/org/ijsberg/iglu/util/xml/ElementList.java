@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.*;
 
 //TODO create tests, clean up and move to iglu-common
-
 /**
  */
 public abstract class ElementList implements Serializable {
@@ -838,6 +837,18 @@ public abstract class ElementList implements Serializable {
 				} else {
 					//locate the end of the tag
 					nextPosition = xmlInput.indexOf('>', currentPosition);
+					//check if '>' not in attribute value
+					String stringInbetweenCurrAndNext = xmlInput.substring(currentPosition, nextPosition);
+					int nrOfDoubleQuotes = StringSupport.count(stringInbetweenCurrAndNext, "\"");
+//					System.out.println((nrOfDoubleQuotes / 2)  + " != " +  (((float)nrOfDoubleQuotes) / 2) +
+//							(nrOfDoubleQuotes / 2 != ((float)nrOfDoubleQuotes) / 2));
+					while(nrOfDoubleQuotes / 2 != ((float)nrOfDoubleQuotes) / 2) {
+						//locate the end of the tag
+						nextPosition = xmlInput.indexOf('>', nextPosition + 1);
+						stringInbetweenCurrAndNext = xmlInput.substring(currentPosition, nextPosition);
+						nrOfDoubleQuotes = StringSupport.count(stringInbetweenCurrAndNext, "\"");
+					}
+
 				}
 				testPosition = xmlInput.indexOf('<', currentPosition);
 /*      TODO if strict / exclude CDATA          if(!processingCData && testPosition >= 0 && testPosition < nextPosition)
