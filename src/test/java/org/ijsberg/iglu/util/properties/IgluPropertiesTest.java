@@ -125,4 +125,21 @@ java.redundancyAnalyzers.patternDuplicateAnalyzer.ignoredConstructs=nl.ijsberg.c
         assertEquals("nl.ijsberg.codeanalysis.code.construct.ImportStatement", array[0]);
         assertEquals("nl.ijsberg.codeanalysis.code.token.Directive", array[1]);
     }
+
+    @Test
+    public void testRemoveSingleProperty() {
+        IgluProperties toEdit = new IgluProperties();
+        toEdit.setProperty("test.prop.a", "1");
+        toEdit.setProperty("test.prop.twenty.seven", "2");
+        toEdit.setProperty("test.a", "3");
+
+        IgluProperties toDelete = new IgluProperties();
+        toDelete.setProperty("test.prop.twenty.seven", "2");
+
+        for(String prop: toDelete.stringPropertyNames()) {
+            toEdit.remove(prop);
+        }
+
+        System.out.println(toEdit);
+    }
 }
