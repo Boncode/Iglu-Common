@@ -57,7 +57,7 @@ public class BasicEntityPersister<T> {
         synchronized (lock) {
             assertUniqueIndexes(entity, key);
             PersistenceHelper.setEntityId(key, idName, entity);
-            repository.replaceValues(key, PersistenceHelper.convertToRecord(fieldNames, entity));
+            repository.addOrReplaceValues(key, PersistenceHelper.convertToRecord(fieldNames, entity));
             save();
             currentKey = repository.descendingKeySet().first();
             return key;
@@ -128,7 +128,7 @@ public class BasicEntityPersister<T> {
         synchronized (lock) {
             long key = PersistenceHelper.getId(idName, entity);
             assertUniqueIndexes(entity, key);
-            repository.replaceValues(key, PersistenceHelper.convertToRecord(fieldNames, entity));
+            repository.addOrReplaceValues(key, PersistenceHelper.convertToRecord(fieldNames, entity));
         }
         save();
     }
