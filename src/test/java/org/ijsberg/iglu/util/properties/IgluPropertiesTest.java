@@ -3,6 +3,7 @@ package org.ijsberg.iglu.util.properties;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -141,5 +142,16 @@ java.redundancyAnalyzers.patternDuplicateAnalyzer.ignoredConstructs=nl.ijsberg.c
         }
 
         System.out.println(toEdit);
+    }
+
+    @Test
+    public void testRegexPatternProperties() throws IOException {
+//        IgluProperties igluProperties = IgluProperties.loadPropertiesFromText("bla.regexp=^(?!.*:).*(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,64}$");
+        IgluProperties igluProperties = IgluProperties.loadProperties("C:\\Users\\knaar\\Desktop\\test.properties");
+
+//        igluProperties.setProperty("regexp", "^(?!.*:).*(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,64}$");
+
+        igluProperties.setProperty("bogus", "bla");
+//        IgluProperties.saveProperties(igluProperties, "C:/Users/knaar/Desktop/test.properties");
     }
 }

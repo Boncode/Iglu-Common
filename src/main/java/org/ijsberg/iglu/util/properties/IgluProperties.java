@@ -126,9 +126,7 @@ public class IgluProperties extends Properties {
 
 	public Object setProperty(String key, String value) {
 		Object retval = super.setProperty(key, value);
-//		if(!orderedPropertyNames.contains(key)) {
-			orderedPropertyNames.add(key);
-//		}
+		orderedPropertyNames.add(key);
 		return retval;
 	}
 
@@ -332,6 +330,12 @@ public class IgluProperties extends Properties {
 			processCommentAndEmpty(line);
 			String key = getKey(line);
 			if(key != null) {
+				String value = getValue(line);
+				//overwrite all key values to not be escaped, only for single line props
+				if(value != null && !value.endsWith("\\")) {
+					put(key, value);
+				}
+
 				orderedPropertyNames.add(key);
 				linesOfComment.put(key, new ArrayList<>(linesGathered));
 				linesGathered.clear();
@@ -390,6 +394,14 @@ public class IgluProperties extends Properties {
 		String s = line.getLine();
 		if(!s.trim().startsWith("#") && s.contains("=")) {
 			return s.substring(0, s.indexOf("=")).trim();
+		}
+		return null;
+	}
+
+	private static String getValue(Line line) {
+		String s = line.getLine();
+		if(!s.trim().startsWith("#") && s.contains("=")) {
+			return s.substring(s.indexOf("=") + 1).trim();
 		}
 		return null;
 	}
