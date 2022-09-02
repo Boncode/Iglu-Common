@@ -143,15 +143,4 @@ java.redundancyAnalyzers.patternDuplicateAnalyzer.ignoredConstructs=nl.ijsberg.c
 
         System.out.println(toEdit);
     }
-
-    @Test
-    public void testRegexPatternProperties() throws IOException {
-//        IgluProperties igluProperties = IgluProperties.loadPropertiesFromText("bla.regexp=^(?!.*:).*(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,64}$");
-        IgluProperties igluProperties = IgluProperties.loadProperties("C:\\Users\\knaar\\Desktop\\test.properties");
-
-//        igluProperties.setProperty("regexp", "^(?!.*:).*(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,64}$");
-
-        igluProperties.setProperty("bogus", "bla");
-//        IgluProperties.saveProperties(igluProperties, "C:/Users/knaar/Desktop/test.properties");
-    }
 }
