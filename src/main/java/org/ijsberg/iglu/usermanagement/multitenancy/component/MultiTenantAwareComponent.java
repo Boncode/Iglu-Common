@@ -8,10 +8,13 @@ import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.usermanagement.multitenancy.model.TenantAwareInput;
+import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
 public class MultiTenantAwareComponent extends StandardComponent {
@@ -60,8 +63,28 @@ public class MultiTenantAwareComponent extends StandardComponent {
         }
 */
         //check output
-        if(returnValue instanceof TenantAwareInput && !userIsAdmin()) {
-            returnValue = ((TenantAwareInput)returnValue).filterOutOtherTenants(getUserGroupNames());
+        if(returnValue != null) {
+            if (returnValue instanceof TenantAwareInput && !userIsAdmin()) {
+                returnValue = ((TenantAwareInput) returnValue).filterOutOtherTenants(getUserGroupNames());
+            }
+//            if (returnValue instanceof Collection) {
+//                System.out.println(returnValue);
+//            }
+            if (returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareInput && !userIsAdmin()) {
+                Collection collectionReturnValue = (Collection) ReflectionSupport.instantiateClass(returnValue.getClass());
+
+                if(!((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareInput) {
+                    Iterator<TenantAwareInput> iterator = ((Collection)returnValue).iterator();
+                    while (iterator.hasNext()){
+                        TenantAwareInput input = iterator.next();
+                        Object filteredInput = input.filterOutOtherTenants(getUserGroupNames());
+                        if(filteredInput != null) {
+                            collectionReturnValue.add(filteredInput);
+                        }
+                    }
+                }
+                return collectionReturnValue;
+            }
         }
 
         return returnValue;
