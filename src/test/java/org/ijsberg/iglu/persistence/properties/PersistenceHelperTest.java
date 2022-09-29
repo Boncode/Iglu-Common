@@ -10,13 +10,13 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.*;
 
 
 public class PersistenceHelperTest extends TestCase {
 
    // private static final String FILE_LOCATION = "/tmp/persistence/";
-    private static final String[] FIELDS = {"id", "name", "value", "bool"};
+    private static final String[] FIELDS = {"id", "name", "value", "bool", "map"};
     private static final String ENTITY_ID = "id";
 
     File tmpDir;
@@ -47,6 +47,12 @@ public class PersistenceHelperTest extends TestCase {
         someEntity1.setName("Hello");
         someEntity1.setBool(false);
 
+        Map<String, Map<String, String>> projectTimelineProperties = new HashMap<>();
+        Map<String, String> singleProjectConfig = new HashMap<>();
+        singleProjectConfig.put("stretchTimeline", "true");
+        projectTimelineProperties.put("projectName", singleProjectConfig);
+        someEntity1.setMap(projectTimelineProperties);
+
         BasicEntityPersister<SomeEntity> persister = new BasicEntityPersister(
                 tmpDir.getAbsolutePath(), SomeEntity.class, ENTITY_ID, FIELDS);
 
@@ -61,6 +67,8 @@ public class PersistenceHelperTest extends TestCase {
         assertEquals(1, persistedEntity.getId());
         assertEquals("Hello", persistedEntity.getName());
         assertFalse(persistedEntity.isBool());
+
+        assertEquals("true", persistedEntity.getMap().get("projectName").get("stretchTimeline"));
 
         assertEquals(1, persisterB.getSize());
 
@@ -94,7 +102,4 @@ public class PersistenceHelperTest extends TestCase {
         entities = persisterD.readByField("value", 20);
         assertEquals(2, entities.size());
     }
-
-
-
 }

@@ -1,10 +1,13 @@
 package org.ijsberg.iglu.persistence.properties;
 
+import java.util.Map;
+
 public class SomeEntity {
     private long id;
     private String name = "bogus";
     private int value;
     private boolean bool = true;
+    private Map<String, Map<String, String>> map;
 
     public SomeEntity() {
     }
@@ -49,6 +52,15 @@ public class SomeEntity {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", value=" + value +
+                ", map=" + map +
                 '}';
+    }
+
+    public void setMap(Map<String, Map<String, String>> map) {
+        this.map = map;
+    }
+
+    public Map<String, Map<String, String>> getMap() {
+        return map;
     }
 }
