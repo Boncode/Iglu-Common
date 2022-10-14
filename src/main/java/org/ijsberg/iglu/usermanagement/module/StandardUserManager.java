@@ -46,6 +46,7 @@ import java.util.*;
 public class StandardUserManager implements UserManager, Authenticator, Startable {
 
 
+	public static final String PBKDF_2_WITH_HMAC_SHA_1 = "PBKDF2WithHmacSHA1";
 	private static final int ITERATIONS = 10 * 1024;
 	private static final int SALT_LENGTH = 32;
 	private static final int KEY_LENGTH = 256;
@@ -110,7 +111,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		if (!PatternMatchingSupport.valueMatchesRegularExpression(password, passwordRegex)) {
 			throw new IllegalArgumentException("passwords does not match regular expression '" + passwordRegex + "'");
 		}       */
-		SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+		SecretKeyFactory f = SecretKeyFactory.getInstance(PBKDF_2_WITH_HMAC_SHA_1);
 		SecretKey key = f.generateSecret(new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH));
 		return EncodingSupport.encodeBase64(key.getEncoded());
 	}

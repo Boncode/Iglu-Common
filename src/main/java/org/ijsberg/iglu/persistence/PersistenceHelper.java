@@ -50,6 +50,7 @@ public class PersistenceHelper {
                         try {
                             field.set(entity, values.get(index));
                         } catch (IllegalArgumentException e) {
+                            //FIXME
                             e.printStackTrace();
                             //throw e;
                         }
