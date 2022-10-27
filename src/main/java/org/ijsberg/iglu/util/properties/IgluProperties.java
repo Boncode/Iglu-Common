@@ -278,7 +278,7 @@ public class IgluProperties extends Properties {
 		return retval;
 	}
 
-	public static IgluProperties loadProperties(String fileName) {
+	public static IgluProperties loadProperties(String fileName) throws ResourceException {
 
 		IgluProperties retval = new IgluProperties();
 		File basefile = new File(fileName);

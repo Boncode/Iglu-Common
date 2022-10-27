@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import static org.ijsberg.iglu.access.Permissions.TENANT_SURPASSING;
+
 public class MultiTenantAwareComponent extends StandardComponent {
 
     private RequestRegistry accessManager;
@@ -40,7 +42,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
     private void checkInput(Object[] parameters) {
         if(parameters != null) {
             for (Object parameter : parameters) {
-                if (parameter instanceof TenantAwareInput && !userIsAdmin()) {
+                if (parameter instanceof TenantAwareInput && !userIsTenantSurpassing()) {
                     System.out.println(new LogEntry("=========     MultiTenantAwareComponent : Found TenantAwareInput, tenant: " + ((TenantAwareInput) parameter).getTenantId()) + " AGAINST " + getUserGroupNames());
                     if(!getUserGroupNames().contains(((TenantAwareInput) parameter).getTenantId())) {
                         throw new SecurityException("user not allowed to interfere with other tenant");
@@ -64,13 +66,13 @@ public class MultiTenantAwareComponent extends StandardComponent {
 */
         //check output
         if(returnValue != null) {
-            if (returnValue instanceof TenantAwareInput && !userIsAdmin()) {
+            if (returnValue instanceof TenantAwareInput && !userIsTenantSurpassing()) {
                 returnValue = ((TenantAwareInput) returnValue).filterOutOtherTenants(getUserGroupNames());
             }
 //            if (returnValue instanceof Collection) {
 //                System.out.println(returnValue);
 //            }
-            if (returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareInput && !userIsAdmin()) {
+            if (returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareInput && !userIsTenantSurpassing()) {
                 Collection collectionReturnValue = (Collection) ReflectionSupport.instantiateClass(returnValue.getClass());
 
                 if(!((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareInput) {
@@ -99,19 +101,19 @@ public class MultiTenantAwareComponent extends StandardComponent {
         Object returnValue = super.invoke(methodName, parameters);
 
         //check output
-        if(returnValue instanceof TenantAwareInput && !userIsAdmin()) {
+        if(returnValue instanceof TenantAwareInput && !userIsTenantSurpassing()) {
             returnValue = ((TenantAwareInput)returnValue).filterOutOtherTenants(getUserGroupNames());
         }
 
         return returnValue;
     }
 
-    private boolean userIsAdmin() {
+    private boolean userIsTenantSurpassing() {
         Request request = getAccessManager().getCurrentRequest();
         if(request != null) {
             User user = request.getUser();
             if(user != null) {
-                return user.hasRole(AccessConstants.ADMIN_ROLE_NAME);
+                return user.hasRole(AccessConstants.ADMIN_ROLE_NAME) || user.hasOneOfRights(TENANT_SURPASSING);
             }
         }
         return false;
