@@ -1,6 +1,7 @@
 package org.ijsberg.iglu.persistence;
 
 import org.ijsberg.iglu.util.ResourceException;
+import org.ijsberg.iglu.util.collection.ListMap;
 import org.ijsberg.iglu.util.collection.ListTreeMap;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
@@ -37,7 +38,7 @@ public class BasicEntityPersister<T> {
         load();
     }
 
-    public BasicEntityPersister withUniqueIndexOn(String fieldName) {
+    public BasicEntityPersister<T> withUniqueIndexOn(String fieldName) {
         uniqueIndexNames.add(fieldName);
         return this;
     }
@@ -93,12 +94,12 @@ public class BasicEntityPersister<T> {
         return entity;
     }
 
-    public List<T> readByField(String fieldName, Object fieldValue) {
+    public List<T> readByField(String filterFieldName, Object fieldValue) {
         List<T> result = new ArrayList<>();
         synchronized (lock) {
             for(Long id : repository.keySet()) {
                 List row = repository.get(id);
-                Object value = row.get(fieldNameList.indexOf(fieldName));
+                Object value = row.get(fieldNameList.indexOf(filterFieldName));
                 if(fieldValue.equals(value)) {
                     T entity = instantiateEntity();
                     PersistenceHelper.setEntityId(id, idName, entity);
@@ -108,6 +109,27 @@ public class BasicEntityPersister<T> {
             }
         }
         return result;
+    }
+
+    public List<T> readByField(String filterFieldName, Object fieldValue, String sortFieldName) {
+        ListMap<Object,T> result = new ListTreeMap<>();
+        synchronized (lock) {
+            for(Long id : repository.keySet()) {
+                List row = repository.get(id);
+                Object value = row.get(fieldNameList.indexOf(filterFieldName));
+                if(fieldValue.equals(value)) {
+                    T entity = instantiateEntity();
+                    PersistenceHelper.setEntityId(id, idName, entity);
+                    PersistenceHelper.populateEntity(row, fieldNames, entity);
+                    Object sortValue = row.get(fieldNameList.indexOf(sortFieldName));
+                    if(sortValue == null) {
+                        sortValue = "";
+                    }
+                    result.put(sortValue, entity);
+                }
+            }
+        }
+        return result.values();
     }
 
     public List<T> readAll() {
