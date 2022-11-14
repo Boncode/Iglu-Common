@@ -19,6 +19,8 @@
 
 package org.ijsberg.iglu.logging;
 
+import java.util.Properties;
+
 /**
  */
 public interface Logger {
@@ -30,4 +32,6 @@ public interface Logger {
 	void removeAppender(Logger appender);
 
 	int getLogLevelOrdinal();
+
+	Properties getProperties();
 }

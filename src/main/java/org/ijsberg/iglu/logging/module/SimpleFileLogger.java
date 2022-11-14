@@ -26,6 +26,7 @@ import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
+import org.ijsberg.iglu.util.properties.IgluProperties;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -185,6 +186,11 @@ public class SimpleFileLogger implements Logger, Startable {
 		return logLevelOrdinal;
 	}
 
+	@Override
+	public Properties getProperties() {
+		return new IgluProperties(properties);
+	}
+
 
 	public void start() {
 		openLogStream();
@@ -216,9 +222,10 @@ public class SimpleFileLogger implements Logger, Startable {
 		return isStarted;
 	}
 
+	private Properties properties;
 
 	public void setProperties(Properties properties) {
-
+		this.properties = properties;
 		logLevelOrdinal = Arrays.asList(Level.LEVEL_CONFIG_TERM).indexOf(properties.getProperty("log_level", Level.LEVEL_CONFIG_TERM[logLevelOrdinal]));
 		entryOriginStackTraceDepth = Integer.parseInt(properties.getProperty("entry_stack_trace_depth", "" + entryOriginStackTraceDepth));
 		System.out.println(new LogEntry("log level set to " + Level.LEVEL_CONFIG_TERM[logLevelOrdinal]));

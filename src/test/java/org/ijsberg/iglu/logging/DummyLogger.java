@@ -19,6 +19,8 @@
 
 package org.ijsberg.iglu.logging;
 
+import java.util.Properties;
+
 /**
  */
 public class DummyLogger implements Logger {
@@ -42,6 +44,11 @@ public class DummyLogger implements Logger {
 	@Override
 	public int getLogLevelOrdinal() {
 		return Level.TRACE.ordinal();
+	}
+
+	@Override
+	public Properties getProperties() {
+		return null;
 	}
 
 	public LogEntry getLastEntry() {

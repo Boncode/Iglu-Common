@@ -23,6 +23,8 @@ import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.Logger;
 
+import java.util.Properties;
+
 /**
  * Created by Jeroen on 24-2-14.
  */
@@ -57,5 +59,10 @@ public class StandardOutLogger implements Logger {
 	@Override
 	public int getLogLevelOrdinal() {
 		return level.ordinal();
+	}
+
+	@Override
+	public Properties getProperties() {
+		return null;
 	}
 }

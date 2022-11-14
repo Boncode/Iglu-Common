@@ -6,6 +6,8 @@ import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.Logger;
 
+import java.util.Properties;
+
 public class CriticalLogMailer implements Logger {
 
     private Level level = Level.CRITICAL;
@@ -63,5 +65,10 @@ public class CriticalLogMailer implements Logger {
     @Override
     public int getLogLevelOrdinal() {
         return level.ordinal();
+    }
+
+    @Override
+    public Properties getProperties() {
+        return null;
     }
 }
