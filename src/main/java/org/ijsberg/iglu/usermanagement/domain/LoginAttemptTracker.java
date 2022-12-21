@@ -12,11 +12,11 @@ public class LoginAttemptTracker {
     private class LoginAttemptRecord {
 
         private Date firstAttemptTime = new Date();
-        private int nrofAttempts = 0;
+        private int nrOfAttempts = 0;
 
         private void reset() {
             firstAttemptTime = new Date();
-            nrofAttempts = 0;
+            nrOfAttempts = 0;
         }
 
         private boolean evaluate() {
@@ -24,7 +24,7 @@ public class LoginAttemptTracker {
                 reset();
                 return false;
             }
-            if(nrofAttempts >= failedAttemptsThresholdForLocking) {
+            if(nrOfAttempts >= failedAttemptsThresholdForLocking) {
                 return true;
             }
             return false;
@@ -35,28 +35,27 @@ public class LoginAttemptTracker {
     private int failedAttemptsThresholdForLocking = 5;
     private int attemptWindowInMinutes = 15;
 
-    private Map<String, LoginAttemptRecord> loginAttemptRecords = new HashMap<>();
+    private final Map<String, LoginAttemptRecord> loginAttemptRecords = new HashMap<>();
 
-    public void reportLoginAttemptFailed(String userId) {
-        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(userId);
+    public void reportLoginAttemptFailed(String sessionId) {
+        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(sessionId);
         if(loginAttemptRecord == null) {
             loginAttemptRecord = new LoginAttemptRecord();
-            loginAttemptRecords.put(userId, loginAttemptRecord);
+            loginAttemptRecords.put(sessionId, loginAttemptRecord);
         }
         loginAttemptRecord.evaluate();
-        loginAttemptRecord.nrofAttempts++;
+        loginAttemptRecord.nrOfAttempts++;
     }
 
-    public void reportLoginAttemptSucceeded(String userId) {
-        loginAttemptRecords.remove(userId);
+    public void reportLoginAttemptSucceeded(String sessionId) {
+        loginAttemptRecords.remove(sessionId);
     }
 
-    public boolean isLocked(String userId) {
-        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(userId);
+    public boolean isLocked(String sessionId) {
+        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(sessionId);
         if(loginAttemptRecord != null) {
             return loginAttemptRecord.evaluate();
         }
         return false;
     }
-
 }
