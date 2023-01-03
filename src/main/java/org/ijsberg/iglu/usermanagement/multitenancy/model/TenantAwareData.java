@@ -7,7 +7,7 @@ import java.util.Set;
  * If the module implementation is wrapped in MultiTenantAwareComponent the methods below will be called in order to
  * ensure multitenancy safety.
  */
-public interface TenantAwareInput {
+public interface TenantAwareData {
 
     String getTenantId();
 

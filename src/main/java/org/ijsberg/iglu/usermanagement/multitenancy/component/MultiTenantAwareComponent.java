@@ -7,7 +7,7 @@ import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.usermanagement.multitenancy.model.TenantAwareInput;
+import org.ijsberg.iglu.usermanagement.multitenancy.model.TenantAwareData;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,9 +42,9 @@ public class MultiTenantAwareComponent extends StandardComponent {
     private void checkInput(Object[] parameters) {
         if(parameters != null) {
             for (Object parameter : parameters) {
-                if (parameter instanceof TenantAwareInput && !userIsTenantSurpassing()) {
-                    System.out.println(new LogEntry("=========     MultiTenantAwareComponent : Found TenantAwareInput, tenant: " + ((TenantAwareInput) parameter).getTenantId()) + " AGAINST " + getUserGroupNames());
-                    if(!getUserGroupNames().contains(((TenantAwareInput) parameter).getTenantId())) {
+                if (parameter instanceof TenantAwareData && !userIsTenantSurpassing()) {
+                    System.out.println(new LogEntry("=========     MultiTenantAwareComponent : Found TenantAwareInput, tenant: " + ((TenantAwareData) parameter).getTenantId()) + " AGAINST " + getUserGroupNames());
+                    if(!getUserGroupNames().contains(((TenantAwareData) parameter).getTenantId())) {
                         throw new SecurityException("user not allowed to interfere with other tenant");
                     }
                 }
@@ -66,19 +66,19 @@ public class MultiTenantAwareComponent extends StandardComponent {
 */
         //check output
         if(returnValue != null) {
-            if (returnValue instanceof TenantAwareInput && !userIsTenantSurpassing()) {
-                returnValue = ((TenantAwareInput) returnValue).filterOutOtherTenants(getUserGroupNames());
+            if (returnValue instanceof TenantAwareData && !userIsTenantSurpassing()) {
+                returnValue = ((TenantAwareData) returnValue).filterOutOtherTenants(getUserGroupNames());
             }
 //            if (returnValue instanceof Collection) {
 //                System.out.println(returnValue);
 //            }
-            if (returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareInput && !userIsTenantSurpassing()) {
+            if (returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareData && !userIsTenantSurpassing()) {
                 Collection collectionReturnValue = (Collection) ReflectionSupport.instantiateClass(returnValue.getClass());
 
-                if(!((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareInput) {
-                    Iterator<TenantAwareInput> iterator = ((Collection)returnValue).iterator();
+                if(!((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareData) {
+                    Iterator<TenantAwareData> iterator = ((Collection)returnValue).iterator();
                     while (iterator.hasNext()){
-                        TenantAwareInput input = iterator.next();
+                        TenantAwareData input = iterator.next();
                         Object filteredInput = input.filterOutOtherTenants(getUserGroupNames());
                         if(filteredInput != null) {
                             collectionReturnValue.add(filteredInput);
@@ -101,8 +101,8 @@ public class MultiTenantAwareComponent extends StandardComponent {
         Object returnValue = super.invoke(methodName, parameters);
 
         //check output
-        if(returnValue instanceof TenantAwareInput && !userIsTenantSurpassing()) {
-            returnValue = ((TenantAwareInput)returnValue).filterOutOtherTenants(getUserGroupNames());
+        if(returnValue instanceof TenantAwareData && !userIsTenantSurpassing()) {
+            returnValue = ((TenantAwareData)returnValue).filterOutOtherTenants(getUserGroupNames());
         }
 
         return returnValue;
