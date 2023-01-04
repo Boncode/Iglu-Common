@@ -210,8 +210,23 @@ public class BasicUser implements User {
 		return groups.keySet();
 	}
 
+	public Set<String> getAssignedPermissionIds() {
+		Set<String> retval = new HashSet<>();
+		for(BasicPermission permission : getAssignedPermissions()) {
+			retval.add(permission.getId());
+		}
+		return retval;
+	}
+
+	public Set<String> getEffectivePermissionIds() {
+		Set<String> retval = new HashSet<>();
+		for(BasicPermission permission : getEffectivePermissions()) {
+			retval.add(permission.getId());
+		}
+		return retval;
+	}
+
 	public Set<BasicPermission> getEffectivePermissions() {
-		System.out.println(Permissions.all());
 		Set<BasicPermission> permissions = new HashSet<>();
 		LOOP:
 		for (Role role : getRoles()) {
@@ -228,6 +243,18 @@ public class BasicUser implements User {
 		return permissions;
 	}
 
+	public Set<BasicPermission> getAssignedPermissions() {
+		Set<BasicPermission> permissions = new HashSet<>();
+		for (Role role : getRoles()) {
+			for (String permissionId : role.listPermissionIds()) {
+				if(Permissions.containsId(permissionId)) {
+					permissions.add(Permissions.get(permissionId));
+				}
+			}
+		}
+		return permissions;
+	}
+
 	public Set<String> getEffectivePermissionNames() {
 		Set<String> retval = new HashSet<>();
 		for(BasicPermission permission : getEffectivePermissions()) {
@@ -236,12 +263,5 @@ public class BasicUser implements User {
 		return retval;
 	}
 
-	public Set<String> getEffectivePermissionIds() {
-		Set<String> retval = new HashSet<>();
-		for(BasicPermission permission : getEffectivePermissions()) {
-			retval.add(permission.getId());
-		}
-		return retval;
-	}
 
 }
