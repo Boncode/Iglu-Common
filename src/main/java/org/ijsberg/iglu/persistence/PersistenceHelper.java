@@ -1,5 +1,6 @@
 package org.ijsberg.iglu.persistence;
 
+import org.ijsberg.iglu.FatalException;
 import org.ijsberg.iglu.util.ResourceException;
 
 import java.lang.reflect.Field;
@@ -50,9 +51,7 @@ public class PersistenceHelper {
                         try {
                             field.set(entity, values.get(index));
                         } catch (IllegalArgumentException e) {
-                            //FIXME
-                            e.printStackTrace();
-                            //throw e;
+                            throw new FatalException("Cannot set field of entity " + entity.getClass().getSimpleName() + ". make sure model changes do not affect currently persisted data!", e);
                         }
                     }
                 }
