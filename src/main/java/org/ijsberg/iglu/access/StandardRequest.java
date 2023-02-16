@@ -85,6 +85,11 @@ public class StandardRequest implements Request//, PropertyListener
 		return session;
 	}
 
+	@Override
+	public boolean hasSession() {
+		return session != null;
+	}
+
 	/**
 	 * Destroys current session.
 	 *

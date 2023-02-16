@@ -46,7 +46,7 @@ public interface Session {
 
 	/**
 	 * Meant for system threads that access protected resources or logic.
-	 * Whether this works depends ultimately on the implementation of the Authenticator being used.
+	 * Whether this works, depends ultimately on the implementation of the Authenticator being used.
 	 *
 	 * @return a system user i.e. administrator
 	 */
@@ -54,7 +54,7 @@ public interface Session {
 
 	/**
 	 * Meant for system threads that access protected resources or logic.
-	 * Whether this works depends ultimately on the implementation of the Authenticator being used.
+	 * Whether this works, depends ultimately on the implementation of the Authenticator being used.
 	 *
 	 * @param expirationTimeoutLoggedIn alternative timeout in seconds
 	 * @return a system user i.e. administrator

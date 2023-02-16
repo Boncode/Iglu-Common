@@ -58,7 +58,9 @@ public interface Request {
 	 */
 	Session getSession(boolean create);
 
-	/**
+    boolean hasSession();
+
+    /**
 	 * Destroys current session.
 	 */
 	void destroySession();
