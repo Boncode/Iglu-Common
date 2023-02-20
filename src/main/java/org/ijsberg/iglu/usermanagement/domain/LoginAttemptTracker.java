@@ -37,22 +37,22 @@ public class LoginAttemptTracker {
 
     private final Map<String, LoginAttemptRecord> loginAttemptRecords = new HashMap<>();
 
-    public void reportLoginAttemptFailed(String sessionId) {
-        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(sessionId);
+    public void reportLoginAttemptFailed(String loginAttemptToken) {
+        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(loginAttemptToken);
         if(loginAttemptRecord == null) {
             loginAttemptRecord = new LoginAttemptRecord();
-            loginAttemptRecords.put(sessionId, loginAttemptRecord);
+            loginAttemptRecords.put(loginAttemptToken, loginAttemptRecord);
         }
         loginAttemptRecord.evaluate();
         loginAttemptRecord.nrOfAttempts++;
     }
 
-    public void reportLoginAttemptSucceeded(String sessionId) {
-        loginAttemptRecords.remove(sessionId);
+    public void reportLoginAttemptSucceeded(String loginAttemptTrackingToken) {
+        loginAttemptRecords.remove(loginAttemptTrackingToken);
     }
 
-    public boolean isLocked(String sessionId) {
-        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(sessionId);
+    public boolean isLocked(String loginAttemptTrackingToken) {
+        LoginAttemptRecord loginAttemptRecord = loginAttemptRecords.get(loginAttemptTrackingToken);
         if(loginAttemptRecord != null) {
             return loginAttemptRecord.evaluate();
         }
