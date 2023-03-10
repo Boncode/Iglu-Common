@@ -1,8 +1,8 @@
-package org.ijsberg.iglu.access;
+package org.ijsberg.iglu.messaging.module;
 
 public class MailMessage extends UserMessage {
 
-    private String subject;
+    private final String subject;
 
     public MailMessage(String subject, String messageText) {
         super(messageText);

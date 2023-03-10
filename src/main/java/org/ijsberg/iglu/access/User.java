@@ -19,6 +19,8 @@
 
 package org.ijsberg.iglu.access;
 
+import org.ijsberg.iglu.messaging.UserConsumableMessage;
+
 import java.util.Collection;
 import java.util.Properties;
 import java.util.Set;

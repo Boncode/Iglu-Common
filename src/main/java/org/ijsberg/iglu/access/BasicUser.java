@@ -18,6 +18,8 @@
  */
 package org.ijsberg.iglu.access;
 
+import org.ijsberg.iglu.messaging.UserConsumableMessage;
+
 import java.util.*;
 
 import static org.ijsberg.iglu.access.Permissions.FULL_CONTROL;
