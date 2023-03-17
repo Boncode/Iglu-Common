@@ -23,6 +23,7 @@ public class BasicRole implements Role {
         this.description = description;
     }
 
+
     public BasicRole(long id, String name, String description, boolean isSystemRole) {
         this.id = id;
         this.name = name;
