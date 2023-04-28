@@ -331,4 +331,9 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 	public boolean isRunning() {
 		return isRunning;
 	}
+
+	@Override
+	public Assembly getCoreAssembly() {
+		return null;
+	}
 }

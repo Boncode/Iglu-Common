@@ -1,10 +1,7 @@
 package org.ijsberg.iglu.assembly;
 
 import org.ijsberg.iglu.Application;
-import org.ijsberg.iglu.configuration.Assembly;
-import org.ijsberg.iglu.configuration.Cluster;
-import org.ijsberg.iglu.configuration.Component;
-import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.configuration.*;
 import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.ShutdownProcess;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
@@ -112,6 +109,7 @@ public class StandardApplication implements Application {
         }
     }
 
+
     public void addAssembly(String name, Assembly assembly) {
         System.out.println("adding assembly " + name + " " + assembly.getClass().getSimpleName());
         coreAssembly.getCoreCluster().connect(name, new StandardComponent(assembly));
@@ -132,6 +130,7 @@ public class StandardApplication implements Application {
     @Override
     public void start() {
         coreAssembly.start();
+        //System.out.println(new AssemblyExplorer("CORE", coreAssembly).getTreeDescription());
     }
 
     @Override
@@ -149,6 +148,7 @@ public class StandardApplication implements Application {
         IgluProperties igluProperties = IgluProperties.copy(properties);
     }
 */
+    @Override
     public Assembly getCoreAssembly() {
         return coreAssembly;
     }
