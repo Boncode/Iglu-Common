@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.messaging.module;
+package org.ijsberg.iglu.messaging.message;
 
 public class MailMessage extends UserMessage {
 

@@ -44,31 +44,34 @@ public class StandardApplication implements Application {
     private BasicAssembly instantiateAssembly(String className, Properties properties) {
         BasicAssembly assembly;
         try {
-            String provider;
-            List<Object> initArgs = new ArrayList<>();
-            if((provider = properties.getProperty("access_manager_provider")) != null) {
-                if(!assemblies.containsKey(provider)) {
-                    throw new ConfigurationException("accessManagerProvider '" + provider + "' not (yet) added");
-                }
-                initArgs.add(assemblies.get(provider).getCoreCluster().getInternalComponents().get("AccessManager"));
-            }
-            if((provider = properties.getProperty("scheduler_provider")) != null) {
-                if(!assemblies.containsKey(provider)) {
-                    throw new ConfigurationException("scheduler '" + provider + "' not (yet) added");
-                }
-                initArgs.add(assemblies.get(provider).getCoreCluster().getInternalComponents().get("Scheduler"));
-            }
-            if(initArgs.size() == 0) {
-                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties);
-            } else if (initArgs.size() == 1) {
-                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, initArgs.get(0));
+            Component[] initArgs = retrieveProvidedComponents(properties);
+            if(initArgs.length > 0) {
+                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, initArgs);
             } else {
-                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, initArgs.get(0), initArgs.get(1));
+                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties);
             }
         } catch (InstantiationException e) {
             throw new ConfigurationException("cannot instantiate assembly", e);
         }
         return assembly;
+    }
+
+    private Component[] retrieveProvidedComponents(Properties properties) {
+        List<Component> providedComponents = new ArrayList<>();
+        extracted(properties, "access_manager_provider", providedComponents, "AccessManager");
+        extracted(properties, "scheduler_provider", providedComponents, "Scheduler");
+        extracted(properties, "message_broker_provider", providedComponents, "MessageBroker");
+        return providedComponents.toArray(new Component[0]);
+    }
+
+    private void extracted(Properties properties, String providerKey, List<Component> providedComponents, String componentName) {
+        String providerName;
+        if((providerName = properties.getProperty(providerKey)) != null) {
+            if(!assemblies.containsKey(providerName)) {
+                throw new ConfigurationException(providerKey + " " + providerName + "' not (yet) added");
+            }
+            providedComponents.add(assemblies.get(providerName).getCoreCluster().getInternalComponents().get(componentName));
+        }
     }
 
     public StandardApplication(String configFile) {

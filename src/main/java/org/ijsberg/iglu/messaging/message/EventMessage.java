@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.messaging.module;
+package org.ijsberg.iglu.messaging.message;
 
 import org.ijsberg.iglu.messaging.MessageStatus;
 import org.ijsberg.iglu.messaging.UserConsumableMessage;
