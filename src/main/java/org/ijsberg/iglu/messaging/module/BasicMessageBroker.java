@@ -27,9 +27,11 @@ public class BasicMessageBroker implements MessageBroker {
     public <T> List<T> getServices(Class<T> type) {
         List<T> services = new ArrayList<>();
         List<Object> implementations = serviceMap.get(type);
-        for(Object o : implementations) {
-            services.add((T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new ServiceProxy(o)));
-            //services.add((T)o);
+        if(implementations != null) {
+            for (Object o : implementations) {
+                services.add((T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new ServiceProxy(o)));
+                //services.add((T)o);
+            }
         }
         return services;
     }
