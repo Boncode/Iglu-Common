@@ -77,7 +77,6 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		rotateIfFileTooOldAtStartup();
 	}
 
-
 	@Override
 	public void onPageEvent(long officialTime) {
 		synchronized (lock) {
