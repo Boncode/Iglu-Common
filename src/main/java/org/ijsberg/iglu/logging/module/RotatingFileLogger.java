@@ -88,7 +88,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 
 			//start with new log file
 			start();
-			clearOutdatedFiles();
+//			clearOutdatedFiles();
 			if(errorLogEntry != null) {
 				log(errorLogEntry);
 			}
@@ -102,9 +102,15 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		}
 	}
 
+	public void start() {
+		super.start();
+		clearOutdatedFiles();
+	}
+
 	private void clearOutdatedFiles() {
 		long now = System.currentTimeMillis();
-		long clearingDate = now - (nrofLogFilesToKeep * logRotateIntervalInHours * 60 * 60 * 1000);
+		long clearingDate = now - (nrofLogFilesToKeep * logRotateIntervalInHours * 60l * 60l * 1000l);
+		System.out.println(new LogEntry(Level.VERBOSE, "about to clear log files before date " + new Date(clearingDate)));
 		File file = new File(fileName);
 		String dirName = file.getParent();
 		File dir = new File(dirName);
@@ -112,8 +118,12 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		for(File fileInDir : files) {
 			if (fileInDir.getName().endsWith(".zip")) {
 				if(fileInDir.lastModified() < clearingDate) {
-					System.out.println(new LogEntry(Level.VERBOSE, "clearing outdated log file " + fileInDir));
+					System.out.println(new LogEntry(Level.VERBOSE, "clearing outdated log file " + fileInDir + " with last-modified-date: "
+							+ new Date(fileInDir.lastModified())));
 					fileInDir.delete();
+				} else {
+//					System.out.println(new LogEntry(Level.VERBOSE, "keeping log file " + fileInDir + " with last-modified-date: "
+//							+ new Date(fileInDir.lastModified())));
 				}
 			}
 		}
