@@ -94,7 +94,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 			}
 		}
 
-		Date officialDate = new Date(officialTime - (nrofLogFilesToKeep * logRotateIntervalInHours * 60 * 60 * 1000));
+		Date officialDate = new Date(officialTime - (nrofLogFilesToKeep * logRotateIntervalInHours * 60l * 60l * 1000l));
 		String destLogFileName = getFileName(officialDate);
 		File obsoleteFile = new File(destLogFileName);
 		if (obsoleteFile.exists()) {
@@ -154,7 +154,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 				String firstLine = FileSupport.getFirstLineInText(file);
 				Date prevDate = getDateFromLogLine(firstLine);
 				long now = System.currentTimeMillis();
-				if (prevDate.getTime() + logRotateIntervalInHours * 60 * 60 * 1000 < now) {
+				if (prevDate.getTime() + logRotateIntervalInHours * 60l * 60l * 1000l < now) {
 					rotate(prevDate);
 				}
 				clearOutdatedFiles();
