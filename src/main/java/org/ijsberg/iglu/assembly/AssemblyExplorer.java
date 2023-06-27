@@ -4,10 +4,14 @@ import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.Startable;
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class AssemblyExplorer {
 
@@ -17,6 +21,8 @@ public class AssemblyExplorer {
     
     private Set<Assembly> internalAssemblies = new LinkedHashSet<>();
     private Set<Component> components = new LinkedHashSet<>();
+
+    private TreeMap<String, Component> componentsByName = new TreeMap();
      
     public AssemblyExplorer(String assemblyName, Assembly assembly) {
         this.assemblyName = assemblyName;
@@ -50,6 +56,7 @@ public class AssemblyExplorer {
             Component component = cluster.getInternalComponents().get(componentName);
             if(!components.contains(component)) {
                 components.add(component);
+                componentsByName.put(componentName, component);
                 if (component.implementsInterface(Assembly.class)) {
                     printComponentTree(depth + 1, component.getProxy(Assembly.class), componentName);
                 } else if (component.implementsInterface(Cluster.class)) {
@@ -72,4 +79,27 @@ public class AssemblyExplorer {
         return treeDescription.toString();
     }
 
+    /**
+     * Invokes method on a component without parameters.
+     * @param componentName
+     * @param methodName
+     * @return
+     */
+    public Object invokeComponent(String componentName, String methodName) {
+        Component component = componentsByName.get(componentName);
+        if(component == null) {
+            return "component not found";
+        }
+        Object result = null;
+        try {
+            result = component.invoke(methodName, new Object[0]);
+        } catch (InvocationTargetException e) {
+            System.out.println(new LogEntry(Level.CRITICAL, "could not invoke method " + methodName + " on component " + componentName));
+            return e + ": " + e.getMessage();
+        } catch (NoSuchMethodException e) {
+            System.out.println(new LogEntry(Level.CRITICAL, "could not invoke method " + methodName + " on component " + componentName));
+            return e + ": " + e.getMessage();
+        }
+        return result;
+    }
 }
