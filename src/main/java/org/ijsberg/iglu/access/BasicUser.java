@@ -49,23 +49,6 @@ public class BasicUser implements User {
 	 * @param roles
 	 * @param settings
 	 */
-/*	public BasicUser(String userId, List<Role> roles, UserGroup group, Properties settings) {
-		this.userId = userId;
-		this.settings = settings;
-
-		for(Role role : roles) {
-			this.roles.put(role.getId(), role);
-		}
-		if(group != null) {
-			this.groups.put(group.getName(), group);
-		}
-	}
-*/
-	/**
-	 * @param userId
-	 * @param roles
-	 * @param settings
-	 */
 	public BasicUser(String userId, List<Role> roles, List<UserGroup> groups, Properties settings) {
 		this.userId = userId;
 		this.settings = settings;
