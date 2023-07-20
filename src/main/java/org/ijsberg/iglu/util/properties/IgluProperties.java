@@ -23,6 +23,7 @@ import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.collection.ListHashMap;
+import org.ijsberg.iglu.util.collection.ListTreeMap;
 import org.ijsberg.iglu.util.io.FileData;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.Line;
@@ -248,6 +249,12 @@ public class IgluProperties extends Properties {
 		return retval;
 	}
 
+	public static IgluProperties keyValueToProperties(String key, String value) {
+		IgluProperties properties = new IgluProperties();
+		properties.setProperty(key, value);
+		return properties;
+	}
+
 	public static boolean propertiesExist(String fileName) {
 		File file = new File(fileName);
 		return file.exists() || FileSupport.class.getClassLoader().getResourceAsStream(fileName) != null;
@@ -456,18 +463,21 @@ public class IgluProperties extends Properties {
 		addSubsection(this, sectionKey, subsection);
 	}
 
-/*	public String toString() {
-		StringBuffer result = new StringBuffer();
-		for(String propertyName : this.stringPropertyNames()) {
-			result.append(propertyName + "=" + getProperty(propertyName) + "\n");
-		}
-		return result.toString();
-	}*/
 	public String toString() {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		store(outputStream, null);
 		return outputStream.toString();
 	}
+
+	public ListTreeMap toListTreeMap() {
+		ListTreeMap listTreeMap = new ListTreeMap();
+		for(String propertyName : orderedPropertyNames) {
+			listTreeMap.put(propertyName, getPropertyAsArray(propertyName));
+		}
+		return listTreeMap;
+	}
+
+	//public
 
 	@Override
 	public boolean equals(Object o) {
