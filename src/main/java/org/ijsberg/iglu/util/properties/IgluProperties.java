@@ -48,6 +48,13 @@ public class IgluProperties extends Properties {
 	public IgluProperties() {
 	}
 
+	public IgluProperties(ListTreeMap<String, String> listTreeMap) {
+		for(String key : listTreeMap.keySet()) {
+			List<String> list = listTreeMap.get(key);
+			setProperty(key, "[" + CollectionSupport.format(list,",") + "]");
+		}
+	}
+
 	public IgluProperties(Properties properties) {
 		if(properties instanceof IgluProperties) {
 			IgluProperties igluProperties = (IgluProperties)properties;
