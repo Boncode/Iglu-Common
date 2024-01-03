@@ -266,7 +266,7 @@ public class Node extends ElementList implements XmlElement {
 
 			result.append("</" + tagname + '>');
 		} else {
-			result.append(" />");
+			result.append("/>");
 		}
 		return result.toString();
 	}
