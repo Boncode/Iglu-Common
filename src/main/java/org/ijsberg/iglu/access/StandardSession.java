@@ -28,7 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
- * A sessiom contains stateful data and access in the form of agents.
+ * A session contains stateful data and access in the form of agents.
  * <p/>
  * A session may contain receivers and transceivers which can be used to
  * communicate messages (asynchronously), such as dedicated log messages.
