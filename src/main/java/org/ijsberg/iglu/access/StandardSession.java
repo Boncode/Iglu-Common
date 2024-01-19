@@ -210,6 +210,11 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		return loginAsSystem(userId);
 	}
 
+	@Override
+	public void loginUserAlreadyAuthenticatedByIdp(User user) {
+		this.user = user;
+		this.userSettings = user.getSettings();
+	}
 
 	/**
 	 * Performs destruction of agents and closes message receivers.

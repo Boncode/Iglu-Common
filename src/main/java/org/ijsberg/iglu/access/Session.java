@@ -61,6 +61,12 @@ public interface Session {
 	 */
 	User loginAsSystem(String userId, long expirationTimeoutLoggedIn);
 
+	/***
+	 *
+	 * @param user
+	 */
+	void loginUserAlreadyAuthenticatedByIdp(User user);
+
 	/**
 	 * Removes a user who was previously logged in.
 	 */
