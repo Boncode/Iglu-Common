@@ -58,13 +58,13 @@ public class StandardApplication implements Application {
 
     private Component[] retrieveProvidedComponents(Properties properties) {
         List<Component> providedComponents = new ArrayList<>();
-        extracted(properties, "access_manager_provider", providedComponents, "AccessManager");
-        extracted(properties, "scheduler_provider", providedComponents, "Scheduler");
-        extracted(properties, "message_broker_provider", providedComponents, "MessageBroker");
+        findAndAddProvidedComponent(properties, "access_manager_provider", providedComponents, "AccessManager");
+        findAndAddProvidedComponent(properties, "scheduler_provider", providedComponents, "Scheduler");
+        findAndAddProvidedComponent(properties, "message_broker_provider", providedComponents, "MessageBroker");
         return providedComponents.toArray(new Component[0]);
     }
 
-    private void extracted(Properties properties, String providerKey, List<Component> providedComponents, String componentName) {
+    private void findAndAddProvidedComponent(Properties properties, String providerKey, List<Component> providedComponents, String componentName) {
         String providerName;
         if((providerName = properties.getProperty(providerKey)) != null) {
             if(!assemblies.containsKey(providerName)) {
