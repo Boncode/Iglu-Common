@@ -11,7 +11,7 @@ import java.util.List;
 
 public class BasicMessageBroker implements MessageBroker {
 
-    private ListMap<Class<?>, Object> serviceMap = new ListHashMap<>();
+    private final ListMap<Class<?>, Object> serviceMap = new ListHashMap<>();
 
     @Override
     public <T> void registerService(Class<T> interfaceType, T implementation) {
@@ -30,7 +30,6 @@ public class BasicMessageBroker implements MessageBroker {
         if(implementations != null) {
             for (Object o : implementations) {
                 services.add((T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new ServiceProxy(o)));
-                //services.add((T)o);
             }
         }
         return services;
