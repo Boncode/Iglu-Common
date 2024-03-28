@@ -10,7 +10,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class PersistenceHelperTest extends TestCase {

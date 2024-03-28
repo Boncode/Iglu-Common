@@ -1,7 +1,10 @@
 package org.ijsberg.iglu.assembly;
 
 import org.ijsberg.iglu.Application;
-import org.ijsberg.iglu.configuration.*;
+import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.ShutdownProcess;
 import org.ijsberg.iglu.configuration.module.StandardComponent;

@@ -3,7 +3,6 @@ package org.ijsberg.iglu.util.properties;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
