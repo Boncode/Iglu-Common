@@ -34,11 +34,11 @@ public class UserGroup {
 		this.name = name;
 		this.description = description;
 	}
-
-	public UserGroup(long id, String name, String description) {
-		this.name = name;
-		this.description = description;
-	}
+//
+//	public UserGroup(long id, String name, String description) {
+//		this.name = name;
+//		this.description = description;
+//	}
 
 	public Long getId() {
 		return id;
