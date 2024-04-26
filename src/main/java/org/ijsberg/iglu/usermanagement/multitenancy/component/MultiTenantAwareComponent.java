@@ -25,11 +25,12 @@ public class MultiTenantAwareComponent extends StandardComponent {
 
     public MultiTenantAwareComponent(Object implementation) {
         super(implementation);
+        System.out.println(new LogEntry("implementation " + implementation + " is MultiTenantAwareComponent"));
     }
 
     public RequestRegistry getAccessManager() {
         if(this.accessManager == null) {
-            System.out.println(new LogEntry("setting access manager"));
+            //System.out.println(new LogEntry("setting access manager"));
             this.accessManager = getProxyForComponentReference(RequestRegistry.class);
             if(this.accessManager == null) {
                 throw new ConfigurationException("implementation " + implementation.getClass().getSimpleName() + " must have an injected reference to RequestRegistry");
