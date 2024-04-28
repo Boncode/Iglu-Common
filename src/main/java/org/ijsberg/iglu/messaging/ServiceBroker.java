@@ -2,7 +2,7 @@ package org.ijsberg.iglu.messaging;
 
 import java.util.List;
 
-public interface MessageBroker {
+public interface ServiceBroker {
 
     <T> void registerService(Class<T> interfaceType, T implementation);
 

@@ -7,15 +7,15 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class BasicMessageBrokerTest extends TestCase {
+public class BasicServiceBrokerTest extends TestCase {
 
     @Test
     public void testInvocation() {
-        BasicMessageBroker messageBroker = new BasicMessageBroker();
+        BasicServiceBroker serviceBroker = new BasicServiceBroker();
         EventMessage eventMessage = new EventMessage("bogus","Hello");
-        messageBroker.registerService(UserConsumableMessage.class, eventMessage);
+        serviceBroker.registerService(UserConsumableMessage.class, eventMessage);
 
-        List<UserConsumableMessage> registeredMessages = messageBroker.getServices(UserConsumableMessage.class);
+        List<UserConsumableMessage> registeredMessages = serviceBroker.getServices(UserConsumableMessage.class);
 
         assertEquals("Hello", registeredMessages.get(0).getMessageText());
     }

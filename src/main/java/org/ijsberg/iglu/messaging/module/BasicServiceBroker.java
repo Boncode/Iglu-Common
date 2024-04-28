@@ -1,6 +1,6 @@
 package org.ijsberg.iglu.messaging.module;
 
-import org.ijsberg.iglu.messaging.MessageBroker;
+import org.ijsberg.iglu.messaging.ServiceBroker;
 import org.ijsberg.iglu.messaging.ServiceProxy;
 import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
@@ -9,7 +9,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicMessageBroker implements MessageBroker {
+public class BasicServiceBroker implements ServiceBroker {
 
     private final ListMap<Class<?>, Object> serviceMap = new ListHashMap<>();
 

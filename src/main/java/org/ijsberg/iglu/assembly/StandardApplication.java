@@ -63,7 +63,7 @@ public class StandardApplication implements Application {
         List<Component> providedComponents = new ArrayList<>();
         findAndAddProvidedComponent(properties, "access_manager_provider", providedComponents, "AccessManager");
         findAndAddProvidedComponent(properties, "scheduler_provider", providedComponents, "Scheduler");
-        findAndAddProvidedComponent(properties, "message_broker_provider", providedComponents, "MessageBroker");
+        findAndAddProvidedComponent(properties, "service_broker_provider", providedComponents, "ServiceBroker");
         return providedComponents.toArray(new Component[0]);
     }
 
