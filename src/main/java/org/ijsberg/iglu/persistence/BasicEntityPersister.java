@@ -45,7 +45,13 @@ public class BasicEntityPersister<T> {
 
     public T create(T entity) {
         synchronized (lock) {
-            long nextKey = ++currentKey;
+//            long nextKey = ++currentKey;
+            long nextKey = System.currentTimeMillis();
+            if(nextKey <= currentKey) {
+                nextKey = currentKey + 1;
+            }
+            currentKey = nextKey;
+
             assertUniqueIndexes(entity, nextKey);
             PersistenceHelper.setEntityId(nextKey, idName, entity);
             repository.put(nextKey, PersistenceHelper.convertToRecord(fieldNames, entity));
