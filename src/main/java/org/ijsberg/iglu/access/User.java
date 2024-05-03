@@ -83,4 +83,5 @@ public interface User {
 
 	Set<String> getGroupNames();
 
+	Set<Long> getGroupIds();
 }

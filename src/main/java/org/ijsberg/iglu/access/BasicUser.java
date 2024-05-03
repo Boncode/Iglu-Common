@@ -42,6 +42,7 @@ public class BasicUser implements User {
 	private String userId;
 	private HashMap<String, Role> roles = new HashMap();
 	private HashMap<String, UserGroup> groups = new HashMap<>();
+	private Set<Long> groupIds = new HashSet<>();
 	private final List<UserConsumableMessage> messageQueue = new ArrayList<>();
 
 	/**
@@ -58,6 +59,7 @@ public class BasicUser implements User {
 		}
 		for(UserGroup group : groups) {
 			this.groups.put(group.getName().trim(), group);
+			this.groupIds.add(group.getId());
 		}
 	}
 
@@ -161,6 +163,7 @@ public class BasicUser implements User {
 
 	public void addGroup(UserGroup group) {
 		this.groups.put(group.getName().trim(), group);
+		this.groupIds.add(group.getId());
 	}
 
 	@Override
@@ -193,6 +196,11 @@ public class BasicUser implements User {
 	@Override
 	public Set<String> getGroupNames() {
 		return groups.keySet();
+	}
+
+	@Override
+	public Set<Long> getGroupIds() {
+		return groupIds;
 	}
 
 	public Set<String> getAssignedPermissionIds() {
