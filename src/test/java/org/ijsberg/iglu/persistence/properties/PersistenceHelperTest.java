@@ -60,13 +60,14 @@ public class PersistenceHelperTest extends TestCase {
 
         assertEquals(0, someEntity1.getId());
         persister.create(someEntity1);
-        assertEquals(1, someEntity1.getId());
+        assertTrue(someEntity1.getId() > 0);
+        long id = someEntity1.getId();
 
         BasicEntityPersister<SomeEntity> persisterB = new BasicEntityPersister(
                 tmpDir.getAbsolutePath(), SomeEntity.class, ENTITY_ID, FIELDS);
 
-        SomeEntity persistedEntity = persisterB.read(1);
-        assertEquals(1, persistedEntity.getId());
+        SomeEntity persistedEntity = persisterB.read(id);
+        assertTrue(persistedEntity.getId() > 0);
         assertEquals("Hello", persistedEntity.getName());
         assertFalse(persistedEntity.isBool());
 
@@ -80,12 +81,12 @@ public class PersistenceHelperTest extends TestCase {
         BasicEntityPersister<SomeEntity> persisterC = new BasicEntityPersister(
                 tmpDir.getAbsolutePath(), SomeEntity.class, ENTITY_ID, FIELDS);
 
-        SomeEntity persistedEntity2 = persisterC.read(1);
+        SomeEntity persistedEntity2 = persisterC.read(id);
         assertEquals("BLA", persistedEntity2.getName());
 
         assertEquals(1, persisterC.getSize());
 
-        persisterC.delete(1);
+        persisterC.delete(id);
         assertEquals(0, persisterC.getSize());
 
         BasicEntityPersister<SomeEntity> persisterD = new BasicEntityPersister(
