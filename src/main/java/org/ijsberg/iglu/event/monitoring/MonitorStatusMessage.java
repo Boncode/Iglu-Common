@@ -1,6 +1,6 @@
-package org.ijsberg.iglu.monitoring;
+package org.ijsberg.iglu.event.monitoring;
 
-public class StatusMessage {
+public class MonitorStatusMessage {
 
     public enum Status {
         OK,
@@ -13,13 +13,13 @@ public class StatusMessage {
 
     private Status status = Status.OK;
 
-    public StatusMessage(String source, boolean active, String message) {
+    public MonitorStatusMessage(String source, boolean active, String message) {
         this.source = source;
         this.active = active;
         this.message = message;
     }
 
-    public StatusMessage(String source, boolean active, String message, Status status) {
+    public MonitorStatusMessage(String source, boolean active, String message, Status status) {
         this.source = source;
         this.active = active;
         this.message = message;

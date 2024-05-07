@@ -20,7 +20,7 @@
 package org.ijsberg.iglu.access.component;
 
 import org.ijsberg.iglu.access.Request;
-import org.ijsberg.iglu.messaging.UserConsumableMessage;
+import org.ijsberg.iglu.event.messaging.UserConsumableMessage;
 
 /**
  */

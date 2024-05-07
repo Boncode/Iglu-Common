@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.messaging;
+package org.ijsberg.iglu.event.messaging;
 
 public enum MessageStatus {
 
