@@ -1,7 +1,7 @@
 package org.ijsberg.iglu.event.messaging.message;
 
-import org.ijsberg.iglu.event.messaging.UserConsumableMessage;
 import org.ijsberg.iglu.event.messaging.MessageStatus;
+import org.ijsberg.iglu.event.messaging.UserConsumableMessage;
 
 public class StatusMessage implements UserConsumableMessage {
 

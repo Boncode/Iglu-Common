@@ -1,12 +1,11 @@
 package org.ijsberg.iglu.event.module;
 
+import org.ijsberg.iglu.event.EventListener;
+import org.ijsberg.iglu.event.EventTopic;
 import org.ijsberg.iglu.event.ServiceBroker;
 import org.ijsberg.iglu.event.messaging.EventMessage;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.event.EventType;
-import org.ijsberg.iglu.event.EventListener;
-import org.ijsberg.iglu.event.EventTopic;
 import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
 
@@ -53,10 +52,10 @@ public class BasicServiceBroker implements ServiceBroker {
     }
 
     @Override
-    public void publish(EventTopic topic, EventMessage message) {
-        for(EventListener eventListener : new ArrayList<>(eventListenerMap.get(topic))) {
+    public void publish(EventMessage message) {
+        for(EventListener eventListener : new ArrayList<>(eventListenerMap.get(message.getTopic()))) {
             try {
-                eventListener.onEvent(topic, message);
+                eventListener.onEvent(message);
             } catch (Exception e) {
                 System.out.println(new LogEntry(Level.CRITICAL, "failed to forward event of type " + message.getType(), e));
             }

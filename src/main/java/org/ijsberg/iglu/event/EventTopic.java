@@ -1,10 +1,11 @@
 package org.ijsberg.iglu.event;
 
-import java.util.Set;
+import java.util.Collection;
 
 public interface EventTopic {
-    Set<EventType> getEventTypes();
+    Collection<EventType> getEventTypes();
 
+    EventType getEventTypeById(String id);
     String getName();
 
     String getLabel();
