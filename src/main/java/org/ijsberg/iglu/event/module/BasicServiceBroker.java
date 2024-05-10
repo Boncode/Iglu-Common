@@ -53,11 +53,14 @@ public class BasicServiceBroker implements ServiceBroker {
 
     @Override
     public void publish(EventMessage message) {
-        for(EventListener eventListener : new ArrayList<>(eventListenerMap.get(message.getTopic()))) {
-            try {
-                eventListener.onEvent(message);
-            } catch (Exception e) {
-                System.out.println(new LogEntry(Level.CRITICAL, "failed to forward event of type " + message.getType(), e));
+        List<EventListener> listeners = eventListenerMap.get(message.getTopic());
+        if(listeners != null) {
+            for (EventListener eventListener : new ArrayList<>(listeners)) {
+                try {
+                    eventListener.onEvent(message);
+                } catch (Exception e) {
+                    System.out.println(new LogEntry(Level.CRITICAL, "failed to forward event of type " + message.getType(), e));
+                }
             }
         }
     }
