@@ -1,10 +1,10 @@
 package org.ijsberg.iglu.logging.module;
 
 import org.ijsberg.iglu.access.AccessManager;
+import org.ijsberg.iglu.event.messaging.message.MailMessage;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.Logger;
-import org.ijsberg.iglu.messaging.message.MailMessage;
 
 import java.util.Properties;
 

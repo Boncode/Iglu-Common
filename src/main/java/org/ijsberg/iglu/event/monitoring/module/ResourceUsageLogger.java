@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.monitoring.module;
+package org.ijsberg.iglu.event.monitoring.module;
 
 import com.sun.management.OperatingSystemMXBean;
 import org.ijsberg.iglu.configuration.Startable;

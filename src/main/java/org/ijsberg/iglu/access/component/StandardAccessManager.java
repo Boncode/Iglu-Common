@@ -25,9 +25,9 @@ import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
+import org.ijsberg.iglu.event.messaging.UserConsumableMessage;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.messaging.UserConsumableMessage;
 import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 

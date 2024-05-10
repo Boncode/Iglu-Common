@@ -1,21 +1,21 @@
-package org.ijsberg.iglu.messaging.message;
+package org.ijsberg.iglu.event.messaging.message;
 
-import org.ijsberg.iglu.messaging.MessageStatus;
-import org.ijsberg.iglu.messaging.UserConsumableMessage;
+import org.ijsberg.iglu.event.messaging.MessageStatus;
+import org.ijsberg.iglu.event.messaging.UserConsumableMessage;
 
-public class EventMessage implements UserConsumableMessage {
+public class StatusMessage implements UserConsumableMessage {
 
     private final String type;
     private final String messageText;
     private final MessageStatus messageStatus;
 
-    public EventMessage(String type, String messageText) {
+    public StatusMessage(String type, String messageText) {
         this.type = type;
         this.messageText = messageText;
         this.messageStatus = MessageStatus.INFO;
     }
 
-    public EventMessage(String type, String messageText, MessageStatus messageStatus) {
+    public StatusMessage(String type, String messageText, MessageStatus messageStatus) {
         this.type = type;
         this.messageText = messageText;
         this.messageStatus = messageStatus;
