@@ -2,7 +2,9 @@ package org.ijsberg.iglu.access.asset;
 
 import org.ijsberg.iglu.persistence.BasicEntityPersister;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class StandardAssetAccessManager implements AssetAccessManager {
@@ -16,13 +18,30 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     }
 
     @Override
-    public void registerAsset(String assetId, String ownerUserId) {
-        settingsRepository.create(new AssetAccessSettings(assetId, ownerUserId));
+    public void registerAsset(String assetId) {
+        settingsRepository.create(new AssetAccessSettings(assetId));
+    }
+
+    @Override
+    public void registerAsset(String assetId, Long userGroupId) {
+        //FIXME temporary method to do initial conversion
+        AssetAccessSettings assetAccessSettings = new AssetAccessSettings(assetId);
+        if(userGroupId != null) {
+            Set<Long> sharedUserGroupIds = new HashSet<>();
+            sharedUserGroupIds.add(userGroupId);
+            assetAccessSettings.setSharedUserGroupIds(sharedUserGroupIds);
+        }
+        settingsRepository.create(assetAccessSettings);
     }
 
     @Override
     public AssetAccessSettings getAssetAccessSettings(String assetId) {
         return getSettingsByAssetId(assetId);
+    }
+
+    @Override
+    public List<AssetAccessSettings> getAssetAccessSettings() {
+        return settingsRepository.readAll();
     }
 
     @Override

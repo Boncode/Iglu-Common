@@ -64,6 +64,7 @@ public class StandardApplication implements Application {
         findAndAddProvidedComponent(properties, "access_manager_provider", providedComponents, "AccessManager");
         findAndAddProvidedComponent(properties, "scheduler_provider", providedComponents, "Scheduler");
         findAndAddProvidedComponent(properties, "service_broker_provider", providedComponents, "ServiceBroker");
+        findAndAddProvidedComponent(properties, "asset_access_manager_provider", providedComponents, "AssetAccessManager");
         return providedComponents.toArray(new Component[0]);
     }
 
