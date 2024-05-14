@@ -21,22 +21,22 @@ import static org.ijsberg.iglu.access.Permissions.TENANT_SURPASSING;
 
 public class MultiTenantAwareComponent extends StandardComponent {
 
-    private RequestRegistry accessManager;
+    private RequestRegistry requestRegistry;
 
     public MultiTenantAwareComponent(Object implementation) {
         super(implementation);
         System.out.println(new LogEntry("implementation " + implementation + " is MultiTenantAwareComponent"));
     }
 
-    public RequestRegistry getAccessManager() {
-        if(this.accessManager == null) {
+    public RequestRegistry getRequestRegistry() {
+        if(this.requestRegistry == null) {
             //System.out.println(new LogEntry("setting access manager"));
-            this.accessManager = getProxyForComponentReference(RequestRegistry.class);
-            if(this.accessManager == null) {
-                throw new ConfigurationException("implementation " + implementation.getClass().getSimpleName() + " must have an injected reference to RequestRegistry");
+            this.requestRegistry = getProxyForComponentReference(RequestRegistry.class);
+            if(this.requestRegistry == null) {
+                throw new ConfigurationException("implementation " + implementation.getClass().getSimpleName() + " is a " + this.getClass().getSimpleName() +  ", and must have an injected reference to RequestRegistry");
             }
         }
-        return accessManager;
+        return requestRegistry;
     }
 
 
@@ -110,7 +110,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
     }
 
     private boolean userIsTenantSurpassing() {
-        Request request = getAccessManager().getCurrentRequest();
+        Request request = getRequestRegistry().getCurrentRequest();
         if(request != null) {
             User user = request.getUser();
             if(user != null) {
@@ -121,7 +121,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
     }
 
     public Set<String> getUserGroupNames() {
-        Request request = getAccessManager().getCurrentRequest();
+        Request request = getRequestRegistry().getCurrentRequest();
         if(request != null) {
             User user = request.getUser();
             if(user != null) {
