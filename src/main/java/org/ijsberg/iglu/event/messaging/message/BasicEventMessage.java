@@ -27,6 +27,14 @@ public class BasicEventMessage implements EventMessage {
         this.timestampUtc = Instant.now();
     }
 
+    public BasicEventMessage(EventTopic eventTopic, EventType eventType, String message, String location) {
+        this.eventTopic = eventTopic;
+        this.eventType = eventType;
+        this.message = message;
+        this.location = location;
+        this.timestampUtc = Instant.now();
+    }
+
     public BasicEventMessage(EventTopic eventTopic, EventType eventType, String message, Instant timestampUtc) {
         this.eventTopic = eventTopic;
         this.eventType = eventType;
