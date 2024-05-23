@@ -278,6 +278,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 
 		component.setProperties(agentFactory.getAgentProperties());
 		//connect component anonymously
+		//todo probably we want to connect them to the presentationLayer
 		agentFactory.getCluster().getFacade().connect(component);
 		return component;
 	}

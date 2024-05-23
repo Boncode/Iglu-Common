@@ -5,14 +5,12 @@ import org.ijsberg.iglu.access.Request;
 import org.ijsberg.iglu.access.User;
 import org.ijsberg.iglu.access.asset.AssetAccessManager;
 import org.ijsberg.iglu.access.asset.AssetAccessSettings;
-import org.ijsberg.iglu.access.asset.AssetSecurityException;
 import org.ijsberg.iglu.access.asset.SecuredAssetData;
 import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.usermanagement.multitenancy.model.TenantAwareData;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.lang.reflect.InvocationTargetException;
@@ -55,115 +53,97 @@ public class MultiTenantAwareComponent extends StandardComponent {
     private void checkInput(Object[] parameters) {
         if(parameters != null) {
             for (Object parameter : parameters) {
-                if(parameter instanceof SecuredAssetData /*&& !userIsTenantSurpassing()*/) {
+                if(parameter instanceof SecuredAssetData) {
                     System.out.println(new LogEntry(Level.DEBUG, "-----> SecuredAssetData input found: " + ((SecuredAssetData) parameter).getRelatedAssetId()));
-                    checkAssetAccess((SecuredAssetData)parameter); //todo throw based on false
-                }
-
-                if (parameter instanceof TenantAwareData && !userIsTenantSurpassing()) {
-                    System.out.println(new LogEntry("=========     MultiTenantAwareComponent : Found TenantAwareInput, tenant: " + ((TenantAwareData) parameter).getTenantId()) + " AGAINST " + getUserGroupNames());
-                    if(!getUserGroupNames().contains(((TenantAwareData) parameter).getTenantId())) {
-                        throw new SecurityException("user not allowed to interfere with other tenant");
+                    if(!userHasAssetAccess((SecuredAssetData)parameter)) {
+                        throw new SecurityException("user not allowed access to input data");
                     }
                 }
             }
         }
     }
 
-    private boolean checkAssetAccess(SecuredAssetData assetData) {
-        AssetAccessSettings assetAccessSettings = getAssetAccessManager().getAssetAccessSettings(assetData.getRelatedAssetId());
-        User user = getRequestRegistry().getCurrentRequest().getUser();
-        if(assetAccessSettings != null && user != null) {
-            //asset is public
-            if(assetAccessSettings.isPublicAsset()) {
-                System.out.println(new LogEntry(Level.DEBUG, "Asset is public: " + assetData.getRelatedAssetId()));
-                return true;
-            }
+    private boolean userHasAssetAccess(SecuredAssetData assetData) {
+        System.out.println(new LogEntry(Level.DEBUG, "-----> SecuredAssetData found: " + assetData.getRelatedAssetId()));
+        if(userIsTenantSurpassing()) {
+            System.out.println(new LogEntry(Level.DEBUG, "User is tenant surpassing and has access."));
+            return true;
+        }
 
-            //user is owner
-            if(assetAccessSettings.getOwnerUserId() != null && assetAccessSettings.getOwnerUserId().equals(user.getId())) {
-                System.out.println(new LogEntry(Level.DEBUG, "Asset " + assetData.getRelatedAssetId() + " is owned by user: " + user.getId()));
-                return true;
-            }
-
-            //user is member of group with access
-            Set<Long> userGroups = user.getGroupIds();
-            if(assetAccessSettings.getSharedUserGroupIds().stream().anyMatch(userGroups::contains)) {
-                System.out.println(new LogEntry(Level.DEBUG, "Asset " + assetData.getRelatedAssetId() + " is owned by user: " + user.getId()));
-                return true;
+        if(assetData.getRelatedAssetId() != null) {
+            AssetAccessSettings assetAccessSettings = getAssetAccessManager().getAssetAccessSettings(assetData.getRelatedAssetId());
+            User user = getRequestRegistry().getCurrentRequest().getUser();
+            if (assetAccessSettings != null && user != null) {
+                if(assetAccessSettings.isPublicAsset()
+                    || assetIsOwnedByUser(assetAccessSettings, user)
+                    || assetIsSharedWithUser(assetAccessSettings, user)
+                ) {
+                    System.out.println(new LogEntry(Level.DEBUG, "User has access by means of asset access settings."));
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] parameters)
-            throws Throwable {
+    private static boolean assetIsSharedWithUser(AssetAccessSettings assetAccessSettings, User user) {
+        Set<Long> userGroups = user.getGroupIds();
+        return assetAccessSettings.getSharedUserGroupIds().stream().anyMatch(userGroups::contains);
+    }
 
+    private static boolean assetIsOwnedByUser(AssetAccessSettings assetAccessSettings, User user) {
+        return assetAccessSettings.getOwnerUserId() != null && assetAccessSettings.getOwnerUserId().equals(user.getId());
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] parameters) throws Throwable {
         checkInput(parameters);
 
         Object returnValue = super.invoke(proxy, method, parameters);
 
-/*        if(returnValue != null) {
-            System.out.println(new LogEntry("MTAC invoked, method: " + method.getName() + ", " + "retval: " + returnValue.getClass().getSimpleName()));
-        }
-*/
-        //check output
+        return checkOutput(returnValue);
+    }
+
+    private Object checkOutput(Object returnValue) throws InstantiationException {
         if(returnValue != null) {
-            if (returnValue instanceof TenantAwareData && !userIsTenantSurpassing()) {
-                returnValue = ((TenantAwareData) returnValue).filterOutOtherTenants(getUserGroupNames());
-            }
-
-            if(returnValue instanceof SecuredAssetData /*&& !userIsTenantSurpassing()*/) {
-                System.out.println(new LogEntry(Level.DEBUG, "-----> SecuredAssetData output found: " + ((SecuredAssetData) returnValue).getRelatedAssetId()));
-                checkAssetAccess((SecuredAssetData)returnValue);
-            }
-
-            // todo find solution for AnalysisPropertiesMap,
-            if(returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof SecuredAssetData /*&& !userIsTenantSurpassing()*/) {
-                Collection collectionReturnValue = (Collection) ReflectionSupport.instantiateClass(returnValue.getClass());
-                Iterator<SecuredAssetData> iterator = ((Collection)returnValue).iterator();
-                while (iterator.hasNext()) {
-                    SecuredAssetData securedAssetData = iterator.next();
-                    if(checkAssetAccess(securedAssetData)) {
-                        collectionReturnValue.add(securedAssetData);
-                    }
+            if(returnValue instanceof SecuredAssetData) {
+                if(!userHasAssetAccess((SecuredAssetData)returnValue)) {
+                    return null;
                 }
             }
 
-            if (returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareData && !userIsTenantSurpassing()) {
-                Collection collectionReturnValue = (Collection) ReflectionSupport.instantiateClass(returnValue.getClass());
-
-                if(!((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof TenantAwareData) {
-                    Iterator<TenantAwareData> iterator = ((Collection)returnValue).iterator();
-                    while (iterator.hasNext()){
-                        TenantAwareData input = iterator.next();
-                        Object filteredInput = input.filterOutOtherTenants(getUserGroupNames());
-                        if(filteredInput != null) {
-                            collectionReturnValue.add(filteredInput);
-                        }
-                    }
-                }
-                return collectionReturnValue;
+            if(returnValue instanceof Collection && !((Collection)returnValue).isEmpty() && ((Collection)returnValue).iterator().next() instanceof SecuredAssetData) {
+                return checkOutputOfCollection(returnValue);
             }
         }
-
         return returnValue;
     }
 
-        @Override
-    public Object invoke(String methodName, Object... parameters) throws InvocationTargetException, NoSuchMethodException, IllegalArgumentException {
+    private Collection checkOutputOfCollection(Object returnValue) throws InstantiationException {
+        Collection collectionReturnValue = (Collection) ReflectionSupport.instantiateClass(returnValue.getClass());
+        Iterator<SecuredAssetData> iterator = ((Collection) returnValue).iterator();
+        while (iterator.hasNext()) {
+            SecuredAssetData securedAssetData = iterator.next();
+            if(userHasAssetAccess(securedAssetData)) {
+                collectionReturnValue.add(securedAssetData);
+            }
+        }
+        return collectionReturnValue;
+    }
 
-        //check input
+    @Override
+    public Object invoke(String methodName, Object... parameters) throws InvocationTargetException, NoSuchMethodException, IllegalArgumentException {
         checkInput(parameters);
 
         Object returnValue = super.invoke(methodName, parameters);
 
-        //check output
-        if(returnValue instanceof TenantAwareData && !userIsTenantSurpassing()) {
-            returnValue = ((TenantAwareData)returnValue).filterOutOtherTenants(getUserGroupNames());
+        if(returnValue != null) {
+            if (returnValue instanceof SecuredAssetData) {
+                if(!userHasAssetAccess((SecuredAssetData) returnValue)) {
+                    return null; //todo need to do something about these nulls maybe
+                }
+            }
         }
-
         return returnValue;
     }
 
@@ -188,5 +168,4 @@ public class MultiTenantAwareComponent extends StandardComponent {
         }
         return Collections.EMPTY_SET;
     }
-
 }
