@@ -1,5 +1,6 @@
 package org.ijsberg.iglu.access.asset;
 
+import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.persistence.BasicEntityPersister;
 
 import java.util.HashSet;
@@ -17,9 +18,14 @@ public class StandardAssetAccessManager implements AssetAccessManager {
         ).withUniqueIndexOn("assetId");
     }
 
+    private RequestRegistry requestRegistry;
+    public void setRequestRegistry(RequestRegistry requestRegistry) {
+        this.requestRegistry = requestRegistry;
+    }
+
     @Override
     public void registerAsset(String assetId) {
-        settingsRepository.create(new AssetAccessSettings(assetId));
+        settingsRepository.create(new AssetAccessSettings(assetId, requestRegistry.getCurrentRequest().getUser().getId()));
     }
 
     @Override

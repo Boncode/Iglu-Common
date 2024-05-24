@@ -17,6 +17,12 @@ public class AssetAccessSettings implements SecuredAssetData {
         //empty constructor for entity persister
     }
 
+    public AssetAccessSettings(String assetId, String ownerUserId) {
+        this.assetId = assetId;
+        this.ownerUserId = ownerUserId;
+    }
+
+    // todo remove after conversion
     public AssetAccessSettings(String assetId) {
         this.assetId = assetId;
     }
