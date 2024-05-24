@@ -140,7 +140,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
         if(returnValue != null) {
             if (returnValue instanceof SecuredAssetData) {
                 if(!userHasAssetAccess((SecuredAssetData) returnValue)) {
-                    return null; //todo need to do something about these nulls maybe
+                    return null; //todo need to do something about these nulls maybe? see metricDataFiltered throwing 500s after nullpointers
                 }
             }
         }
