@@ -19,6 +19,7 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
@@ -64,6 +65,7 @@ public class SimpleFileLogger implements Logger, Startable {
 		originalSystemOut = System.out;
 		filteredSystemOut = new LogPrintStream(originalSystemOut, this);
 	}
+
 
 	protected void openLogStream() {
 		try {
