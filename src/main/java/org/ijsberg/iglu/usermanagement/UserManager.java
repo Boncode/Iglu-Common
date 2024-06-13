@@ -34,6 +34,8 @@ public interface UserManager {
 
 	void updateAccount(User user);
 
+//	void updateAccounts(List<User> users);
+
 	void resetPassword(String userId, String newPassword);
 
 	void resetPassword(String userId, String oldPassword, String newPassword);
