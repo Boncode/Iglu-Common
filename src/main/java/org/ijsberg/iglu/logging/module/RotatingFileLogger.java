@@ -19,6 +19,8 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import org.ijsberg.iglu.access.AccessManager;
+import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
@@ -46,6 +48,9 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		super(fileName);
 	}
 
+	public void setAccessManager(AccessManager accessManager) {
+		System.getProperties();
+	}
 
 
 	/**

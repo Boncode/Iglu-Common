@@ -231,6 +231,17 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		}
 	}
 
+/*	@Override
+	public void updateAccounts(List<User> users) {
+		for(User user : users) {
+			Account account = accounts.get(user.getId());
+			if (account != null) {
+				account.setProperties(user.getSettings());
+			}
+		}
+		save();
+	}
+*/
 	@Override
 	public void resetPassword(String userId, String newPassword) {
 		Account account = accounts.get(userId);
