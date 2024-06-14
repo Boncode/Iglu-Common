@@ -19,13 +19,12 @@
 
 package org.ijsberg.iglu.logging.module;
 
-import org.ijsberg.iglu.access.AccessManager;
-import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
+import org.ijsberg.iglu.util.time.TimeSupport;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,11 +46,6 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	public RotatingFileLogger(String fileName) {
 		super(fileName);
 	}
-
-	public void setAccessManager(AccessManager accessManager) {
-		System.getProperties();
-	}
-
 
 	/**
 	 * @param date
@@ -158,6 +152,9 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 				//VBS 20191003 06:34:11.227
 				String firstLine = FileSupport.getFirstLineInText(file);
 				Date prevDate = getDateFromLogLine(firstLine);
+				if(logRotateIntervalInHours % 24 == 0) { //if the rotation interval is a multiple of 24 hours, i.e. a day, the date will be floored to midnight
+					prevDate = TimeSupport.floorToMidnight(prevDate);
+				}
 				long now = System.currentTimeMillis();
 				if (prevDate.getTime() + logRotateIntervalInHours * 60l * 60l * 1000l < now) {
 					rotate(prevDate);

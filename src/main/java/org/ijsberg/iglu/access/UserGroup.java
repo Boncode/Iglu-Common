@@ -53,6 +53,8 @@ public class UserGroup {
 	}
 
 	public String toString() {
-		return name;
+		return "UserGroup{name=" + name +
+				", description=" + description +
+				"}";
 	}
 }

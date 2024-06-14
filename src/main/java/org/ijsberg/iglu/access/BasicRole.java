@@ -93,4 +93,14 @@ public class BasicRole implements Role {
     public boolean isSystemRole() {
         return isSystemRole;
     }
+
+    @Override
+    public String toString(){
+        return "BasicRole{id=" + id +
+                ", name=" + name +
+                ", description=" + description +
+                ", permissionIds=" + permissionIds +
+                ", isSystemRole=" + isSystemRole +
+                "}";
+    }
 }
