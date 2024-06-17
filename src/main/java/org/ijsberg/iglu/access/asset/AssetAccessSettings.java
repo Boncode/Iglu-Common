@@ -65,6 +65,6 @@ public class AssetAccessSettings implements SecuredAssetData {
     }
 
     public void setRelatedAssetId(String relatedAssetId) {
-        //needed for json mapping, ignored... might want a DTO in analysis infrastructure
+        //todo needed for json mapping, ignored... might want a DTO in analysis infrastructure
     }
 }
