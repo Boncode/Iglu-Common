@@ -73,7 +73,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		super.setProperties(properties);
 		nrofLogFilesToKeep = Integer.parseInt(properties.getProperty("nr_log_files_to_keep", "" + nrofLogFilesToKeep));
 		logRotateIntervalInHours = Integer.parseInt(properties.getProperty("rotate_interval_hours", "" + logRotateIntervalInHours));
-		rotateIfFileTooOldAtStartup();
+		checkFileRotationOnStartup();
 	}
 
 	@Override
@@ -81,9 +81,9 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		synchronized (lock) {
 			stop();
 
-			Date rotateDate = new Date(officialTime);
+//			Date rotateDate = new Date(officialTime);
 			//save current log with date
-			LogEntry errorLogEntry = rotate(rotateDate);
+			LogEntry errorLogEntry = rotateIfFileToOld();
 
 			//start with new log file
 			start();
@@ -134,6 +134,15 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		File file = new File(fileName + ".log");
 		file.renameTo(new File(getFileName(rotateDate)));
 		file = new File(getFileName(rotateDate));
+		// Can be removed if all portals are >= 4.5.0@@
+		// renaming due to possible duplicate after flooring the log date to midnight
+		File dateCheckFile = new File(file.getPath() + ".zip");
+		if(dateCheckFile.exists()) {
+			String DateConversionFileName = file.getPath().substring(0, file.getPath().length() - 4) + "_accurate_date_conversion.log";
+			file.renameTo(new File(DateConversionFileName));
+			file = new File(DateConversionFileName);
+		}
+		// end part to be removed
 		try {
 			FileSupport.zip(file);
 			file.delete();
@@ -144,9 +153,14 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		return errorLogEntry;
 	}
 
-	private void rotateIfFileTooOldAtStartup() {
+	private void checkFileRotationOnStartup() {
+		rotateIfFileToOld();
+		clearOutdatedFiles();
+	}
 
+	private LogEntry rotateIfFileToOld() {
 		File file = new File(fileName + ".log");
+		LogEntry errorLog = null;
 		if(file.exists()) {
 			try {
 				//VBS 20191003 06:34:11.227
@@ -157,15 +171,15 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 				}
 				long now = System.currentTimeMillis();
 				if (prevDate.getTime() + logRotateIntervalInHours * 60l * 60l * 1000l < now) {
-					rotate(prevDate);
+					errorLog = rotate(prevDate);
 				}
-				clearOutdatedFiles();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ParseException pe) {
 				pe.printStackTrace();
 			}
 		}
+		return errorLog;
 	}
 
 	public static Date getDateFromLogLine(String logLine) throws ParseException {
