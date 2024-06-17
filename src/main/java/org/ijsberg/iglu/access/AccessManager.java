@@ -39,7 +39,7 @@ public interface AccessManager extends Authenticator {
 	 *
 	 * @return a collection of references to current sessions
 	 */
-	Collection getSessions();
+	Collection<Session> getSessions();
 
 	/**
 	 * This method is invoked at the point where a (stateless) request accesses the application.
