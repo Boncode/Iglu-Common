@@ -40,7 +40,7 @@ import java.util.*;
  */
 public class SimpleFileLogger implements Logger, Startable {
 
-	private boolean isStarted = false;
+	protected boolean isStarted = false;
 	private int logLevelOrdinal = Level.DEBUG.ordinal();
 	private String dateFormat = LogEntry.DEFAULT_TIMESTAMP_FORMAT;
 	private int entryOriginStackTraceDepth = 0;

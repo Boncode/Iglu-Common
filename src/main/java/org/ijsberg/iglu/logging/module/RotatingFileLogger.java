@@ -22,6 +22,7 @@ package org.ijsberg.iglu.logging.module;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
+import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
 import org.ijsberg.iglu.util.time.TimeSupport;
@@ -106,13 +107,20 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		clearOutdatedFiles();
 	}
 
-	private void clearOutdatedFiles() {
+	protected void clearOutdatedFiles() {
 		long now = System.currentTimeMillis();
 		long clearingDate = now - (nrofLogFilesToKeep * logRotateIntervalInHours * 60l * 60l * 1000l);
 		System.out.println(new LogEntry(Level.VERBOSE, "about to clear log files before date " + new Date(clearingDate)));
 		File file = new File(fileName);
 		String dirName = file.getParent();
 		File dir = new File(dirName);
+		if(!dir.exists()) {
+			try {
+				dir = FileSupport.createDirectory(dirName);
+			} catch (IOException e) {
+				throw new ResourceException("cannot create directory " + dirName, e);
+			}
+		}
 		File[] files = dir.listFiles();
 		for(File fileInDir : files) {
 			if (fileInDir.getName().endsWith(".zip")) {
