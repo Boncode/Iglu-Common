@@ -49,6 +49,8 @@ public class MultiTenantAwareComponent extends StandardComponent {
     }
 
 
+    //todo try to merge checking input / output
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] parameters) throws Throwable {
         checkInput(parameters);
