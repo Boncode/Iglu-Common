@@ -191,6 +191,9 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	}
 
 	public static Date getDateFromLogLine(String logLine) throws ParseException {
+		if(logLine == null) {
+			return new Date();
+		}
 		String dateString = logLine.substring(4, 18);
 		return new SimpleDateFormat(LogEntry.DEFAULT_DATE_FORMAT).parse(dateString);
 	}
