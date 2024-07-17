@@ -113,7 +113,7 @@ public class BasicUser implements User {
 	}
 
 	@Override
-	public boolean hasOneOfRights(String... rightsIds) {
+	public boolean hasOneOfRights(String ... rightsIds) {
 		for(String accessRightId : rightsIds) {
 			for (Role role : roles.values()) {
 				if (role.hasPermission(accessRightId)) {
@@ -122,6 +122,17 @@ public class BasicUser implements User {
 			}
 		}
 		return false;
+	}
+
+
+	@Override
+	public boolean hasAllRights(String ... rightsIds) {
+		for (String accessRightId : rightsIds) {
+			if (!hasOneOfRights(accessRightId)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

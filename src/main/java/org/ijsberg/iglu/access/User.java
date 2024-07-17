@@ -55,6 +55,8 @@ public interface User {
 	 */
 	boolean hasOneOfRights(String ... rightsIds);
 
+	boolean hasAllRights(String ... rightsIds);
+
 	/**
 	 * @param roleId role ID
 	 * @return a role by the given ID
