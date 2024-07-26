@@ -502,6 +502,9 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 			User user = session.getUser();
 			if(user != null) {
 				user.dropMessage(message);
+				break;
+				// could be the case that there are multiple sessions for 1 user (e.g. System),
+				// so we just break after first occurrence
 			}
 		}
 	}
