@@ -178,7 +178,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 					prevDate = TimeSupport.floorToMidnight(prevDate);
 				}
 				long now = System.currentTimeMillis();
-				if (prevDate.getTime() + logRotateIntervalInHours * 60l * 60l * 1000l < now) {
+				if (prevDate.getTime() + logRotateIntervalInHours * 60l * 60l * 1000l <= now) {
 					errorLog = rotate(prevDate);
 				}
 			} catch (IOException e) {
