@@ -212,8 +212,8 @@ public class SimpleFileLogger implements Logger, Startable {
 	}
 
 	public void stop() {
+		System.out.println(new LogEntry("stopping file logging to " + this.fileName));
 		synchronized (lock) {
-			System.out.println(new LogEntry("stopping file logging to " + this.fileName));
 			isStarted = false;
 			System.setOut(originalSystemOut);
 			logFilePrintStream.close();
