@@ -83,7 +83,7 @@ public class MultiTenantAwareComponent extends StandardComponent {
         if(parameters != null) {
             for (Object parameter : parameters) {
                 if(parameter instanceof SecuredAssetData) {
-                    System.out.println(new LogEntry(Level.VERBOSE, "-----> SecuredAssetData input found: " + ((SecuredAssetData) parameter).getRelatedAssetId()));
+                    System.out.println(new LogEntry(Level.TRACE, "-----> SecuredAssetData input found: " + ((SecuredAssetData) parameter).getRelatedAssetId()));
 
                     User user = getUserFromRequest();
                     if(!checkUserAccessForAssetData(user, (SecuredAssetData)parameter)) {
