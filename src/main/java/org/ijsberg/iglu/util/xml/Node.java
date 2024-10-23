@@ -31,6 +31,7 @@ public class Node extends ElementList implements XmlElement {
 	protected boolean isSingleTag;
 	protected Node parentNode;
 
+	protected int startTagEndLineNr;
 
 	/**
 	 * Constructs an empty node without a name
@@ -46,6 +47,7 @@ public class Node extends ElementList implements XmlElement {
 
 		startLineNr = tag.lineNr;
 		endLineNr = tag.correspondingTag != null ? tag.correspondingTag.lineNr : startLineNr;
+		startTagEndLineNr = tag.lastLineNr;
 
 		nodeAttributes = tag.attributes;
 
@@ -399,5 +401,9 @@ public class Node extends ElementList implements XmlElement {
 
 	public boolean isSingleTag() {
 		return isSingleTag;
+	}
+
+	public int getStartTagEndLineNr() {
+		return startTagEndLineNr;
 	}
 }

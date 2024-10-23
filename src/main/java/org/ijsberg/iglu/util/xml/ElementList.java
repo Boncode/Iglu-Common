@@ -619,6 +619,7 @@ public abstract class ElementList implements Serializable {
 
 		protected Tag(int lineNr, String contents) throws ParseException {
 			this.lineNr = lineNr;
+			this.lastLineNr = lineNr;
 
 			char firstCharacter = contents.charAt(0);
 			int contentsLength = contents.length();
