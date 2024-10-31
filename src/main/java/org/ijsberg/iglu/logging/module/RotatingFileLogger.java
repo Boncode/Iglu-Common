@@ -19,7 +19,10 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import org.ijsberg.iglu.event.IgluEventTopic;
+import org.ijsberg.iglu.event.IgluEventType;
 import org.ijsberg.iglu.event.ServiceBroker;
+import org.ijsberg.iglu.event.messaging.message.BasicEventMessage;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
@@ -113,6 +116,23 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		super.start();
 	}
 
+
+	protected void reportLoggingRotated() {
+		if(serviceBroker != null) {
+			if(rotatedLogFileName != null) {
+				try {
+					long crc = FileSupport.calculateCRC(rotatedLogFileName);
+					String rotatingEventMessage = "log file archived, name: " + rotatedLogFileName + ", CRC: " + crc;
+					System.out.println(new LogEntry(Level.DEBUG, rotatingEventMessage));
+					serviceBroker.publish(new BasicEventMessage(IgluEventTopic.IGLU_EVENTS, IgluEventType.LOGFILE_ROTATED,
+							rotatingEventMessage));
+				} catch (IOException e) {
+					System.out.println(new LogEntry(Level.CRITICAL, "error while making rotatingEventMessage for file " + rotatedLogFileName, e));
+				}
+			}
+		}
+	}
+
 	protected void clearOutdatedFiles() {
 		long now = System.currentTimeMillis();
 		long clearingDate = now - (nrofLogFilesToKeep * logRotateIntervalInHours * 60l * 60l * 1000l);
@@ -161,6 +181,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 			FileSupport.zip(file);
 			file.delete();
 			rotatedLogFileName = file.getPath() + ".zip";
+			reportLoggingRotated();
 		} catch (IOException e) {
 			errorLogEntry = new LogEntry(Level.CRITICAL,"cannot zip file " + file, e);
 			e.printStackTrace();
