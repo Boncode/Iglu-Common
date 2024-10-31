@@ -80,4 +80,15 @@ public class BasicEventMessage implements EventMessage {
     public int hashCode() {
         return Objects.hash(eventType, timestampUtc, location, message);
     }
+
+    @Override
+    public String toString() {
+        return "BasicEventMessage{" +
+                "eventTopic=" + eventTopic +
+                ", eventType=" + eventType +
+                ", timestampUtc=" + timestampUtc +
+                ", location='" + location + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

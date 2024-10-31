@@ -19,6 +19,9 @@ public class BasicServiceBroker implements ServiceBroker {
 
     private final ListMap<EventTopic, EventListener> eventListenerMap = new ListHashMap<>();
 
+    public BasicServiceBroker() {
+    }
+
     @Override
     public <T> void registerService(Class<T> interfaceType, T implementation) {
         serviceMap.put(interfaceType, implementation);

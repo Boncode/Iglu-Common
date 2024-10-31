@@ -32,29 +32,38 @@ public class StandardApplication implements Application {
         addCoreAssembly(coreAssembly);
     }
 
-    public void addCoreAssembly(BasicAssembly coreAssembly) {
-        System.out.println("adding core assembly " + coreAssembly.getClass().getSimpleName());
-        this.coreAssembly = coreAssembly;
-        try {
-            coreAssembly.getCoreCluster().connect("CoreAssembly", new StandardComponent(coreAssembly));
-            System.out.println("core assembly connected to core cluster");
-        } catch (ConfigurationException ce) {
-            System.out.println("error when connecting core assembly connected to core cluster with message: " + ce.getMessage());
+    public StandardApplication(String configFile) {
+        IgluProperties properties = IgluProperties.loadProperties(configFile);
+//        boolean regardAsCoreAssembly = true;
+        for(String assemblyId : properties.getSubsectionKeys()) {
+            System.out.println("instantiating assembly " + assemblyId);
+            BasicAssembly assembly = instantiateAssembly(properties.getProperty(assemblyId + ".class"), properties.getSubsection(assemblyId + ".properties"));
+            if(regardAsCoreAssembly(assembly)) {
+                addCoreAssembly(assembly);
+//                regardAsCoreAssembly = false;
+            } else {
+                addAssembly(assemblyId, assembly);
+            }
         }
-        initializeShutdownHook();
+        writeAppReport();
+    }
+
+
+    private boolean regardAsCoreAssembly(Assembly assembly) {
+        return assembly.getCoreCluster().getInternalComponents().get("AccessManager") != null && coreAssembly == null;
     }
 
     private BasicAssembly instantiateAssembly(String className, Properties properties) {
         BasicAssembly assembly;
         try {
-            Component[] initArgs = retrieveProvidedComponents(properties);
-            if(initArgs.length > 0) {
-                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, initArgs);
+            //Component[] initArgs = retrieveProvidedComponents(properties);
+            if(coreAssembly != null) {
+                assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties, coreAssembly);
             } else {
                 assembly = (BasicAssembly) ReflectionSupport.instantiateClass(className, properties);
             }
         } catch (InstantiationException e) {
-            throw new ConfigurationException("cannot instantiate assembly", e);
+            throw new ConfigurationException("cannot instantiate assembly " + className, e);
         }
         return assembly;
     }
@@ -68,6 +77,7 @@ public class StandardApplication implements Application {
         return providedComponents.toArray(new Component[0]);
     }
 
+
     private void findAndAddProvidedComponent(Properties properties, String providerKey, List<Component> providedComponents, String componentName) {
         String providerName;
         if((providerName = properties.getProperty(providerKey)) != null) {
@@ -78,20 +88,6 @@ public class StandardApplication implements Application {
         }
     }
 
-    public StandardApplication(String configFile) {
-        IgluProperties properties = IgluProperties.loadProperties(configFile);
-        boolean regardAsCoreAssembly = true;
-        for(String assemblyId : properties.getSubsectionKeys()) {
-            System.out.println("instantiating assembly " + assemblyId);
-            if(regardAsCoreAssembly) {
-                addCoreAssembly(instantiateAssembly(properties.getProperty(assemblyId + ".class"), properties.getSubsection(assemblyId + ".properties")));
-                regardAsCoreAssembly = false;
-            } else {
-                addAssembly(assemblyId, instantiateAssembly(properties.getProperty(assemblyId + ".class"), properties.getSubsection(assemblyId + ".properties")));
-            }
-        }
-        writeAppReport();
-    }
 
     private void writeAppReport() {
         try {
@@ -118,10 +114,24 @@ public class StandardApplication implements Application {
 
 
     public void addAssembly(String name, Assembly assembly) {
-        System.out.println("adding assembly " + name + " " + assembly.getClass().getSimpleName());
-        coreAssembly.getCoreCluster().connect(name, new StandardComponent(assembly));
-        System.out.println("assembly " + name + " connected to core cluster");
-        assemblies.put(name, assembly);
+        if(coreAssembly != null) {
+            System.out.println("adding assembly " + name + " " + assembly.getClass().getSimpleName());
+            coreAssembly.getCoreCluster().connect(name, new StandardComponent(assembly));
+            System.out.println("assembly " + name + " connected to core cluster");
+            assemblies.put(name, assembly);
+        }
+    }
+
+    public void addCoreAssembly(BasicAssembly coreAssembly) {
+        System.out.println("adding core assembly " + coreAssembly.getClass().getSimpleName());
+        this.coreAssembly = coreAssembly;
+        try {
+            coreAssembly.getCoreCluster().connect("CoreAssembly", new StandardComponent(coreAssembly));
+            System.out.println("core assembly connected to core cluster");
+        } catch (ConfigurationException ce) {
+            System.out.println("error when connecting core assembly connected to core cluster with message: " + ce.getMessage());
+        }
+        initializeShutdownHook();
     }
 
     private void initializeShutdownHook() {

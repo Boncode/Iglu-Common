@@ -15,8 +15,9 @@ import java.util.Properties;
 
 public class StandardCoreAssembly extends BasicAssembly {
 
-    protected RotatingFileLogger logger;
+    protected Component logger;
     protected Component scheduler;
+    protected Component rootConsole;
 
     public StandardCoreAssembly(Properties properties) {
         super(properties);
@@ -29,34 +30,34 @@ public class StandardCoreAssembly extends BasicAssembly {
         }
         core.connect("Scheduler", scheduler);
 
-        logger = new RotatingFileLogger("logs/" + this.getClass().getSimpleName());
-        Component loggerComponent = new StandardComponent(logger);
-        core.connect("Logger", loggerComponent);
-        Properties loggerProperties;
-        if(IgluProperties.propertiesExist(home + "/" + configDir + "/logger.properties")) {
-            loggerProperties = IgluProperties.loadProperties(home + "/" + configDir + "/logger.properties");
-        } else {
-            loggerProperties = new IgluProperties();
-            loggerProperties.setProperty("log_level", "DEBUG");
-            loggerProperties.setProperty("log_to_standard_out", "true");
-            try {
-                IgluProperties.saveProperties(loggerProperties, home + "/" + configDir + "/logger.properties");
-            } catch (IOException e) {
-                System.err.println("could not save logger.properties with message: " + e.getMessage());
+        if(logger == null) {
+            RotatingFileLogger rotatingFileLogger = new RotatingFileLogger("logs/" + this.getClass().getSimpleName());
+            logger = new StandardComponent(rotatingFileLogger);
+            core.connect("Logger", logger);
+            Properties loggerProperties;
+            if (IgluProperties.propertiesExist(home + "/" + configDir + "/logger.properties")) {
+                loggerProperties = IgluProperties.loadProperties(home + "/" + configDir + "/logger.properties");
+            } else {
+                loggerProperties = new IgluProperties();
+                loggerProperties.setProperty("log_level", "DEBUG");
+                loggerProperties.setProperty("log_to_standard_out", "true");
+                try {
+                    IgluProperties.saveProperties(loggerProperties, home + "/" + configDir + "/logger.properties");
+                } catch (IOException e) {
+                    System.err.println("could not save logger.properties with message: " + e.getMessage());
+                }
+            }
+            logger.setProperties(loggerProperties);
+
+            if (Boolean.parseBoolean(loggerProperties.getProperty("log_to_standard_out", "false"))) {
+                rotatingFileLogger.addAppender(new StandardOutLogger());
             }
         }
-        loggerComponent.setProperties(loggerProperties);
 
-        if(Boolean.parseBoolean(loggerProperties.getProperty("log_to_standard_out", "false"))) {
-            logger.addAppender(new StandardOutLogger());
+        if(rootConsole == null) {
+            rootConsole = new StandardComponent(new RootConsole(this));
+            core.connect("RootConsole", rootConsole);
         }
-
-        Component rootConsole = new StandardComponent(new RootConsole(this));
-        core.connect("RootConsole", rootConsole);
-    }
-
-    public void addLogAppender(Logger logger) {
-        this.logger.addAppender(logger);
     }
 
 }

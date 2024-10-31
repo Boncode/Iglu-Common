@@ -19,6 +19,7 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import org.ijsberg.iglu.event.ServiceBroker;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
@@ -43,6 +44,12 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	private int logRotateIntervalInHours = 24;
 	public static SafeDateFormat TIMESTAMP_LOGFILE_FORMAT = new SafeDateFormat("yyyy_MM_dd_HH_mm");
 
+	protected ServiceBroker serviceBroker;
+	public void setServiceBroker(ServiceBroker serviceBroker) {
+		this.serviceBroker = serviceBroker;
+	}
+
+	protected String rotatedLogFileName;
 
 	public RotatingFileLogger(String fileName) {
 		super(fileName);
@@ -104,7 +111,6 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 
 	public void start() {
 		super.start();
-		clearOutdatedFiles();
 	}
 
 	protected void clearOutdatedFiles() {
@@ -146,20 +152,22 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		// renaming due to possible duplicate after flooring the log date to midnight
 		File dateCheckFile = new File(file.getPath() + ".zip");
 		if(dateCheckFile.exists()) {
-			String DateConversionFileName = file.getPath().substring(0, file.getPath().length() - 4) + "_accurate_date_conversion.log";
-			file.renameTo(new File(DateConversionFileName));
-			file = new File(DateConversionFileName);
+			String dateConversionFileName = file.getPath().substring(0, file.getPath().length() - 4) + "_accurate_date_conversion.log";
+			file.renameTo(new File(dateConversionFileName));
+			file = new File(dateConversionFileName);
 		}
 		// end part to be removed
 		try {
 			FileSupport.zip(file);
 			file.delete();
+			rotatedLogFileName = file.getPath() + ".zip";
 		} catch (IOException e) {
 			errorLogEntry = new LogEntry(Level.CRITICAL,"cannot zip file " + file, e);
 			e.printStackTrace();
 		}
 		return errorLogEntry;
 	}
+
 
 	private void checkFileRotationOnStartup() {
 		rotateIfFileToOld();
