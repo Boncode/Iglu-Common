@@ -125,12 +125,8 @@ public class StandardApplication implements Application {
     public void addCoreAssembly(BasicAssembly coreAssembly) {
         System.out.println("adding core assembly " + coreAssembly.getClass().getSimpleName());
         this.coreAssembly = coreAssembly;
-        try {
-            coreAssembly.getCoreCluster().connect("CoreAssembly", new StandardComponent(coreAssembly));
-            System.out.println("core assembly connected to core cluster");
-        } catch (ConfigurationException ce) {
-            System.out.println("error when connecting core assembly connected to core cluster with message: " + ce.getMessage());
-        }
+        coreAssembly.getCoreCluster().connect("CoreAssembly", new StandardComponent(coreAssembly));
+        System.out.println("core assembly connected to core cluster");
         initializeShutdownHook();
     }
 
