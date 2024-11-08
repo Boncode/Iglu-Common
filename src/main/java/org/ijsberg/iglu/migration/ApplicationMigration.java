@@ -55,7 +55,7 @@ public class ApplicationMigration {
     private static void wetRunMigrators(List<Migrator> migrators) {
         for(Migrator migrator : migrators) {
             try {
-                System.out.println(new LogEntry(Level.VERBOSE, "---------- WET RUN for " + migrator.getClass().getSimpleName() +  " ----------\n"));;
+                System.out.println(new LogEntry(Level.VERBOSE, "---------- WET RUN for " + migrator.getClass().getSimpleName() +  " ----------\n"));
                 migrator.run(false);
             } catch(Throwable t) {
                 throw new ApplicationMigrationException("Wet run with migrator: " + migrator.getClass().getSimpleName() + " caused an error.", t);
@@ -66,7 +66,7 @@ public class ApplicationMigration {
     private static void dryRunMigrators(List<Migrator> migrators) {
         for(Migrator migrator : migrators) {
             try {
-                System.out.println(new LogEntry(Level.VERBOSE, "---------- DRY RUN for " + migrator.getClass().getSimpleName() +  " ----------\n"));;
+                System.out.println(new LogEntry(Level.VERBOSE, "---------- DRY RUN for " + migrator.getClass().getSimpleName() +  " ----------\n"));
                 migrator.run(true);
             } catch(Throwable t) {
                 throw new ApplicationMigrationException("Dry run with migrator: " + migrator.getClass().getSimpleName() + " caused an error.", t);
