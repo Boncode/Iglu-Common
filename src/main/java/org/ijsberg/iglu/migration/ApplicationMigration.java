@@ -26,10 +26,12 @@ public class ApplicationMigration {
 
             List<Migrator> migrators = createMigrators();
             System.out.println(new LogEntry(Level.VERBOSE, migrators.size() + " migration steps have been defined"));
-            System.out.println(new LogEntry(Level.VERBOSE, "---------- DRY RUN ----------\n"));
+            System.out.println(new LogEntry(Level.VERBOSE, ""));
+            System.out.println(new LogEntry(Level.VERBOSE, "---------- DRY RUN ----------"));
             dryRunMigrators(migrators);
 
-            System.out.println(new LogEntry(Level.VERBOSE, "---------- WET RUN ----------\n"));
+            System.out.println(new LogEntry(Level.VERBOSE, ""));
+            System.out.println(new LogEntry(Level.VERBOSE, "---------- WET RUN ----------"));
             wetRunMigrators(migrators);
         } catch (ApplicationMigrationException e) {
             System.out.println(new LogEntry(Level.CRITICAL, "An error occurred while migrating application", e));
