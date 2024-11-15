@@ -19,25 +19,27 @@ public class ApplicationMigration {
     private static final String LOG_LOCATION = "logs/migration/";
 
     public static void processMigrations() {
-        SimpleFileLogger logger = createLogger();
-        logger.start();
+        SimpleFileLogger logger = null;
         try {
+            logger = createLogger();
+            logger.start();
+
             System.out.println(new LogEntry(Level.VERBOSE, "About to migrate application"));
 
             List<Migrator> migrators = createMigrators();
-            System.out.println(new LogEntry(Level.VERBOSE, migrators.size() + " migration steps have been defined"));
-            System.out.println(new LogEntry(Level.VERBOSE, ""));
-            System.out.println(new LogEntry(Level.VERBOSE, "---------- DRY RUN ----------"));
-            dryRunMigrators(migrators);
 
-            System.out.println(new LogEntry(Level.VERBOSE, ""));
-            System.out.println(new LogEntry(Level.VERBOSE, "---------- WET RUN ----------"));
+            dryRunMigrators(migrators);
             wetRunMigrators(migrators);
+
+            cleanupPreviousPatchFiles();
+
         } catch (ApplicationMigrationException e) {
             System.out.println(new LogEntry(Level.CRITICAL, "An error occurred while migrating application", e));
             throw e;
         } finally {
-            logger.stop();
+            if(logger != null) {
+                logger.stop();
+            }
         }
     }
 
@@ -55,6 +57,8 @@ public class ApplicationMigration {
     }
 
     private static void wetRunMigrators(List<Migrator> migrators) {
+        System.out.println(new LogEntry(Level.VERBOSE, ""));
+        System.out.println(new LogEntry(Level.VERBOSE, "---------- WET RUN ----------"));
         for(Migrator migrator : migrators) {
             try {
                 System.out.println(new LogEntry(Level.VERBOSE, "---------- WET RUN for " + migrator.getClass().getSimpleName() +  " ----------\n"));
@@ -66,6 +70,8 @@ public class ApplicationMigration {
     }
 
     private static void dryRunMigrators(List<Migrator> migrators) {
+        System.out.println(new LogEntry(Level.VERBOSE, ""));
+        System.out.println(new LogEntry(Level.VERBOSE, "---------- DRY RUN ----------"));
         for(Migrator migrator : migrators) {
             try {
                 System.out.println(new LogEntry(Level.VERBOSE, "---------- DRY RUN for " + migrator.getClass().getSimpleName() +  " ----------\n"));
@@ -77,6 +83,7 @@ public class ApplicationMigration {
     }
 
     private static List<Migrator> createMigrators() {
+        System.out.println(new LogEntry(Level.VERBOSE, "Creating migrator instances..."));
         List<Migrator> migrators = new ArrayList<>();
         if(IgluProperties.propertiesExist("./migrator-properties/migrator.properties")) {
             IgluProperties allMigratorProperties = IgluProperties.loadProperties("./migrator-properties/migrator.properties");
@@ -89,6 +96,20 @@ public class ApplicationMigration {
                 }
             }
         }
+        System.out.println(new LogEntry(Level.VERBOSE, migrators.size() + " migration steps have been defined"));
         return migrators;
+    }
+
+    private static void cleanupPreviousPatchFiles() {
+        System.out.println(new LogEntry(Level.VERBOSE, "Cleaning up patch and migration files..."));
+        try {
+            FileSupport.emptyDirectory("./properties-to-replace-on-patching");
+            FileSupport.emptyDirectory("./properties-to-delete-on-patching");
+            FileSupport.emptyDirectory("./migrator-properties");
+
+            System.out.println(new LogEntry(Level.VERBOSE, "Done cleaning up."));
+        } catch (IOException e) {
+            throw new ApplicationMigrationException("Migration process failed to clean up patch and migration files.", e);
+        }
     }
 }
