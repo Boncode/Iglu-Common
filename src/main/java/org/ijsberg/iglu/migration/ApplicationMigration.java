@@ -31,8 +31,6 @@ public class ApplicationMigration {
             dryRunMigrators(migrators);
             wetRunMigrators(migrators);
 
-            cleanupPreviousPatchFiles();
-
         } catch (ApplicationMigrationException e) {
             System.out.println(new LogEntry(Level.CRITICAL, "An error occurred while migrating application", e));
             throw e;
@@ -98,18 +96,5 @@ public class ApplicationMigration {
         }
         System.out.println(new LogEntry(Level.VERBOSE, migrators.size() + " migration steps have been defined"));
         return migrators;
-    }
-
-    private static void cleanupPreviousPatchFiles() {
-        System.out.println(new LogEntry(Level.VERBOSE, "Cleaning up patch and migration files..."));
-        try {
-            FileSupport.emptyDirectory("./properties-to-replace-on-patching");
-            FileSupport.emptyDirectory("./properties-to-delete-on-patching");
-            FileSupport.emptyDirectory("./migrator-properties");
-
-            System.out.println(new LogEntry(Level.VERBOSE, "Done cleaning up."));
-        } catch (IOException e) {
-            throw new ApplicationMigrationException("Migration process failed to clean up patch and migration files.", e);
-        }
     }
 }
