@@ -10,6 +10,8 @@ public class AssetAccessSettings implements SecuredAssetData {
     private String assetId;
     private String ownerUserId;
 
+    private String name;
+
     private boolean publicAsset;
     private Set<Long> sharedUserGroupIds = new HashSet<>();
 
@@ -17,14 +19,16 @@ public class AssetAccessSettings implements SecuredAssetData {
         //empty constructor for entity persister
     }
 
-    public AssetAccessSettings(String assetId, String ownerUserId) {
+    public AssetAccessSettings(String assetId, String ownerUserId, String name) {
         this.assetId = assetId;
         this.ownerUserId = ownerUserId;
+        this.name = name;
     }
 
     // todo remove after conversion
-    public AssetAccessSettings(String assetId) {
+    public AssetAccessSettings(String assetId, String name) {
         this.assetId = assetId;
+        this.name = name;
     }
 
     public String getAssetId() {
@@ -57,6 +61,14 @@ public class AssetAccessSettings implements SecuredAssetData {
 
     public long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

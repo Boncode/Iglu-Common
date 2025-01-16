@@ -14,7 +14,7 @@ public class StandardAssetAccessManager implements AssetAccessManager {
 
     public StandardAssetAccessManager() {
         settingsRepository = new BasicEntityPersister<>("data", AssetAccessSettings.class,
-            "id", "assetId", "ownerUserId", "publicAsset", "sharedUserGroupIds"
+            "id", "assetId", "ownerUserId", "publicAsset", "sharedUserGroupIds", "name"
         ).withUniqueIndexOn("assetId");
     }
 
@@ -24,14 +24,14 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     }
 
     @Override
-    public void registerAsset(String assetId) {
-        settingsRepository.create(new AssetAccessSettings(assetId, requestRegistry.getCurrentRequest().getUser().getId()));
+    public void registerAsset(String assetId, String name) {
+        settingsRepository.create(new AssetAccessSettings(assetId, requestRegistry.getCurrentRequest().getUser().getId(), name));
     }
 
     @Override
-    public void registerAsset(String assetId, Long userGroupId) {
+    public void registerAsset(String assetId, Long userGroupId, String name) {
         //FIXME temporary method to do initial conversion
-        AssetAccessSettings assetAccessSettings = new AssetAccessSettings(assetId);
+        AssetAccessSettings assetAccessSettings = new AssetAccessSettings(assetId, name);
         if(userGroupId != null) {
             Set<Long> sharedUserGroupIds = new HashSet<>();
             sharedUserGroupIds.add(userGroupId);
