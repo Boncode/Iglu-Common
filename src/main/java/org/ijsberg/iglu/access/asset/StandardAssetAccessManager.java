@@ -54,6 +54,25 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     public void updateAssetAccessSettings(AssetAccessSettings accessSettings) {
         AssetAccessSettings existingSettings = settingsRepository.read(accessSettings.getId());
         if(existingSettings != null) {
+            if(existingSettings.isPublicAsset() && !accessSettings.isPublicAsset()) {
+                // asset now made private
+                // check shared teams reset
+                accessSettings.setSharedUserGroupIds(new HashSet<>());
+                // check owner set, if not, then current user is owner. Admins can always access assets.
+                if(existingSettings.getOwnerUserId().isEmpty()) {
+                    accessSettings.setOwnerUserId(requestRegistry.getCurrentRequest().getUser().getId());
+                }
+            }
+
+            if(!existingSettings.getSharedUserGroupIds().isEmpty() && accessSettings.getSharedUserGroupIds().isEmpty()) {
+                if(!accessSettings.isPublicAsset()) {
+                    // asset now made private
+                    if(existingSettings.getOwnerUserId() == null) {
+                        accessSettings.setOwnerUserId(requestRegistry.getCurrentRequest().getUser().getId());
+                    }
+                }
+            }
+
             settingsRepository.update(accessSettings);
         }
     }

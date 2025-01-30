@@ -128,15 +128,15 @@ public class MultiTenantAwareComponent extends StandardComponent {
     private boolean checkUserAccessForAssetData(User user, SecuredAssetData assetData) {
         System.out.println(new LogEntry(Level.TRACE, "-----> SecuredAssetData found: " + assetData.getRelatedAssetId()));
 
-        if(userIsTenantSurpassing(user)) {
-            System.out.println(new LogEntry(Level.TRACE, "User is tenant surpassing and has access."));
+        if(userHasAdministratorRole(user)) {
+            System.out.println(new LogEntry(Level.TRACE, "User is an administrator and has access."));
             return true;
         }
 
         if(assetData.getRelatedAssetId() != null) {
             AssetAccessSettings assetAccessSettings = getAssetAccessManager().getAssetAccessSettings(assetData.getRelatedAssetId());
             if (assetAccessSettings != null && user != null) {
-                if(userHasAssetAccess(user, assetAccessSettings)) {
+                if(userHasAssetAccessByMeansOfSettings(user, assetAccessSettings)) {
                     System.out.println(new LogEntry(Level.TRACE, "User has access by means of asset access settings."));
                     return true;
                 }

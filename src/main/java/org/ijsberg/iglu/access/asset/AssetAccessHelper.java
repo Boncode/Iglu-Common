@@ -22,6 +22,18 @@ public class AssetAccessHelper {
     }
 
     /**
+     * Checks if a user has administrator role, directly granting access
+     * @param user
+     * @return
+     */
+    public static boolean userHasAdministratorRole(User user) {
+        if(user != null) {
+            return user.hasRole(AccessConstants.ADMIN_ROLE_NAME);
+        }
+        return false;
+    }
+
+    /**
      * Checks if given user has access to asset, by checking all aspects of asset access:
      * - public assets are always accessible
      * - if the user owns the asset
@@ -30,10 +42,25 @@ public class AssetAccessHelper {
      * @param assetAccessSettings
      * @return
      */
-    public static boolean userHasAssetAccess(User user, AssetAccessSettings assetAccessSettings) {
+    public static boolean userHasAssetAccessByMeansOfSettings(User user, AssetAccessSettings assetAccessSettings) {
         return assetAccessSettings.isPublicAsset()
                 || assetIsOwnedByUser(user, assetAccessSettings)
-                || assetIsSharedWithUser(user, assetAccessSettings);
+                || assetIsSharedWithUser(user, assetAccessSettings)
+                || assetIsSharedAndUserIsTenantSurpassing(user, assetAccessSettings);
+    }
+
+    /**
+     * In the case the user isn't part of a team with which the asset is shared, the user can still be granted access
+     * if the user has the permission TENANT_SURPASSING (basically, the power user).
+     * @param user
+     * @param assetAccessSettings
+     * @return
+     */
+    private static boolean assetIsSharedAndUserIsTenantSurpassing(User user, AssetAccessSettings assetAccessSettings) {
+        if(!assetAccessSettings.getSharedUserGroupIds().isEmpty()) {
+            return userIsTenantSurpassing(user);
+        }
+        return false;
     }
 
     /**
