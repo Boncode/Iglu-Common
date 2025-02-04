@@ -45,6 +45,11 @@ public class BasicUser implements User {
 	private Set<Long> groupIds = new HashSet<>();
 	private final List<UserConsumableMessage> messageQueue = new ArrayList<>();
 
+
+	//public static BasicUser createAdmin() {
+
+	//}
+
 	/**
 	 * @param userId
 	 * @param roles

@@ -271,6 +271,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 					accounts = new HashMap<>();
 					Account admin = new SimpleAccount("admin", getHash("admin"));
 					admin.putProperty("passwordChanged", "false");
+					admin.putProperty("roles","administrator");
 					addAccount(admin);
 				}
 			} catch (ClassNotFoundException | IOException e) {
