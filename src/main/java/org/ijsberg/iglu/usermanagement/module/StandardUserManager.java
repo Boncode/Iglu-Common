@@ -59,22 +59,6 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	private byte[] salt;
 
-/*	static {
-		new Executable() {
-			@Override
-			protected Object execute() throws Throwable {
-				try {
-					//Note: this can be very slow on Linux
-					long start = System.currentTimeMillis();
-					salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LENGTH);
-					System.out.println(new LogEntry(CRITICAL, "salt created in " + (System.currentTimeMillis() - start) + " ms"));
-				} catch (NoSuchAlgorithmException e) {
-					System.out.println(new LogEntry(CRITICAL, "unable to generate salt", e));
-				}
-				return null;
-			}
-		}.executeAsync();
-	}*/
 
 	public StandardUserManager(byte[] salt) {
 		this.salt = salt;
@@ -105,12 +89,6 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	}
 
 	private static String hash(String password, byte[] salt) throws InvalidKeySpecException, NoSuchAlgorithmException {
-/*		if ("".equals(password)) {
-			throw new IllegalArgumentException("empty passwords are not supported");
-		}
-		if (!PatternMatchingSupport.valueMatchesRegularExpression(password, passwordRegex)) {
-			throw new IllegalArgumentException("passwords does not match regular expression '" + passwordRegex + "'");
-		}       */
 		SecretKeyFactory f = SecretKeyFactory.getInstance(PBKDF_2_WITH_HMAC_SHA_1);
 		SecretKey key = f.generateSecret(new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH));
 		return EncodingSupport.encodeBase64(key.getEncoded());
@@ -231,17 +209,6 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		}
 	}
 
-/*	@Override
-	public void updateAccounts(List<User> users) {
-		for(User user : users) {
-			Account account = accounts.get(user.getId());
-			if (account != null) {
-				account.setProperties(user.getSettings());
-			}
-		}
-		save();
-	}
-*/
 	@Override
 	public void resetPassword(String userId, String newPassword) {
 		Account account = accounts.get(userId);
@@ -271,7 +238,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 					accounts = new HashMap<>();
 					Account admin = new SimpleAccount("admin", getHash("admin"));
 					admin.putProperty("passwordChanged", "false");
-					admin.putProperty("roles","administrator");
+					admin.putProperty("roles",Roles.getRole(Roles.ADMINISTRATOR).getName());
 					addAccount(admin);
 				}
 			} catch (ClassNotFoundException | IOException e) {
