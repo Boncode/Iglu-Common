@@ -1,7 +1,5 @@
 package org.ijsberg.iglu.access;
 
-/**
- */
 public class UserGroup {
 
 	private long id;
