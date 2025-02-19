@@ -1,39 +1,39 @@
-package org.ijsberg.iglu.access;
+package org.ijsberg.iglu.persistence;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.ijsberg.iglu.access.Permission;
+import org.ijsberg.iglu.access.Role;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.util.List;
 import java.util.Objects;
 
-public class BasicRole implements Role {
+public class BasicRoleTestDto implements Role {
 
     private long id;
     private String name;
     private String description;
     private String permissionIds = "";
 
-    @JsonProperty("systemRole")
-    private boolean isSystemRole = false;
+    private boolean systemRole = false;
 
 
-    public BasicRole() {}
+    public BasicRoleTestDto() {}
 
-    public BasicRole(String name, String description) {
+    public BasicRoleTestDto(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
 
-    public BasicRole(long id, String name, String description, boolean isSystemRole) {
+    public BasicRoleTestDto(long id, String name, String description, boolean systemRole) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.isSystemRole = isSystemRole;
+        this.systemRole = systemRole;
     }
 
-    public BasicRole with(Permission permission) {
+    public BasicRoleTestDto with(Permission permission) {
         List<String> permissionIdList = StringSupport.split(permissionIds, ",");
         if(!permissionIdList.contains(permission.getId())) {
             permissionIdList.add(permission.getId());
@@ -75,34 +75,34 @@ public class BasicRole implements Role {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BasicRole basicRole = (BasicRole) o;
-        return id == basicRole.id && Objects.equals(name, basicRole.name);
+        BasicRoleTestDto basicRole = (BasicRoleTestDto) o;
+        return getId() == basicRole.getId() && Objects.equals(name, basicRole.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(getId(), name);
     }
 
-//    public void addPermission(String permissionId) {
-//        List<String> permissionIdList = listPermissionIds();
-//        if(!permissionIdList.contains(permissionId)) {
-//            permissionIdList.add(permissionId);
-//            permissionIds = CollectionSupport.format(permissionIdList, ",");
-//        }
-//    }
+    public void addPermission(String permissionId) {
+        List<String> permissionIdList = listPermissionIds();
+        if(!permissionIdList.contains(permissionId)) {
+            permissionIdList.add(permissionId);
+            permissionIds = CollectionSupport.format(permissionIdList, ",");
+        }
+    }
 
     public boolean isSystemRole() {
-        return isSystemRole;
+        return systemRole;
     }
 
     @Override
     public String toString(){
-        return "BasicRole{id=" + id +
+        return "BasicRoleTestDto{id=" + getId() +
                 ", name=" + name +
                 ", description=" + description +
                 ", permissionIds=" + permissionIds +
-                ", isSystemRole=" + isSystemRole +
+                ", systemRole=" + systemRole +
                 "}";
     }
 }

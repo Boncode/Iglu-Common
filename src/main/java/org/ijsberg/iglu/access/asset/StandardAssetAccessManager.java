@@ -1,21 +1,20 @@
 package org.ijsberg.iglu.access.asset;
 
 import org.ijsberg.iglu.access.component.RequestRegistry;
-import org.ijsberg.iglu.persistence.BasicEntityPersister;
+import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 public class StandardAssetAccessManager implements AssetAccessManager {
 
-    private final BasicEntityPersister<AssetAccessSettings> settingsRepository;
+    private final BasicJsonPersister<AssetAccessSettings> settingsRepository;
 
     public StandardAssetAccessManager() {
-        settingsRepository = new BasicEntityPersister<>("data", AssetAccessSettings.class,
-            "id", "assetId", "ownerUserId", "publicAsset", "sharedUserGroupIds", "name"
-        ).withUniqueIndexOn("assetId");
+        settingsRepository = new BasicJsonPersister<>(
+                "data", AssetAccessSettings.class
+        ).withUniqueAttributeName("assetId");
     }
 
     private RequestRegistry requestRegistry;

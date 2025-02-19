@@ -1,22 +1,3 @@
-/*
- * Copyright 2011-2014 Jeroen Meetsma - IJsberg Automatisering BV
- *
- * This file is part of Iglu.
- *
- * Iglu is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Iglu is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.ijsberg.iglu.usermanagement.module;
 
 import org.ijsberg.iglu.FatalException;
@@ -24,25 +5,21 @@ import org.ijsberg.iglu.access.*;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 import org.ijsberg.iglu.usermanagement.Account;
 import org.ijsberg.iglu.usermanagement.UserManager;
-import org.ijsberg.iglu.usermanagement.domain.SimpleAccount;
+import org.ijsberg.iglu.usermanagement.domain.JsonSimpleAccount;
 import org.ijsberg.iglu.util.ResourceException;
-import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.EncodingSupport;
 import org.ijsberg.iglu.util.properties.IgluProperties;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.io.File;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
-/**
- */
 public class StandardUserManager implements UserManager, Authenticator, Startable {
 
 
@@ -51,14 +28,12 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	private static final int SALT_LENGTH = 32;
 	private static final int KEY_LENGTH = 256;
 
-	private static final String passwordRegex = "\\w{4,10}";
-	protected String storageFileName = "./data/users.bin";
 	private boolean isStarted = false;
 
-	private HashMap<String, Account> accounts;
+	private BasicJsonPersister<JsonSimpleAccount> accountPersister;
 
-	private byte[] salt;
-
+	private final byte[] salt;
+	protected String dataDir = "./data/users.bin";
 
 	public StandardUserManager(byte[] salt) {
 		this.salt = salt;
@@ -107,7 +82,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	@Override
 	public User authenticate(Credentials credentials) throws AuthenticationException {
 
-		Account account = accounts.get(credentials.getUserId());
+		Account account = getAccountByUserId(credentials.getUserId());
 		if (account != null) {
 			String password = getPasswordFromCredentials(credentials);
 			if (passwordsMatch(password, account.getHashedPassword())) {
@@ -122,12 +97,20 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		throw new AuthenticationException(AuthenticationException.CREDENTIALS_INVALID);
 	}
 
+	private JsonSimpleAccount getAccountByUserId(String userId) {
+		List<JsonSimpleAccount> accounts = accountPersister.readByField("userId", userId);
+		if (accounts.isEmpty()) {
+			return null;
+		}
+		return accounts.get(0);
+	}
+
 	@Override
 	public User authenticate(Credentials expiredCredentials, Credentials newCredentials) throws AuthenticationException {
 		User user = authenticate(expiredCredentials);
-		Account account = accounts.get(expiredCredentials.getUserId());
+		JsonSimpleAccount account = getAccountByUserId(expiredCredentials.getUserId());
 		account.setHashedPassword(getPasswordFromCredentials(newCredentials));
-		save();
+		accountPersister.update(account);
 		return user;
 	}
 
@@ -155,26 +138,28 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	@Override
 	public void addAccount(String userId, String password) {
-		Account account = new SimpleAccount(userId, getHash(password));
+		Account account = new JsonSimpleAccount(userId, getHash(password));
 		addAccount(account);
 	}
 
 	private void addAccount(Account account) {
-		accounts.put(account.getUserId(), account);
-		save();
+		accountPersister.create(new JsonSimpleAccount(account.getUserId(), account.getHashedPassword(), account.getProperties()));
 	}
 
 	@Override
 	public void removeAccount(String userId) {
-		accounts.remove(userId);
-		save();
+		JsonSimpleAccount account = getAccountByUserId(userId);
+		if(account != null) {
+			accountPersister.delete(account.getId());
+		}
 	}
 
 	@Override
 	public boolean setGroup(String userId, String groupId) {
-		Account account = accounts.get(userId);
+		JsonSimpleAccount account = getAccountByUserId(userId);
 		if(account != null) {
 			account.putProperty("group", groupId);
+			accountPersister.update(account);
 			return true;
 		}
 		return false;
@@ -183,91 +168,60 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	@Override
 	public List<String> listAccounts() {
 		List<String> retval = new ArrayList<>();
-		for(Account account : accounts.values()) {
+		for(Account account : accountPersister.readAll()) {
 			retval.add(account.getUserId() + ":" + account.getProperties().getProperty("group"));
 		}
 		return retval;
 	}
 
-	public Map<String, Account> getAccounts() {
-		return new HashMap<>(accounts);
+	public List<JsonSimpleAccount> getAccounts() {
+		return accountPersister.readAll();
 	}
 
 	@Override
 	public void addAccount(User user, String password) {
-		Account account = new SimpleAccount(user.getId(), getHash(password), user.getSettings());
-		accounts.put(user.getId(), account);
-		save();
+		accountPersister.create(new JsonSimpleAccount(user.getId(), getHash(password), user.getSettings()));
 	}
 
 	@Override
 	public void updateAccount(User user) {
-		Account account = accounts.get(user.getId());
+		JsonSimpleAccount account = getAccountByUserId(user.getId());
 		if(account != null) {
 			account.setProperties(user.getSettings());
-			save();
+			accountPersister.update(account);
 		}
 	}
 
 	@Override
 	public void resetPassword(String userId, String newPassword) {
-		Account account = accounts.get(userId);
+		JsonSimpleAccount account = getAccountByUserId(userId);
 		account.setHashedPassword(getHash(newPassword));
-		save();
+		accountPersister.update(account);
 	}
 
 	@Override
 	public void resetPassword(String userId, String oldPassword, String newPassword) {
-		Account account = accounts.get(userId);
+		JsonSimpleAccount account = getAccountByUserId(userId);
 		if(account != null && passwordsMatch(oldPassword, account.getHashedPassword())) {
 			account.setHashedPassword(getHash(newPassword));
-			save();
+			accountPersister.update(account);
 		} else {
 			throw new AuthenticationException();
 		}
 	}
 
-
 	private void load() {
-		synchronized (lock) {
-			try {
-				File file = new File(storageFileName);
-				if (file.exists()) {
-					accounts = (HashMap<String, Account>) FileSupport.readSerializable(storageFileName);
-				} else {
-					accounts = new HashMap<>();
-					Account admin = new SimpleAccount("admin", getHash("admin"));
-					admin.putProperty("passwordChanged", "false");
-					admin.putProperty("roles",Roles.getRole(Roles.ADMINISTRATOR).getName());
-					addAccount(admin);
-				}
-			} catch (ClassNotFoundException | IOException e) {
-				throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);
-			}
+		accountPersister = new BasicJsonPersister<>(dataDir, JsonSimpleAccount.class)
+				.withUniqueAttributeName("userId");
+		if(accountPersister.readAll().isEmpty()) {
+			JsonSimpleAccount admin = new JsonSimpleAccount("admin", getHash("admin"));
+			admin.putProperty("passwordChanged", "false");
+			admin.putProperty("roles",Roles.getRole(Roles.ADMINISTRATOR).getName());
+			addAccount(admin);
 		}
 	}
-
-	private final Object lock = new Object();
-
-	private void save() {
-	    System.out.println(new LogEntry("about to save accounts"));
-		synchronized (lock) {
-			try {
-				File file = new File(storageFileName);
-				if (!file.exists()) {
-					FileSupport.createFile(storageFileName);
-				}
-				FileSupport.saveSerializable(accounts, storageFileName);
-			} catch (IOException e) {
-				throw new ConfigurationException("unable to save account data to '" + storageFileName + "'", e);
-			}
-		}
-        System.out.println(new LogEntry("accounts saved"));
-	}
-
 
 	public void setProperties(Properties properties) {
-		storageFileName = properties.getProperty("storage_file_name", storageFileName);
+		dataDir = properties.getProperty("data_dir", dataDir);
 	}
-
 }
