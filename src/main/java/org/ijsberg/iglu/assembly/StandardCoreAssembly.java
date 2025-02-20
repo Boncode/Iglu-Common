@@ -4,7 +4,6 @@ import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.invocation.RootConsole;
-import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.logging.module.RotatingFileLogger;
 import org.ijsberg.iglu.logging.module.StandardOutLogger;
 import org.ijsberg.iglu.scheduling.module.StandardScheduler;
