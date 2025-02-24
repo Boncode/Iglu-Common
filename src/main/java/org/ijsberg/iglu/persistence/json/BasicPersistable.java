@@ -1,14 +1,8 @@
 package org.ijsberg.iglu.persistence.json;
 
-public abstract class BasicPersistable {
+public interface BasicPersistable {
 
-    private long id;
+    long getId();
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    void setId(long id);
 }
