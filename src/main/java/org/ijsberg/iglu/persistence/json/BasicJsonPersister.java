@@ -11,7 +11,10 @@ import org.ijsberg.iglu.util.io.FileSupport;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 //public class BasicJsonPersister<T extends BasicPersistable> { //todo

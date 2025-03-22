@@ -19,7 +19,6 @@
 
 package org.ijsberg.iglu.logging.module;
 
-import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;

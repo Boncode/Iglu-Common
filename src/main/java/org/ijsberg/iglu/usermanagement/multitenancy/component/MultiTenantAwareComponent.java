@@ -14,9 +14,11 @@ import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
-import static org.ijsberg.iglu.access.asset.AssetAccessHelper.*;
+import static org.ijsberg.iglu.access.asset.AssetAccessHelper.userHasAdministratorRole;
+import static org.ijsberg.iglu.access.asset.AssetAccessHelper.userHasAssetAccessByMeansOfSettings;
 
 public class MultiTenantAwareComponent extends StandardComponent {
 
