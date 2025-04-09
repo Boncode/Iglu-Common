@@ -25,6 +25,8 @@ import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.caching.Cache;
 import org.ijsberg.iglu.util.caching.CachedObject;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -367,7 +369,7 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 
 	/**
 	 * Removes an object from cache.
-	 *
+	 * When V is of type Closeable this method will try to close the resource after removing it.
 	 * @param key object key
 	 */
 	public void clear(Object key) {
@@ -379,6 +381,13 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 					mirror.remove(key);
 				}
 			}
+			if (removed instanceof Closeable) {
+                try {
+                    ((Closeable) removed).close();
+                } catch (IOException e) {
+					System.out.println(new LogEntry("error while closing resource with key " + key));
+                }
+            }
 			System.out.println(new LogEntry("object with key " + key + (removed == null ? " NOT" : "") + " removed from cache"));
 		}
 	}
