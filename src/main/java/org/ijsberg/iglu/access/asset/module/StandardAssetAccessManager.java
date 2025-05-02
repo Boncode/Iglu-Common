@@ -1,5 +1,7 @@
-package org.ijsberg.iglu.access.asset;
+package org.ijsberg.iglu.access.asset.module;
 
+import org.ijsberg.iglu.access.asset.AssetAccessManager;
+import org.ijsberg.iglu.access.asset.AssetAccessSettings;
 import org.ijsberg.iglu.access.component.RequestRegistry;
 import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
