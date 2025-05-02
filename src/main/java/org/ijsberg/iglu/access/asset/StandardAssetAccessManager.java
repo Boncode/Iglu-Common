@@ -5,7 +5,6 @@ import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class StandardAssetAccessManager implements AssetAccessManager {
 
@@ -25,18 +24,6 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     @Override
     public void registerAsset(String assetId, String name) {
         settingsRepository.create(new AssetAccessSettings(assetId, requestRegistry.getCurrentRequest().getUser().getId(), name));
-    }
-
-    @Override
-    public void registerAsset(String assetId, Long userGroupId, String name) {
-        //FIXME temporary method to do initial conversion
-        AssetAccessSettings assetAccessSettings = new AssetAccessSettings(assetId, name);
-        if(userGroupId != null) {
-            Set<Long> sharedUserGroupIds = new HashSet<>();
-            sharedUserGroupIds.add(userGroupId);
-            assetAccessSettings.setSharedUserGroupIds(sharedUserGroupIds);
-        }
-        settingsRepository.create(assetAccessSettings);
     }
 
     @Override

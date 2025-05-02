@@ -25,12 +25,6 @@ public class AssetAccessSettings implements SecuredAssetData {
         this.name = name;
     }
 
-    // todo remove after conversion
-    public AssetAccessSettings(String assetId, String name) {
-        this.assetId = assetId;
-        this.name = name;
-    }
-
     public String getAssetId() {
         return assetId;
     }

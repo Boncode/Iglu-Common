@@ -6,8 +6,6 @@ public interface AssetAccessManager {
 
     void registerAsset(String assetId, String name);
 
-    void registerAsset(String assetId, Long userGroupId, String name);
-
     AssetAccessSettings getAssetAccessSettings(String assetId);
 
     List<AssetAccessSettings> getAssetAccessSettings();
