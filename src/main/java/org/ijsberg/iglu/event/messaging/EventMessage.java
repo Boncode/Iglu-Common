@@ -8,11 +8,12 @@ import java.time.Instant;
 public interface EventMessage {
 
     EventTopic getTopic();
+
     EventType getType();
+
     Instant getTimestampUtc();
 
     String getLocation();
 
     String getMessage();
-
 }
