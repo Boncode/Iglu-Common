@@ -7,14 +7,20 @@ import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 
 public class StandardAssetAccessManager implements AssetAccessManager {
 
-    private final BasicJsonPersister<AssetAccessSettings> settingsRepository;
+    private BasicJsonPersister<AssetAccessSettings> settingsRepository;
 
     public StandardAssetAccessManager() {
+
+    }
+
+    public void setProperties(Properties properties) {
+        String dataDirPath = properties.getProperty("home") + "/data";
         settingsRepository = new BasicJsonPersister<>(
-                "data", AssetAccessSettings.class
+                dataDirPath, AssetAccessSettings.class
         ).withUniqueAttributeName("assetId");
     }
 
