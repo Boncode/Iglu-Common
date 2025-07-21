@@ -423,6 +423,7 @@ public class IgluProperties extends Properties {
 	public static void saveProperties(Properties properties, String fileName) throws IOException {
 		FileData fileData = new FileData(fileName);
 		String tmpFileName = fileData.getPath() + "/." + System.currentTimeMillis() + "." + fileData.getFileName();
+		FileSupport.createDirectory(fileData.getPath());
 		FileOutputStream outputStream = new FileOutputStream(tmpFileName);
 		properties.store(outputStream, null);
 		outputStream.close();
