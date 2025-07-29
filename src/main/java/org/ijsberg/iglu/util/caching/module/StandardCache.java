@@ -414,6 +414,7 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 								System.out.println(new LogEntry("error while closing resource with key " + key));
 							}
 						}
+						System.out.println(new LogEntry("object with key " + key + (removed == null ? " NOT" : "") + " removed from cache"));
 					}
 				}
 			}
