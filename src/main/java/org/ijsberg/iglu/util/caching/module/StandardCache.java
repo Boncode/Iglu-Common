@@ -33,10 +33,11 @@ import java.util.*;
  * This class is a basic caching service that stores objects for a certain amount of time.
  */
 public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
+
 	private Date lastRun = new Date();
 
-	private final HashMap<K, CachedObject<V>> data = new HashMap<K, CachedObject<V>>(50);
-	private final HashMap<K, CachedObject<V>> mirror = new HashMap<K, CachedObject<V>>(50);
+	private final HashMap<K, CachedObject<V>> data = new HashMap<>(50);
+	private final HashMap<K, CachedObject<V>> mirror = new HashMap<>(50);
 
 	public static final int DEFAULT_TTL = 900;// 15 minutes; 0 = don't cache
 	public static final int DEFAULT_CLEANUP_INTERVAL = 180; // 3 minutes; 0 = never cleanup
@@ -372,22 +373,23 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 	 * When V is of type Closeable this method will try to close the resource after removing it.
 	 * @param key object key
 	 */
-	public void clear(Object key) {
-		Object removed;
+	public void clear(K key) {
 		if (isCachingEnabled()) {
+			CachedObject<V> removed;
 			synchronized (mirror) {
 				synchronized (data) {
 					removed = data.remove(key);
 					mirror.remove(key);
+
+					if (removed != null && removed.getObject() instanceof Closeable) {
+						try {
+							((Closeable) removed.getObject()).close();
+						} catch (IOException e) {
+							System.out.println(new LogEntry("error while closing resource with key " + key));
+						}
+					}
 				}
 			}
-			if (removed instanceof Closeable) {
-                try {
-                    ((Closeable) removed).close();
-                } catch (IOException e) {
-					System.out.println(new LogEntry("error while closing resource with key " + key));
-                }
-            }
 			System.out.println(new LogEntry("object with key " + key + (removed == null ? " NOT" : "") + " removed from cache"));
 		}
 	}
@@ -397,29 +399,35 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 	 *
 	 * @param keys object keys
 	 */
-	public void clear(Collection keys) {
-		synchronized (mirror) {
-			synchronized (data) {
-				Iterator i = keys.iterator();
-				while (i.hasNext()) {
-					Object key = i.next();
-					data.remove(key);
-					mirror.remove(key);
+	public void clear(Collection<K> keys) {
+		if (isCachingEnabled()) {
+			synchronized (mirror) {
+				synchronized (data) {
+					for (K key : keys) {
+						CachedObject<V> removed = data.remove(key);
+						mirror.remove(key);
+
+						if (removed != null && removed.getObject() instanceof Closeable) {
+							try {
+								((Closeable) removed.getObject()).close();
+							} catch (IOException e) {
+								System.out.println(new LogEntry("error while closing resource with key " + key));
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 
 	public void clear() {
-		synchronized (mirror) {
-			synchronized (data) {
-				data.clear();
-				mirror.clear();
+		if(isCachingEnabled()) {
+			synchronized (mirror) {
+				Set<K> keys = Set.copyOf(mirror.keySet());
+				clear(keys);
 			}
 		}
 	}
-
-
 
 	/**
 	 * Retrieves a cache from the current layer or creates it.
@@ -444,7 +452,7 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable {
 	 * @return
 	 */
 	public static <K, V> Cache<K, V> createCache(String cacheName, int ttl, long cleanupInterval/*, Application application, Layer layer*/) {
-		StandardCache cache = new StandardCache(ttl, cleanupInterval);
+		StandardCache<K, V> cache = new StandardCache<>(ttl, cleanupInterval);
 		cache.setProperties(new Properties());
 		cache.start();
 		return cache;
