@@ -15,5 +15,6 @@ public interface ServiceBroker {
     void subscribe(EventTopic eventTypesToReceive, EventListener listener);
 
     void unsubscribe(EventTopic eventTypesToReceive, EventListener listener);
+
     void publish(EventMessage message);
 }
