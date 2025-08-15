@@ -1,5 +1,7 @@
 package org.ijsberg.iglu.event;
 
+import org.ijsberg.iglu.event.model.EventType;
+
 public enum IgluEventType implements EventType {
 
     LOGGING_STARTED,

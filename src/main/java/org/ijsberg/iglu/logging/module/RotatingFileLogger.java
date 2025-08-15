@@ -1,28 +1,8 @@
-/*
- * Copyright 2011-2014 Jeroen Meetsma - IJsberg Automatisering BV
- *
- * This file is part of Iglu.
- *
- * Iglu is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Iglu is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.ijsberg.iglu.logging.module;
 
-import org.ijsberg.iglu.event.IgluEventTopic;
+import org.ijsberg.iglu.event.EventBus;
 import org.ijsberg.iglu.event.IgluEventType;
-import org.ijsberg.iglu.event.ServiceBroker;
-import org.ijsberg.iglu.event.messaging.message.BasicEventMessage;
+import org.ijsberg.iglu.event.model.BasicEvent;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
@@ -35,11 +15,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Properties;
 
-/**
- */
 public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 
 
@@ -47,10 +26,10 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	private int logRotateIntervalInHours = 24;
 	public static SafeDateFormat TIMESTAMP_LOGFILE_FORMAT = new SafeDateFormat("yyyy_MM_dd_HH_mm");
 
-	protected ServiceBroker serviceBroker;
-	public void setServiceBroker(ServiceBroker serviceBroker) {
-		this.serviceBroker = serviceBroker;
-	}
+    protected EventBus eventBus;
+    public void setEventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
 	protected String rotatedLogFileName;
 
@@ -118,14 +97,13 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 
 
 	protected void reportLoggingRotated() {
-		if(serviceBroker != null) {
+		if(eventBus != null) {
 			if(rotatedLogFileName != null) {
 				try {
 					long crc = FileSupport.calculateCRC(rotatedLogFileName);
 					String rotatingEventMessage = "log file archived, name: " + rotatedLogFileName + ", CRC: " + crc;
 					System.out.println(new LogEntry(Level.DEBUG, rotatingEventMessage));
-					serviceBroker.publish(new BasicEventMessage(IgluEventTopic.IGLU_EVENTS, IgluEventType.LOGFILE_ROTATED,
-							rotatingEventMessage));
+                    eventBus.publish(new BasicEvent(IgluEventType.LOGFILE_ROTATED, Instant.now()/*rotatingEventMessage*/));
 				} catch (IOException e) {
 					System.out.println(new LogEntry(Level.CRITICAL, "error while making rotatingEventMessage for file " + rotatedLogFileName, e));
 				}

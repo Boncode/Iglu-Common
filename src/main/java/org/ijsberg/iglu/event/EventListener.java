@@ -1,7 +1,8 @@
 package org.ijsberg.iglu.event;
 
-import org.ijsberg.iglu.event.messaging.EventMessage;
+import org.ijsberg.iglu.event.model.Event;
 
-public interface EventListener {
-    void onEvent(EventMessage eventMessage);
+public interface EventListener<T extends Event> {
+
+    void onEvent(T event);
 }

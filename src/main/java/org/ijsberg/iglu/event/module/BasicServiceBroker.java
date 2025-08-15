@@ -1,23 +1,34 @@
 package org.ijsberg.iglu.event.module;
 
+import org.ijsberg.iglu.event.*;
 import org.ijsberg.iglu.event.EventListener;
-import org.ijsberg.iglu.event.EventTopic;
-import org.ijsberg.iglu.event.ServiceBroker;
-import org.ijsberg.iglu.event.messaging.EventMessage;
+import org.ijsberg.iglu.event.model.Event;
+import org.ijsberg.iglu.event.model.EventTopic;
+import org.ijsberg.iglu.event.model.EventType;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
+import org.ijsberg.iglu.util.collection.ListTreeMap;
+import org.ijsberg.iglu.util.time.TimePeriod;
 
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
-public class BasicServiceBroker implements ServiceBroker {
+import static org.ijsberg.iglu.util.time.TimeUnit.DAY;
+
+public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
 
     private final ListMap<Class<?>, Object> serviceMap = new ListHashMap<>();
 
-    private final ListMap<EventTopic, EventListener> eventListenerMap = new ListHashMap<>();
+    private static final TimePeriod EVENT_MESSAGE_TIME_PERIOD_TO_STORE = new TimePeriod(1, DAY);
+    private final ListTreeMap<Instant, Event> latestEvents = new ListTreeMap<>();
+
+    private final ListMap<EventTopic<? extends Event>, EventListener<? extends Event>> eventListenersByTopic = new ListHashMap<>();
+    private final ListMap<EventType, EventTopic<? extends Event>> topicsByEventType = new ListHashMap<>();
+    private final Set<EventTopic<? extends Event>> allTopics = new HashSet<>();
 
     public BasicServiceBroker() {
     }
@@ -45,27 +56,120 @@ public class BasicServiceBroker implements ServiceBroker {
     }
 
     @Override
+    public void registerEventTopic(EventTopic eventTopic, EventType... eventTypes) {
+        allTopics.add(eventTopic);
+        for(EventType eventType : eventTypes) {
+            topicsByEventType.putDistinct(eventType, eventTopic);
+        }
+    }
+
+    @Override
     public void subscribe(EventTopic topic, EventListener listener) {
-        eventListenerMap.put(topic, listener);
+        synchronized(eventListenersByTopic) {
+            eventListenersByTopic.putDistinct(topic, listener);
+        }
     }
 
     @Override
     public void unsubscribe(EventTopic topic, EventListener listener) {
-        eventListenerMap.remove(topic, listener);
+        synchronized(eventListenersByTopic) {
+            eventListenersByTopic.remove(topic, listener);
+        }
     }
 
     @Override
-    public void publish(EventMessage message) {
-        List<EventListener> listeners = eventListenerMap.get(message.getTopic());
-        if(listeners != null) {
-            for (EventListener eventListener : new ArrayList<>(listeners)) {
-                try {
-                    eventListener.onEvent(message);
-                } catch (Exception e) {
-                    System.out.println(new LogEntry(Level.CRITICAL, "failed to forward event of type " + message.getType(), e));
+    public <T extends Event> void publish(T event) {
+        synchronized(latestEvents) {
+            latestEvents.putDistinct(event.getTimestampUtc(), event);
+        }
+
+        List<EventTopic<? extends Event>> topicsForType = topicsByEventType.get(event.getType());
+        if(topicsForType != null) {
+            for (EventTopic<? extends Event> topic : topicsForType) {
+                if(checkEventTypeValidityForTopic(topic, event)) {
+                    System.out.println(new LogEntry(Level.DEBUG, "Publishing event in topic [" + topic.id() + "] " + event.getType().getId()));
+                    synchronized (eventListenersByTopic) {
+                        List<EventListener<T>> listeners = getEventListenersForTopic(topic);
+                        for (EventListener<T> eventListener : new ArrayList<>(listeners)) {
+                            try {
+                                eventListener.onEvent(event);
+                            } catch (Exception e) {
+                                System.out.println(new LogEntry(Level.CRITICAL, "failed to forward event of type " + event.getType(), e));
+                            }
+                        }
+                    }
+                } else {
+                    System.out.println(new LogEntry(Level.CRITICAL, "NOT publishing event in topic [" + topic.id() + "] " + event.getType().getId()
+                            + " as it is not compatible with expected class type: " + topic.eventClass().getSimpleName()));
                 }
             }
         }
     }
 
+    private <T extends Event> List<EventListener<T>> getEventListenersForTopic(EventTopic<? extends Event> topic) {
+        List<EventListener<T>> eventListeners = new ArrayList<>();
+        List<EventListener<? extends Event>> eventListenersForTopic = eventListenersByTopic.get(topic);
+        if(eventListenersForTopic != null) {
+            for(EventListener<? extends Event> listener : eventListenersForTopic) {
+                eventListeners.add(((EventListener<T>)listener));
+            }
+        }
+        return eventListeners;
+    }
+
+    @Override
+    public Map<EventTopic<? extends Event>, List<Event>> getLatestEvents() {
+        Map<EventTopic<? extends Event>, List<Event>> latestEventByTopic = new HashMap<>();
+        synchronized(latestEvents) {
+            for(Event event : latestEvents.valuesDescending()) {
+                List<EventTopic<? extends Event>> topicsForEvent = topicsByEventType.get(event.getType());
+                for(EventTopic<? extends Event> topic : topicsForEvent) {
+                    if(latestEventByTopic.containsKey(topic)) {
+                        latestEventByTopic.get(topic).add(event);
+                    } else {
+                        List<Event> list = new ArrayList<>();
+                        list.add(event);
+                        latestEventByTopic.put(topic, list);
+                    }
+                }
+            }
+            return latestEventByTopic;
+        }
+    }
+
+    private <T extends Event> boolean checkEventTypeValidityForTopic(EventTopic<? extends Event> topic, T event) {
+        if(!topic.eventClass().isAssignableFrom(event.getClass())) {
+            System.out.println(new LogEntry(Level.DEBUG, "event of type " + event.getClass().getSimpleName() +  " not a (sub)type of " + topic.eventClass().getSimpleName()));
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int getPageIntervalInMinutes() {
+        return 60;
+    }
+
+    @Override
+    public int getPageOffsetInMinutes() {
+        return 0;
+    }
+
+    @Override
+    public void onPageEvent(long officialTime) {
+        Instant timeUtcToKeepEntries = Instant.now().minus(EVENT_MESSAGE_TIME_PERIOD_TO_STORE.getLength(), EVENT_MESSAGE_TIME_PERIOD_TO_STORE.getTimeUnit().getTemporalUnit());
+        synchronized(latestEvents) {
+            Set<Instant> keySet = new LinkedHashSet<>(latestEvents.keySet());
+            for (Instant key : keySet) {
+                if (key.isBefore(timeUtcToKeepEntries)) {
+                    latestEvents.removeAll(key);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean isStarted() {
+        return true;
+    }
 }

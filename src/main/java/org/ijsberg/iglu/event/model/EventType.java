@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.event;
+package org.ijsberg.iglu.event.model;
 
 public interface EventType {
 
