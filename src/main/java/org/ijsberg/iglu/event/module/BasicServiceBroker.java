@@ -56,7 +56,7 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
     }
 
     @Override
-    public void registerEventTopic(EventTopic eventTopic, EventType... eventTypes) {
+    public void registerEventTopic(EventTopic<? extends Event> eventTopic, EventType... eventTypes) {
         allTopics.add(eventTopic);
         for(EventType eventType : eventTypes) {
             topicsByEventType.putDistinct(eventType, eventTopic);
@@ -64,14 +64,14 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
     }
 
     @Override
-    public void subscribe(EventTopic topic, EventListener listener) {
+    public void subscribe(EventTopic<? extends Event> topic, EventListener<? extends Event> listener) {
         synchronized(eventListenersByTopic) {
             eventListenersByTopic.putDistinct(topic, listener);
         }
     }
 
     @Override
-    public void unsubscribe(EventTopic topic, EventListener listener) {
+    public void unsubscribe(EventTopic<? extends Event> topic, EventListener<? extends Event> listener) {
         synchronized(eventListenersByTopic) {
             eventListenersByTopic.remove(topic, listener);
         }

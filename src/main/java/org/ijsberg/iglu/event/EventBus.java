@@ -9,11 +9,11 @@ import java.util.Map;
 
 public interface EventBus {
 
-    void registerEventTopic(EventTopic eventTopic, EventType... eventTypes);
+    void registerEventTopic(EventTopic<? extends Event> eventTopic, EventType... eventTypes);
 
-    void subscribe(EventTopic eventTypesToReceive, EventListener listener);
+    void subscribe(EventTopic<? extends Event> eventTypesToReceive, EventListener<? extends Event> listener);
 
-    void unsubscribe(EventTopic eventTypesToReceive, EventListener listener);
+    void unsubscribe(EventTopic<? extends Event> eventTypesToReceive, EventListener<? extends Event> listener);
 
     <T extends Event> void publish(T event);
 
