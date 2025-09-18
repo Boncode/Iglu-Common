@@ -1,7 +1,8 @@
 package org.ijsberg.iglu.event.module;
 
-import org.ijsberg.iglu.event.*;
+import org.ijsberg.iglu.event.EventBus;
 import org.ijsberg.iglu.event.EventListener;
+import org.ijsberg.iglu.event.ServiceBroker;
 import org.ijsberg.iglu.event.model.Event;
 import org.ijsberg.iglu.event.model.EventTopic;
 import org.ijsberg.iglu.event.model.EventType;
