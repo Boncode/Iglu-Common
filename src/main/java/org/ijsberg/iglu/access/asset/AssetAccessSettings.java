@@ -11,6 +11,7 @@ public class AssetAccessSettings implements SecuredAssetData {
     private String ownerUserId;
 
     private String name;
+    private String type;
 
     private boolean publicAsset;
     private Set<Long> sharedUserGroupIds = new HashSet<>();
@@ -19,9 +20,10 @@ public class AssetAccessSettings implements SecuredAssetData {
         //empty constructor for entity persister
     }
 
-    public AssetAccessSettings(String assetId, String ownerUserId, String name) {
+    public AssetAccessSettings(String assetId, String ownerUserId, String type, String name) {
         this.assetId = assetId;
         this.ownerUserId = ownerUserId;
+        this.type = type;
         this.name = name;
     }
 
@@ -72,5 +74,13 @@ public class AssetAccessSettings implements SecuredAssetData {
 
     public void setRelatedAssetId(String relatedAssetId) {
         //todo needed for json mapping, ignored... might want a DTO in analysis infrastructure
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

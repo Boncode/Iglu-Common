@@ -2,9 +2,13 @@ package org.ijsberg.iglu.access.asset.module;
 
 import org.ijsberg.iglu.access.asset.AssetAccessManager;
 import org.ijsberg.iglu.access.asset.AssetAccessSettings;
+import org.ijsberg.iglu.access.asset.SecuredAssetData;
 import org.ijsberg.iglu.access.component.RequestRegistry;
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -30,8 +34,8 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     }
 
     @Override
-    public void registerAsset(String assetId, String name) {
-        settingsRepository.create(new AssetAccessSettings(assetId, requestRegistry.getCurrentRequest().getUser().getId(), name));
+    public void registerAsset(String assetId, String type, String name) {
+        settingsRepository.create(new AssetAccessSettings(assetId, requestRegistry.getCurrentRequest().getUser().getId(), type, name));
     }
 
     @Override
@@ -76,6 +80,19 @@ public class StandardAssetAccessManager implements AssetAccessManager {
         AssetAccessSettings existingSettings = getSettingsByAssetId(assetId);
         if(existingSettings != null) {
             settingsRepository.delete(existingSettings.getId());
+        }
+    }
+
+    @Override
+    public void sanityCheck(Collection<? extends SecuredAssetData> securedAssets, String assetType) {
+        System.out.println(new LogEntry("performing sanity check for " + securedAssets.size() + " secured asset(s) of type " + assetType));
+        for(SecuredAssetData securedAssetData : securedAssets) {
+            AssetAccessSettings settings = getAssetAccessSettings(securedAssetData.getRelatedAssetId());
+            if(settings == null) {
+                System.out.println(new LogEntry(Level.CRITICAL, "settings for asset " + securedAssetData.getRelatedAssetId() + " of type " + assetType + " not found"));
+            } else {
+               // TODO
+            }
         }
     }
 
