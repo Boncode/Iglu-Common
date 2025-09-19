@@ -8,10 +8,7 @@ import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class StandardAssetAccessManager implements AssetAccessManager {
 
@@ -86,14 +83,41 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     @Override
     public void sanityCheck(Collection<? extends SecuredAssetData> securedAssets, String assetType) {
         System.out.println(new LogEntry("performing sanity check for " + securedAssets.size() + " secured asset(s) of type " + assetType));
+        checkIfSettingsExistForActualAssets(securedAssets, assetType);
+        checkIfActualAssetsExistForSettings(securedAssets, assetType);
+        //TODO cleanup deprecated assets in a later stage
+    }
+
+    private void checkIfSettingsExistForActualAssets(Collection<? extends SecuredAssetData> securedAssets, String assetType) {
         for(SecuredAssetData securedAssetData : securedAssets) {
             AssetAccessSettings settings = getAssetAccessSettings(securedAssetData.getRelatedAssetId());
             if(settings == null) {
-                System.out.println(new LogEntry(Level.CRITICAL, "settings for asset " + securedAssetData.getRelatedAssetId() + " of type " + assetType + " not found"));
+                System.out.println(new LogEntry(Level.CRITICAL, "settings for asset " + securedAssetData.getRelatedAssetId() + " of type " + assetType + " not found"));//; Will be added"));
+                //TODO add
+                //registerAsset(securedAssetData.getRelatedAssetId(), assetType, securedAssetData.getName());
             } else {
-               // TODO
+                if(settings.getType() == null) {
+                    System.out.println(new LogEntry(Level.CRITICAL, "type for asset " + securedAssetData.getRelatedAssetId() + " not set; Will be set to " + assetType));
+                    settings.setType(assetType);
+                    updateAssetAccessSettings(settings);
+                }
             }
         }
+    }
+
+    private void checkIfActualAssetsExistForSettings(Collection<? extends SecuredAssetData> securedAssets, String assetType) {
+        Set<String> assetIds = new HashSet<>();
+        securedAssets.stream().map(SecuredAssetData::getRelatedAssetId).forEach(assetIds::add);
+        for(AssetAccessSettings settings : getSettingsByType(assetType)) {
+            if(!assetIds.contains(settings.getAssetId())) {
+                System.out.println(new LogEntry(Level.CRITICAL, "asset settings of type " + assetType + ", with id " + settings.getAssetId() + " do not represent existing asset"));// Will be removed"));
+                //TODO deregister
+            }
+        }
+    }
+
+    private List<AssetAccessSettings> getSettingsByType(String assetType) {
+        return settingsRepository.readByField("type", assetType);
     }
 
     private AssetAccessSettings getSettingsByAssetId(String assetId) {

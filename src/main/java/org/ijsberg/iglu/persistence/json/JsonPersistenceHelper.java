@@ -10,7 +10,8 @@ public class JsonPersistenceHelper {
         try {
             Field field = entity.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
-            if (field.get(entity).equals(fieldValue)) {
+            Object value = field.get(entity);
+            if ((value == null && fieldValue == null) || (value != null && value.equals(fieldValue))) {
                 return true;
             }
         } catch (ReflectiveOperationException e) {
