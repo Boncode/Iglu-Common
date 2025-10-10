@@ -37,7 +37,7 @@ public class StandardAssetAccessManager implements AssetAccessManager {
 
     @Override
     public AssetAccessSettings getAssetAccessSettings(String assetId) {
-        return getSettingsByAssetId(assetId);
+        return assetId != null ? getSettingsByAssetId(assetId) : null;
     }
 
     @Override
