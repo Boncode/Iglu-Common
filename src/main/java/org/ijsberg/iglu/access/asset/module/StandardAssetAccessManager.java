@@ -54,7 +54,7 @@ public class StandardAssetAccessManager implements AssetAccessManager {
                 // check shared teams reset
                 accessSettings.setSharedUserGroupIds(new HashSet<>());
                 // check owner set, if not, then current user is owner. Admins can always access assets.
-                if(existingSettings.getOwnerUserId().isEmpty()) {
+                if(existingSettings.getOwnerUserId() == null || existingSettings.getOwnerUserId().isEmpty()) {
                     accessSettings.setOwnerUserId(requestRegistry.getCurrentRequest().getUser().getId());
                 }
             }
