@@ -1,9 +1,9 @@
-package org.ijsberg.iglu.access.asset.module;
+package org.ijsberg.iglu.asset.component;
 
-import org.ijsberg.iglu.access.asset.AssetAccessManager;
-import org.ijsberg.iglu.access.asset.AssetAccessSettings;
-import org.ijsberg.iglu.access.asset.SecuredAssetData;
-import org.ijsberg.iglu.access.component.RequestRegistry;
+import org.ijsberg.iglu.asset.AssetAccessManager;
+import org.ijsberg.iglu.asset.AssetAccessSettings;
+import org.ijsberg.iglu.asset.SecuredAssetData;
+import org.ijsberg.iglu.access.RequestRegistry;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.persistence.json.BasicJsonPersister;

@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.access.asset;
+package org.ijsberg.iglu.asset;
 
 import java.util.Collection;
 import java.util.List;

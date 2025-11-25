@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.access.asset;
+package org.ijsberg.iglu.asset;
 
 import org.ijsberg.iglu.access.AccessConstants;
 import org.ijsberg.iglu.access.User;

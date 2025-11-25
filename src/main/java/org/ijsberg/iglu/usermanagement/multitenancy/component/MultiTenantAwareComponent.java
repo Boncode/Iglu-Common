@@ -2,10 +2,10 @@ package org.ijsberg.iglu.usermanagement.multitenancy.component;
 
 import org.ijsberg.iglu.access.Request;
 import org.ijsberg.iglu.access.User;
-import org.ijsberg.iglu.access.asset.AssetAccessManager;
-import org.ijsberg.iglu.access.asset.AssetAccessSettings;
-import org.ijsberg.iglu.access.asset.SecuredAssetData;
-import org.ijsberg.iglu.access.component.RequestRegistry;
+import org.ijsberg.iglu.asset.AssetAccessManager;
+import org.ijsberg.iglu.asset.AssetAccessSettings;
+import org.ijsberg.iglu.asset.SecuredAssetData;
+import org.ijsberg.iglu.access.RequestRegistry;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.Level;
@@ -17,8 +17,8 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Iterator;
 
-import static org.ijsberg.iglu.access.asset.AssetAccessHelper.userHasAdministratorRole;
-import static org.ijsberg.iglu.access.asset.AssetAccessHelper.userHasAssetAccessByMeansOfSettings;
+import static org.ijsberg.iglu.asset.AssetAccessHelper.userHasAdministratorRole;
+import static org.ijsberg.iglu.asset.AssetAccessHelper.userHasAssetAccessByMeansOfSettings;
 
 public class MultiTenantAwareComponent extends StandardComponent {
 

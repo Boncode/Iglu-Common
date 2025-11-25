@@ -1,4 +1,4 @@
-package org.ijsberg.iglu.access.asset;
+package org.ijsberg.iglu.asset;
 
 public class AssetSecurityException extends RuntimeException {
 
