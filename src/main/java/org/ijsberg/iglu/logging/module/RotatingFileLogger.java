@@ -27,6 +27,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	public static SafeDateFormat TIMESTAMP_LOGFILE_FORMAT = new SafeDateFormat("yyyy_MM_dd_HH_mm");
 
     protected EventBus eventBus;
+
     public void setEventBus(EventBus eventBus) {
         this.eventBus = eventBus;
     }
@@ -103,7 +104,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 					long crc = FileSupport.calculateCRC(rotatedLogFileName);
 					String rotatingEventMessage = "log file archived, name: " + rotatedLogFileName + ", CRC: " + crc;
 					System.out.println(new LogEntry(Level.DEBUG, rotatingEventMessage));
-                    eventBus.publish(new BasicEvent(IgluEventType.LOGFILE_ROTATED, Instant.now()/*rotatingEventMessage*/));
+                    eventBus.publish(new BasicEvent(IgluEventType.LOGFILE_ROTATED, Instant.now(), "Logger"));
 				} catch (IOException e) {
 					System.out.println(new LogEntry(Level.CRITICAL, "error while making rotatingEventMessage for file " + rotatedLogFileName, e));
 				}

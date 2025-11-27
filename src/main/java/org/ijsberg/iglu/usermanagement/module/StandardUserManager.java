@@ -176,6 +176,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		return retval;
 	}
 
+	@Override
 	public List<JsonSimpleAccount> getAccounts() {
 		return accountPersister.readAll();
 	}

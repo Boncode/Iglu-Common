@@ -1,11 +1,11 @@
 package org.ijsberg.iglu.usermanagement.multitenancy.component;
 
 import org.ijsberg.iglu.access.Request;
+import org.ijsberg.iglu.access.RequestRegistry;
 import org.ijsberg.iglu.access.User;
 import org.ijsberg.iglu.asset.AssetAccessManager;
 import org.ijsberg.iglu.asset.AssetAccessSettings;
 import org.ijsberg.iglu.asset.SecuredAssetData;
-import org.ijsberg.iglu.access.RequestRegistry;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.Level;

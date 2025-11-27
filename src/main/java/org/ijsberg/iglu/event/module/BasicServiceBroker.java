@@ -70,6 +70,23 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
             eventListenersByTopic.putDistinct(topic, listener);
         }
     }
+    @Override
+    public void subscribeToAll(EventListener<? extends Event> listener) {
+        synchronized(allTopics) {
+            for(EventTopic topic : allTopics) {
+                eventListenersByTopic.putDistinct(topic, listener);
+            }
+        }
+    }
+
+    @Override
+    public void unsubscribe(EventListener<? extends Event> listener) {
+        synchronized(allTopics) {
+            for(EventTopic topic : allTopics) {
+                unsubscribe(topic, listener);
+            }
+        }
+    }
 
     @Override
     public void unsubscribe(EventTopic<? extends Event> topic, EventListener<? extends Event> listener) {
@@ -92,11 +109,7 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
                     synchronized (eventListenersByTopic) {
                         List<EventListener<T>> listeners = getEventListenersForTopic(topic);
                         for (EventListener<T> eventListener : new ArrayList<>(listeners)) {
-                            try {
-                                eventListener.onEvent(event);
-                            } catch (Exception e) {
-                                System.out.println(new LogEntry(Level.CRITICAL, "failed to forward event of type " + event.getType(), e));
-                            }
+                            forwardEvent(event, eventListener);
                         }
                     }
                 } else {
@@ -104,6 +117,19 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
                             + " as it is not compatible with expected class type: " + topic.eventClass().getSimpleName()));
                 }
             }
+        }
+    }
+
+    private static <T extends Event> void forwardEvent(T event, EventListener<T> eventListener) {
+        try {
+            long start = System.currentTimeMillis();
+            eventListener.onEvent(event);
+            long end = System.currentTimeMillis();
+            if(end - start > 100) {
+                System.out.println(new LogEntry(Level.CRITICAL, "handling forwarded event of type " + event.getType() + " by " + eventListener.getClass().getSimpleName() + " took " + (end - start) + " ms (> 100)"));
+            }
+        } catch (Throwable t) {
+            System.out.println(new LogEntry(Level.CRITICAL, "handling forwarded event of type " + event.getType() + " by " + eventListener.getClass().getSimpleName() + " failed", t));
         }
     }
 

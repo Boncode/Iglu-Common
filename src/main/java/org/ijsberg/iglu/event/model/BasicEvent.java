@@ -6,10 +6,12 @@ public class BasicEvent implements Event {
 
     private final EventType type;
     private final Instant timestampUtc;
+    private final String assetId;
 
-    public BasicEvent(EventType type, Instant timestampUtc) {
+    public BasicEvent(EventType type, Instant timestampUtc, String assetId) {
         this.type = type;
         this.timestampUtc = timestampUtc;
+        this.assetId = assetId;
     }
 
     @Override
@@ -20,6 +22,19 @@ public class BasicEvent implements Event {
     @Override
     public Instant getTimestampUtc() {
         return timestampUtc;
+    }
+
+    @Override
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public String getMessage() {
+        return toString();
+    }
+
+    public String getDescription() {
+        return type.getLabel();
     }
 
     @Override

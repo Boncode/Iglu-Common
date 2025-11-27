@@ -1,9 +1,13 @@
 package org.ijsberg.iglu.asset;
 
+import org.ijsberg.iglu.event.BasicEventTrigger;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class AssetAccessSettings implements SecuredAssetData {
+public class AssetAccessSettings /*implements SecuredAssetData*/ {
 
     private long id;
 
@@ -16,14 +20,16 @@ public class AssetAccessSettings implements SecuredAssetData {
     private boolean publicAsset;
     private Set<Long> sharedUserGroupIds = new HashSet<>();
 
+    private List<BasicEventTrigger> eventTriggers = new ArrayList<>();
+
     public AssetAccessSettings() {
         //empty constructor for entity persister
     }
 
-    public AssetAccessSettings(String assetId, String ownerUserId, String type, String name) {
+    public AssetAccessSettings(String assetId, String ownerUserId, String assetType, String name) {
         this.assetId = assetId;
         this.ownerUserId = ownerUserId;
-        this.type = type;
+        this.type = assetType;
         this.name = name;
     }
 
@@ -67,7 +73,7 @@ public class AssetAccessSettings implements SecuredAssetData {
         this.name = name;
     }
 
-    @Override
+    //@Override
     public String getRelatedAssetId() {
         return assetId;
     }
@@ -82,5 +88,13 @@ public class AssetAccessSettings implements SecuredAssetData {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public List<BasicEventTrigger> getEventTriggers() {
+        return eventTriggers;
+    }
+
+    public void addTrigger(BasicEventTrigger trigger) {
+        eventTriggers.add(trigger);
     }
 }

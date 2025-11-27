@@ -19,7 +19,10 @@
 
 package org.ijsberg.iglu.usermanagement;
 
+import org.ijsberg.iglu.access.AuthenticationException;
+import org.ijsberg.iglu.access.Credentials;
 import org.ijsberg.iglu.access.User;
+import org.ijsberg.iglu.usermanagement.domain.JsonSimpleAccount;
 
 import java.util.List;
 
@@ -29,6 +32,8 @@ public interface UserManager {
 
 
 	void addAccount(String userId, String password);
+
+	List<JsonSimpleAccount> getAccounts();
 
 	void addAccount(User user, String password);
 
@@ -45,4 +50,6 @@ public interface UserManager {
 	boolean setGroup(String userId, String groupId);
 
 	List<String> listAccounts();
+
+	User authenticate(Credentials credentials) throws AuthenticationException;
 }

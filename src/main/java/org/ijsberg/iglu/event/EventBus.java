@@ -15,7 +15,11 @@ public interface EventBus {
 
     void unsubscribe(EventTopic<? extends Event> eventTypesToReceive, EventListener<? extends Event> listener);
 
+    void unsubscribe(EventListener<? extends Event> listener);
+
     <T extends Event> void publish(T event);
 
     Map<EventTopic<? extends Event>, List<Event>> getLatestEvents();
+
+    void subscribeToAll(EventListener<? extends Event> listener);
 }

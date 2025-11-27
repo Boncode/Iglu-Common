@@ -7,4 +7,10 @@ public interface Event {
     EventType getType();
 
     Instant getTimestampUtc();
+
+    String getAssetId();
+
+    String getDescription();
+
+    String getMessage();
 }
