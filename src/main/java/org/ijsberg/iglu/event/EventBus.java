@@ -11,7 +11,7 @@ public interface EventBus {
 
     void registerEventTopic(EventTopic<? extends Event> eventTopic, EventType... eventTypes);
 
-    void subscribe(EventTopic<? extends Event> eventTypesToReceive, EventListener<? extends Event> listener);
+    <T extends Event> void subscribe(EventTopic<T> topic, EventListener<T> listener);
 
     void unsubscribe(EventTopic<? extends Event> eventTypesToReceive, EventListener<? extends Event> listener);
 

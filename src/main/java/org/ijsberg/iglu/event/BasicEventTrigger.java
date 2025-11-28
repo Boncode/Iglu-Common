@@ -3,9 +3,11 @@ package org.ijsberg.iglu.event;
 public class BasicEventTrigger {
 
     public enum ConditionType {
-        LARGER_THAN,
-        SMALLER_THAN,
-        EQUALS;
+        ABOVE_THRESHOLD,
+        BELOW_THRESHOLD,
+        ABOVE_PREVIOUS,
+        BELOW_PREVIOUS
+        //EQUALS;
     }
 
     private long id;

@@ -65,11 +65,12 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
     }
 
     @Override
-    public void subscribe(EventTopic<? extends Event> topic, EventListener<? extends Event> listener) {
+    public <T extends Event> void subscribe(EventTopic<T> topic, EventListener<T> listener) {
         synchronized(eventListenersByTopic) {
             eventListenersByTopic.putDistinct(topic, listener);
         }
     }
+
     @Override
     public void subscribeToAll(EventListener<? extends Event> listener) {
         synchronized(allTopics) {
