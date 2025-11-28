@@ -31,6 +31,9 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
     private final ListMap<EventType, EventTopic<? extends Event>> topicsByEventType = new ListHashMap<>();
     private final Set<EventTopic<? extends Event>> allTopics = new HashSet<>();
 
+    private final ListMap<Class<? extends Event>, EventTopic<? extends Event>> topicsByEventClass = new ListHashMap<>();
+
+
     public BasicServiceBroker() {
     }
 
@@ -62,6 +65,7 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
         for(EventType eventType : eventTypes) {
             topicsByEventType.putDistinct(eventType, eventTopic);
         }
+        topicsByEventClass.put(eventTopic.eventClass(), eventTopic);
     }
 
     @Override
@@ -102,7 +106,8 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
             latestEvents.putDistinct(event.getTimestampUtc(), event);
         }
 
-        List<EventTopic<? extends Event>> topicsForType = topicsByEventType.get(event.getType());
+//        List<EventTopic<? extends Event>> topicsForType = topicsByEventType.get(event.getType());
+        List<EventTopic<? extends Event>> topicsForType = topicsByEventClass.get(event.getClass());
         if(topicsForType != null) {
             for (EventTopic<? extends Event> topic : topicsForType) {
                 if(checkEventTypeValidityForTopic(topic, event)) {
@@ -150,7 +155,8 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
         Map<EventTopic<? extends Event>, List<Event>> latestEventByTopic = new HashMap<>();
         synchronized(latestEvents) {
             for(Event event : latestEvents.valuesDescending()) {
-                List<EventTopic<? extends Event>> topicsForEvent = topicsByEventType.get(event.getType());
+//                List<EventTopic<? extends Event>> topicsForEvent = topicsByEventType.get(event.getType());
+                List<EventTopic<? extends Event>> topicsForEvent = topicsByEventClass.get(event.getClass());
                 for(EventTopic<? extends Event> topic : topicsForEvent) {
                     if(latestEventByTopic.containsKey(topic)) {
                         latestEventByTopic.get(topic).add(event);
