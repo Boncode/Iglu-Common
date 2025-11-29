@@ -12,6 +12,7 @@ import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
 import org.ijsberg.iglu.util.collection.ListTreeMap;
+import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 import org.ijsberg.iglu.util.time.TimePeriod;
 
 import java.lang.reflect.Proxy;
@@ -59,14 +60,24 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
         return services;
     }
 
+    private Map<EventTopic, List<EventType>> eventTypesByTopic = new HashMap<>();
+
     @Override
-    public void registerEventTopic(EventTopic<? extends Event> eventTopic, EventType... eventTypes) {
+    public void registerEventTopic(EventTopic<? extends Event> eventTopic) {
         allTopics.add(eventTopic);
-        for(EventType eventType : eventTypes) {
+        /*for(EventType eventType : eventTypes) {
             topicsByEventType.putDistinct(eventType, eventTopic);
-        }
+        }*/
+        List<EventType> eventTypes = ReflectionSupport.getInnerEnumTypes(eventTopic.eventClass(), EventType.class);
+        eventTypesByTopic.put(eventTopic, eventTypes);
         topicsByEventClass.put(eventTopic.eventClass(), eventTopic);
     }
+
+    @Override
+    public Map<EventTopic, List<EventType>> getEventTypesByTopic() {
+        return eventTypesByTopic;
+    }
+
 
     @Override
     public <T extends Event> void subscribe(EventTopic<T> topic, EventListener<T> listener) {

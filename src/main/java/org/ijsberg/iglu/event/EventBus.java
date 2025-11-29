@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface EventBus {
 
-    void registerEventTopic(EventTopic<? extends Event> eventTopic, EventType... eventTypes);
+    void registerEventTopic(EventTopic<? extends Event> eventTopic);
 
     <T extends Event> void subscribe(EventTopic<T> topic, EventListener<T> listener);
 
@@ -22,4 +22,7 @@ public interface EventBus {
     Map<EventTopic<? extends Event>, List<Event>> getLatestEvents();
 
     void subscribeToAll(EventListener<? extends Event> listener);
+
+    Map<EventTopic, List<EventType>> getEventTypesByTopic();
+
 }
