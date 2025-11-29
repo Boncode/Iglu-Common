@@ -2,13 +2,29 @@ package org.ijsberg.iglu.event.model;
 
 import java.time.Instant;
 
-public abstract class BasicEvent implements Event {
+public class IgluEvent implements Event {
+
+    public enum IgluEventType implements EventType {
+
+        LOGGING_STARTED,
+        LOGFILE_ROTATED;
+
+        @Override
+        public String getId() {
+            return name();
+        }
+
+        @Override
+        public String getLabel() {
+            return name().replaceAll("_", " ").toLowerCase();
+        }
+    }
 
     private final EventType type;
     private final Instant timestampUtc;
     private final String assetId;
 
-    public BasicEvent(EventType type, Instant timestampUtc, String assetId) {
+    public IgluEvent(EventType type, Instant timestampUtc, String assetId) {
         this.type = type;
         this.timestampUtc = timestampUtc;
         this.assetId = assetId;
@@ -40,8 +56,8 @@ public abstract class BasicEvent implements Event {
     @Override
     public String toString() {
         return "BasicEvent{" +
-                "type=" + type +
-                ", timestampUtc=" + timestampUtc +
-                '}';
+            "type=" + type +
+            ", timestampUtc=" + timestampUtc +
+            '}';
     }
 }

@@ -1,8 +1,8 @@
 package org.ijsberg.iglu.logging.module;
 
 import org.ijsberg.iglu.event.EventBus;
-import org.ijsberg.iglu.event.IgluEventType;
 import org.ijsberg.iglu.event.model.BasicEvent;
+import org.ijsberg.iglu.event.model.IgluEvent;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Properties;
+
+import static org.ijsberg.iglu.event.model.IgluEvent.IgluEventType.LOGFILE_ROTATED;
 
 public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 
@@ -104,7 +106,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 					long crc = FileSupport.calculateCRC(rotatedLogFileName);
 					String rotatingEventMessage = "log file archived, name: " + rotatedLogFileName + ", CRC: " + crc;
 					System.out.println(new LogEntry(Level.DEBUG, rotatingEventMessage));
-                    eventBus.publish(new BasicEvent(IgluEventType.LOGFILE_ROTATED, Instant.now(), "Logger"));
+                    eventBus.publish(new IgluEvent(LOGFILE_ROTATED, Instant.now(), "Logger"));
 				} catch (IOException e) {
 					System.out.println(new LogEntry(Level.CRITICAL, "error while making rotatingEventMessage for file " + rotatedLogFileName, e));
 				}
