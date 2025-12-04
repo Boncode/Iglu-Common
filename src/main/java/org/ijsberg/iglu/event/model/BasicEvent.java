@@ -39,9 +39,18 @@ public abstract class BasicEvent implements Event {
 
     @Override
     public String toString() {
-        return "BasicEvent{" +
+        return getClass().getSimpleName() + " {" +
                 "type=" + type +
                 ", timestampUtc=" + timestampUtc +
                 '}';
     }
+
+    protected static String getEventTypeLabel(EventType eventType) {
+        return getEventTypeLabel(eventType.getId());
+    };
+
+    public static String getEventTypeLabel(String eventType) {
+        return eventType.replaceAll("_", " ").toLowerCase();
+    };
+
 }

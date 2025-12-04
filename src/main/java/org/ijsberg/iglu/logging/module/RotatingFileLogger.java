@@ -1,7 +1,6 @@
 package org.ijsberg.iglu.logging.module;
 
 import org.ijsberg.iglu.event.EventBus;
-import org.ijsberg.iglu.event.model.BasicEvent;
 import org.ijsberg.iglu.event.model.IgluEvent;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;

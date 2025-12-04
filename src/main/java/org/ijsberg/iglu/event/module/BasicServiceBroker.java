@@ -8,31 +8,22 @@ import org.ijsberg.iglu.event.model.EventTopic;
 import org.ijsberg.iglu.event.model.EventType;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.collection.ListHashMap;
 import org.ijsberg.iglu.util.collection.ListMap;
-import org.ijsberg.iglu.util.collection.ListTreeMap;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
-import org.ijsberg.iglu.util.time.TimePeriod;
 
 import java.lang.reflect.Proxy;
-import java.time.Instant;
 import java.util.*;
 
-import static org.ijsberg.iglu.util.time.TimeUnit.DAY;
-
-public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
+public class BasicServiceBroker implements ServiceBroker, EventBus {
 
     private final ListMap<Class<?>, Object> serviceMap = new ListHashMap<>();
 
-    private static final TimePeriod EVENT_MESSAGE_TIME_PERIOD_TO_STORE = new TimePeriod(1, DAY);
-    private final ListTreeMap<Instant, Event> latestEvents = new ListTreeMap<>();
-
     private final ListMap<EventTopic<? extends Event>, EventListener<? extends Event>> eventListenersByTopic = new ListHashMap<>();
-    private final ListMap<EventType, EventTopic<? extends Event>> topicsByEventType = new ListHashMap<>();
+    //private final ListMap<EventType, EventTopic<? extends Event>> topicsByEventType = new ListHashMap<>();
     private final Set<EventTopic<? extends Event>> allTopics = new HashSet<>();
 
-    private final ListMap<Class<? extends Event>, EventTopic<? extends Event>> topicsByEventClass = new ListHashMap<>();
+    private final ListMap<Class<? extends Event>, EventTopic> topicsByEventClass = new ListHashMap<>();
 
 
     public BasicServiceBroker() {
@@ -78,6 +69,11 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
         return eventTypesByTopic;
     }
 
+    @Override
+    public List<EventTopic> getTopicsForEventType(Class<? extends Event> eventType) {
+        return topicsByEventClass.get(eventType);
+    }
+
 
     @Override
     public <T extends Event> void subscribe(EventTopic<T> topic, EventListener<T> listener) {
@@ -113,12 +109,9 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
 
     @Override
     public <T extends Event> void publish(T event) {
-        synchronized(latestEvents) {
-            latestEvents.putDistinct(event.getTimestampUtc(), event);
-        }
 
 //        List<EventTopic<? extends Event>> topicsForType = topicsByEventType.get(event.getType());
-        List<EventTopic<? extends Event>> topicsForType = topicsByEventClass.get(event.getClass());
+        List<EventTopic> topicsForType = topicsByEventClass.get(event.getClass());
         if(topicsForType != null) {
             for (EventTopic<? extends Event> topic : topicsForType) {
                 if(checkEventTypeValidityForTopic(topic, event)) {
@@ -161,27 +154,6 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
         return eventListeners;
     }
 
-    @Override
-    public Map<EventTopic<? extends Event>, List<Event>> getLatestEvents() {
-        Map<EventTopic<? extends Event>, List<Event>> latestEventByTopic = new HashMap<>();
-        synchronized(latestEvents) {
-            for(Event event : latestEvents.valuesDescending()) {
-//                List<EventTopic<? extends Event>> topicsForEvent = topicsByEventType.get(event.getType());
-                List<EventTopic<? extends Event>> topicsForEvent = topicsByEventClass.get(event.getClass());
-                for(EventTopic<? extends Event> topic : topicsForEvent) {
-                    if(latestEventByTopic.containsKey(topic)) {
-                        latestEventByTopic.get(topic).add(event);
-                    } else {
-                        List<Event> list = new ArrayList<>();
-                        list.add(event);
-                        latestEventByTopic.put(topic, list);
-                    }
-                }
-            }
-            return latestEventByTopic;
-        }
-    }
-
     private <T extends Event> boolean checkEventTypeValidityForTopic(EventTopic<? extends Event> topic, T event) {
         if(!topic.eventClass().isAssignableFrom(event.getClass())) {
             System.out.println(new LogEntry(Level.DEBUG, "event of type " + event.getClass().getSimpleName() +  " not a (sub)type of " + topic.eventClass().getSimpleName()));
@@ -190,31 +162,5 @@ public class BasicServiceBroker implements ServiceBroker, EventBus, Pageable {
         return true;
     }
 
-    @Override
-    public int getPageIntervalInMinutes() {
-        return 60;
-    }
 
-    @Override
-    public int getPageOffsetInMinutes() {
-        return 0;
-    }
-
-    @Override
-    public void onPageEvent(long officialTime) {
-        Instant timeUtcToKeepEntries = Instant.now().minus(EVENT_MESSAGE_TIME_PERIOD_TO_STORE.getLength(), EVENT_MESSAGE_TIME_PERIOD_TO_STORE.getTimeUnit().getTemporalUnit());
-        synchronized(latestEvents) {
-            Set<Instant> keySet = new LinkedHashSet<>(latestEvents.keySet());
-            for (Instant key : keySet) {
-                if (key.isBefore(timeUtcToKeepEntries)) {
-                    latestEvents.removeAll(key);
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean isStarted() {
-        return true;
-    }
 }

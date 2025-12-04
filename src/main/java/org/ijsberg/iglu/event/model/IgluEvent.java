@@ -2,7 +2,7 @@ package org.ijsberg.iglu.event.model;
 
 import java.time.Instant;
 
-public class IgluEvent implements Event {
+public class IgluEvent extends BasicEvent {
 
     public enum IgluEventType implements EventType {
 
@@ -16,48 +16,12 @@ public class IgluEvent implements Event {
 
         @Override
         public String getLabel() {
-            return name().replaceAll("_", " ").toLowerCase();
+            return getEventTypeLabel(this);
+
         }
     }
 
-    private final EventType type;
-    private final Instant timestampUtc;
-    private final String assetId;
-
-    public IgluEvent(EventType type, Instant timestampUtc, String assetId) {
-        this.type = type;
-        this.timestampUtc = timestampUtc;
-        this.assetId = assetId;
-    }
-
-    @Override
-    public EventType getType() {
-        return type;
-    }
-
-    @Override
-    public Instant getTimestampUtc() {
-        return timestampUtc;
-    }
-
-    @Override
-    public String getAssetId() {
-        return assetId;
-    }
-
-    public String getMessage() {
-        return toString();
-    }
-
-    public String getDescription() {
-        return type.getLabel();
-    }
-
-    @Override
-    public String toString() {
-        return "BasicEvent{" +
-            "type=" + type +
-            ", timestampUtc=" + timestampUtc +
-            '}';
+    public IgluEvent(IgluEventType type, Instant timestampUtc, String assetId) {
+        super(type, timestampUtc, assetId);
     }
 }

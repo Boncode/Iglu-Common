@@ -1,10 +1,6 @@
 package org.ijsberg.iglu.event;
 
-import org.ijsberg.iglu.event.model.EventTopic;
-import org.ijsberg.iglu.event.model.EventType;
-
 import java.util.List;
-import java.util.Map;
 
 public interface ServiceBroker {
 
