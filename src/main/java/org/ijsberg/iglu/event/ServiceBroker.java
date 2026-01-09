@@ -9,7 +9,4 @@ public interface ServiceBroker {
     <T> void unregisterService(Class<T> interfaceType, T implementation);
 
     <T> List<T> getServices(Class<T> type);
-
-
-    //void unsubscribe(EventListener<? extends Event> listener);
 }

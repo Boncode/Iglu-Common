@@ -11,6 +11,8 @@ public interface AssetAccessManager {
 
     List<AssetAccessSettings> getAssetAccessSettings();
 
+    List<AssetAccessSettings> getAssetAccessSettingsByType(String type);
+
     void updateAssetAccessSettings(AssetAccessSettings accessSettings);
 
     void deregisterAssetAccessSettings(String assetId);

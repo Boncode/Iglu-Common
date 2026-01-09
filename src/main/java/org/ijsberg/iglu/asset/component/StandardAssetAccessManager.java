@@ -46,6 +46,11 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     }
 
     @Override
+    public List<AssetAccessSettings> getAssetAccessSettingsByType(String type) {
+        return settingsRepository.readByField("type", type);
+    }
+
+    @Override
     public void updateAssetAccessSettings(AssetAccessSettings accessSettings) {
         AssetAccessSettings existingSettings = settingsRepository.read(accessSettings.getId());
         if(existingSettings != null) {
