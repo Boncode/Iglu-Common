@@ -10,6 +10,8 @@ import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
 import java.util.*;
 
+import static org.ijsberg.iglu.access.component.StandardAccessManager.defaultAdminAccountName;
+
 public class StandardAssetAccessManager implements AssetAccessManager {
 
     private BasicJsonPersister<AssetAccessSettings> settingsRepository;
@@ -32,7 +34,15 @@ public class StandardAssetAccessManager implements AssetAccessManager {
 
     @Override
     public void registerAsset(String assetId, String type, String name) {
-        settingsRepository.create(new AssetAccessSettings(assetId, requestRegistry.getCurrentRequest().getUser().getId(), type, name));
+        settingsRepository.create(new AssetAccessSettings(assetId, getCurrentUserId(), type, name));
+    }
+
+    private String getCurrentUserId() {
+        if(requestRegistry != null && requestRegistry.getCurrentRequest() != null && requestRegistry.getCurrentRequest().getUser() != null) {
+            return requestRegistry.getCurrentRequest().getUser().getId();
+        } else {
+            return defaultAdminAccountName;
+        }
     }
 
     @Override
