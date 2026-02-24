@@ -225,11 +225,11 @@ public class StandardRequest implements Request//, PropertyListener
 	/**
 	 * Exports user settings to entry point which in turn may export to client.
 	 */
-	public void exportUserSettings() {
+	/*public void exportUserSettings() {
 		if (entryPoint != null) {
 			entryPoint.exportUserSettings(this, getUserSettings());
 		}
-	}
+	}*/
 
 
 	/**
