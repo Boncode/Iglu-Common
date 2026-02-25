@@ -94,7 +94,5 @@ public class AssetAccessSettings /*implements SecuredAssetData*/ {
         return eventTriggers;
     }
 
-    public void addTrigger(BasicEventTrigger trigger) {
-        eventTriggers.add(trigger);
-    }
+    public void setEventTriggers(List<BasicEventTrigger> eventTriggers) { this.eventTriggers = eventTriggers; }
 }
