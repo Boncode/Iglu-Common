@@ -112,58 +112,6 @@ public interface Request {
 	User getUser();
 
 	/**
-	 * @return true if a session was resolved or just created
-	 */
-	boolean isSessionAvailable();
-
-	/**
-	 * Notification of a request invoking a component's method.
-	 * Meant for internal use, which may be asserted by checking if
-	 * this is an internal request (by representation).
-	 * @see this#startRepresentingRequest(Request)
-	 *
-	 * @param component component currently being entered
-	 */
-//	void onEnterComponent(Component component);
-
-	/**
-	 * Notification of a request returning from a component's method invocation.
-	 * Meant for internal use, which may be asserted by checking if
-	 * this is an internal request (by representation).
-	 * @see this#startRepresentingRequest(Request)
-	 *
-	 * @return the component left according to the request
-	 */
-//	Component onLeaveComponent();
-
-	/**
-	 * By passing an internal request via this method, a user request will
-	 * temporarily be regarded as internal request.
-	 * An internal request can, for instance, be obtained during startup phase
-	 * by a component.
-	 * <p/>
-	 * It's also possible to let an internal request represent a user
-	 * request in order to temporarily downgrade its access rights.
-	 *
-	 * @param requestToBeRepresented request to be represented
-	 * @return true if the request is able to represent the given request
-	 * @see Request#stopRepresentingRequest()
-	 */
-//	boolean startRepresentingRequest(Request requestToBeRepresented);
-
-	/**
-	 * @return the request represented or null
-	 */
-//	Request getRepresentedRequest();
-
-	/**
-	 * Stops acting as some other request.
-	 *
-	 * @see Request#startRepresentingRequest(Request)
-	 */
-//	void stopRepresentingRequest();
-
-	/**
 	 * Stores some object as attribute on the request.
 	 *
 	 * @param key   attribute key
@@ -195,63 +143,9 @@ public interface Request {
 	void increaseTimesEntered();
 
 	/**
-	 * @return a layer passed or currently accessed by the user request
-	 */
-//	Layer getCurrentLayer();
-
-	/**
-	 * @return a module passed or currently accessed by the user request
-	 */
-//	Module getCurrentModule();
-
-	/**
-	 * @return the component the request has currently reached
-	 */
-//	Component getCurrentComponent();
-
-	/**
 	 * @return a set of properties defining the user's settings
 	 */
 	Properties getUserSettings();
-
-	/**
-	 * @return a description of the internal process if the request is an internal request
-	 */
-//	String getInternalProcessDescription();
-
-	/**
-	 * Exports user settings to the entry point which in turn may export to the client.
-	 */
-	void exportUserSettings();
-
-
-	/**
-	 * @return a transaction for the request
-	 */
-//	Transaction getTransaction();
-
-	/**
-	 *
-	 * @param formId ID of a currently processed form
-	 * @return an empty or partially or fully completed form that exists during the course
-	 * of the current request or during (part of) the course of a session
-	 */
-//	Form getForm(String formId);
-
-	/**
-	 * Stores a form on the request or the session if it exists.
-	 *
-	 * @param formId ID of form to be processed
-	 * @param form form to be processed
-	 */
-//	void putForm(Object formId, Form form);
-
-	/**
-	 *
-	 * @return true if this request is bound to the current thread
-	 * @see Application#bindRequest(EntryPoint)
-	 */
-//	public boolean isBoundToCurrentThread();
 
 	/**
 	 * Retrieves session and, if found, stores a reference in the request.

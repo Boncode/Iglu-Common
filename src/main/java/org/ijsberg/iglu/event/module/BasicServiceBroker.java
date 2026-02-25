@@ -127,6 +127,9 @@ public class BasicServiceBroker implements ServiceBroker, EventBus {
                             + " as it is not compatible with expected class type: " + topic.eventClass().getSimpleName()));
                 }
             }
+        } else {
+            System.out.println(new LogEntry(Level.CRITICAL, "NOT publishing event " + event.getType().getId()
+                + " as no topic is registered for " + event.getClass().getSimpleName()));
         }
     }
 
