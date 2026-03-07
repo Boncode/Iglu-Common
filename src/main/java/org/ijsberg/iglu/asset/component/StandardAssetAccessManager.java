@@ -38,7 +38,11 @@ public class StandardAssetAccessManager implements AssetAccessManager {
     }
 
     private String getCurrentUserId() {
-        if(requestRegistry != null && requestRegistry.getCurrentRequest() != null && requestRegistry.getCurrentRequest().getUser() != null) {
+        if(
+                requestRegistry != null &&
+                requestRegistry.getCurrentRequest() != null &&
+                requestRegistry.getCurrentRequest().getUser() != null &&
+                !"System".equals(requestRegistry.getCurrentRequest().getUser().getId())) {
             return requestRegistry.getCurrentRequest().getUser().getId();
         } else {
             return defaultAdminAccountName;
@@ -107,9 +111,8 @@ public class StandardAssetAccessManager implements AssetAccessManager {
         for(SecuredAssetData securedAssetData : securedAssets) {
             AssetAccessSettings settings = getAssetAccessSettings(securedAssetData.getRelatedAssetId());
             if(settings == null) {
-                System.out.println(new LogEntry(Level.CRITICAL, "settings for asset " + securedAssetData.getRelatedAssetId() + " of type " + assetType + " not found"));//; Will be added"));
-                //TODO add
-                //registerAsset(securedAssetData.getRelatedAssetId(), assetType, securedAssetData.getName());
+                System.out.println(new LogEntry(Level.CRITICAL, "settings for asset " + securedAssetData.getRelatedAssetId() + " of type " + assetType + " not found, will be added"));//; Will be added"));
+                registerAsset(securedAssetData.getRelatedAssetId(), assetType, securedAssetData.getName());
             } else {
                 if(settings.getType() == null) {
                     System.out.println(new LogEntry(Level.CRITICAL, "type for asset " + securedAssetData.getRelatedAssetId() + " not set; Will be set to " + assetType));
