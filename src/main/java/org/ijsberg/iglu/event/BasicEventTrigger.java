@@ -6,8 +6,10 @@ public class BasicEventTrigger {
         ABOVE_THRESHOLD,
         BELOW_THRESHOLD,
         ABOVE_PREVIOUS,
-        BELOW_PREVIOUS
-        //EQUALS;
+        BELOW_PREVIOUS,
+        PERCENTAGE_GREATER_THAN,
+        PERCENTAGE_SMALLER_THAN,
+        HAS_CHANGED
     }
 
     private long id;
