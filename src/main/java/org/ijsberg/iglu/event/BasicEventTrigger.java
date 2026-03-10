@@ -13,6 +13,7 @@ public class BasicEventTrigger {
     }
 
     private long id;
+    private String name;
     private String metricId;
     private Float threshold;
     private ConditionType conditionType;
@@ -27,8 +28,9 @@ public class BasicEventTrigger {
     }*/
 
 
-    public BasicEventTrigger(String metricId, Float threshold, ConditionType conditionType) {
+    public BasicEventTrigger(String metricId, String name, Float threshold, ConditionType conditionType) {
         id = System.currentTimeMillis();
+        this.name = name;
         this.metricId = metricId;
         this.threshold = threshold;
         this.conditionType = conditionType;
@@ -61,4 +63,8 @@ public class BasicEventTrigger {
     public void setConditionType(ConditionType conditionType) {
         this.conditionType = conditionType;
     }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
 }
