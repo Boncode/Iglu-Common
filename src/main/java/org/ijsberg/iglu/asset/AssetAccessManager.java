@@ -18,4 +18,6 @@ public interface AssetAccessManager {
     void deregisterAssetAccessSettings(String assetId);
 
     void sanityCheck(Collection<? extends SecuredAssetData> securedAssets, String assetType);
+
+    List<String> getAllNotificationTiggerConditions();
 }

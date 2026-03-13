@@ -4,11 +4,13 @@ import org.ijsberg.iglu.access.RequestRegistry;
 import org.ijsberg.iglu.asset.AssetAccessManager;
 import org.ijsberg.iglu.asset.AssetAccessSettings;
 import org.ijsberg.iglu.asset.SecuredAssetData;
+import org.ijsberg.iglu.event.BasicEventTrigger;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.persistence.json.BasicJsonPersister;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.ijsberg.iglu.access.component.StandardAccessManager.defaultAdminAccountName;
 
@@ -105,6 +107,11 @@ public class StandardAssetAccessManager implements AssetAccessManager {
         checkIfSettingsExistForActualAssets(securedAssets, assetType);
         checkIfActualAssetsExistForSettings(securedAssets, assetType);
         //TODO cleanup deprecated assets in a later stage
+    }
+
+    @Override
+    public List<String> getAllNotificationTiggerConditions() {
+        return Stream.of(BasicEventTrigger.ConditionType.values()).map(BasicEventTrigger.ConditionType::name).toList();
     }
 
     private void checkIfSettingsExistForActualAssets(Collection<? extends SecuredAssetData> securedAssets, String assetType) {
