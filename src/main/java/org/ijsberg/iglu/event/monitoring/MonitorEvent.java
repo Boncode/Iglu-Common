@@ -24,6 +24,7 @@ public class MonitorEvent extends BasicEvent {
     private String remoteEventTypeId;
     private String remoteSystemId;
     private String remoteAssetId;
+    private String remoteMessage;
 
     public MonitorEvent(String remoteTopicId, BasicEventDto sourceEventDto, String remoteSystemId, String monitorAssetId) {
         super(MonitorEventType.MONITOR_EVENT, sourceEventDto.getTimestampUtc(), monitorAssetId);
@@ -31,6 +32,7 @@ public class MonitorEvent extends BasicEvent {
         this.remoteEventTypeId = sourceEventDto.getEventTypeId();
         this.remoteSystemId = remoteSystemId;
         this.remoteAssetId = sourceEventDto.getAssetId();
+        this.remoteMessage = sourceEventDto.getMessage();
     }
 
     public String getRemoteTopicId() {
@@ -47,6 +49,10 @@ public class MonitorEvent extends BasicEvent {
 
     public String getRemoteAssetId() {
         return remoteAssetId;
+    }
+
+    public String getRemoteMessage() {
+        return remoteMessage;
     }
 
     @Override

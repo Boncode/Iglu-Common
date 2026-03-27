@@ -11,15 +11,18 @@ public class BasicEventDto {
     private final String eventTypeId;
     private final Instant timestampUtc;
     private final String assetId;
+    private final String message;
 
     @JsonCreator
     public BasicEventDto(
         @JsonProperty(value = "eventTypeId") String eventTypeId,
         @JsonProperty(value = "timestampUtc") Instant timestampUtc,
-        @JsonProperty(value = "assetId") String assetId) {
+        @JsonProperty(value = "assetId") String assetId,
+        @JsonProperty(value = "message") String message) {
         this.eventTypeId = eventTypeId;
         this.timestampUtc = timestampUtc;
         this.assetId = assetId;
+        this.message = message;
     }
 
     public String getEventTypeId() {
@@ -32,6 +35,10 @@ public class BasicEventDto {
 
     public String getAssetId() {
         return assetId;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     @Override
