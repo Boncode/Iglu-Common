@@ -33,9 +33,9 @@ import java.util.Iterator;
  * Iglu has its own XML library / Document for the following reasons:
  * <ul>
  * <li>to be independent of 3rd party XML libraries</li>
- * <li>to be able to deal with inconsequent use of XML</li>
+ * <li>to be able to deal with HTML</li>
  * <li>to avoid unwanted behavior such as dtd-retrieval over the network</li>
- * <li>to format XML in an nice way as text</li>
+ * <li>to format XML in a nice way as text</li>
  * </ul>
  */
 public class Document extends ElementList {
