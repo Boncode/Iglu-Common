@@ -3,7 +3,7 @@ package org.ijsberg.iglu.access;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Roles{
+public class Roles {
 
     public static final Long ADMINISTRATOR = 2L;
 
