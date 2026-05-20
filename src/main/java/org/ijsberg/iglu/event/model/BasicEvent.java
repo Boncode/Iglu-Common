@@ -1,5 +1,7 @@
 package org.ijsberg.iglu.event.model;
 
+import org.ijsberg.iglu.util.misc.StringSupport;
+
 import java.time.Instant;
 
 public abstract class BasicEvent implements Event {
