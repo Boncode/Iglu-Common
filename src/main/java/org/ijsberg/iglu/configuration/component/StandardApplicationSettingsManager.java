@@ -3,6 +3,9 @@ package org.ijsberg.iglu.configuration.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.model.ApplicationSettingsDto;
+import org.ijsberg.iglu.configuration.model.WebTrafficSettingsDto;
+import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
 
 import java.io.File;
@@ -28,28 +31,40 @@ public class StandardApplicationSettingsManager implements ApplicationSettingsMa
             "  \"lockAfterInactivityInDays\" : 365\n" +
             "}";
 
-    private final String dataFilePath;
+    private final String regularSettingsFilePath;
+    private final String webTrafficSettingsFilePath;
 
     private ApplicationSettingsDto settings;
+    private WebTrafficSettingsDto webTrafficSettings;
 
     public StandardApplicationSettingsManager(String configDir) {
-        dataFilePath = configDir + "/" + "app_settings.json";
-        if(!FileSupport.fileExists(dataFilePath)) {
+        regularSettingsFilePath = configDir + "/app_settings.json";
+        if(!FileSupport.fileExists(regularSettingsFilePath)) {
             createSettingsFile();
         }
+        webTrafficSettingsFilePath = configDir + "/web_traffic_settings.json";
+        if(!FileSupport.fileExists(webTrafficSettingsFilePath)) {
+            saveWebTrafficSettings(new WebTrafficSettingsDto());
+        }
+
+        settings = loadSettings(regularSettingsFilePath, ApplicationSettingsDto.class);
+        webTrafficSettings = loadSettings(webTrafficSettingsFilePath, WebTrafficSettingsDto.class);
+    }
+
+    private <T> T loadSettings(String settingsFilePath, Class<T> settingsDtoType) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            settings = objectMapper.readValue(new File(dataFilePath), ApplicationSettingsDto.class);
+            return objectMapper.readValue(new File(settingsFilePath), settingsDtoType);
         } catch (IOException e) {
-            throw new ConfigurationException("Could not read " + dataFilePath, e);
+            throw new ConfigurationException("Could not read " + settingsFilePath, e);
         }
     }
 
     private void createSettingsFile() {
         try {
-            FileSupport.saveTextFile(DEFAULT_SETTINGS, new File(dataFilePath));
+            FileSupport.saveTextFile(DEFAULT_SETTINGS, new File(regularSettingsFilePath));
         } catch (IOException e) {
-            throw new ConfigurationException("Could not create " + dataFilePath, e);
+            throw new ConfigurationException("Could not create " + regularSettingsFilePath, e);
         }
     }
 
@@ -84,6 +99,22 @@ public class StandardApplicationSettingsManager implements ApplicationSettingsMa
             settings = applicationSettingsDto;
         }
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(dataFilePath), settings);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(regularSettingsFilePath), settings);
+    }
+
+    @Override
+    public void saveWebTrafficSettings(WebTrafficSettingsDto webTrafficSettings) {
+        this.webTrafficSettings = webTrafficSettings;
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(webTrafficSettingsFilePath), webTrafficSettings);
+        } catch (IOException e) {
+            throw new ResourceException("cannot save web traffic settings", e);
+        }
+    }
+
+    @Override
+    public WebTrafficSettingsDto getWebTrafficSettings() {
+        return webTrafficSettings;
     }
 }
