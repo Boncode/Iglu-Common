@@ -982,7 +982,7 @@ public abstract class ElementList implements Serializable {
 								splitContents.add(node);
 							}
 						} else {
-							//endtag without a start tag encounterd
+							//endtag without a start tag encountered
 							if (!strict/* || interpreteAsXHTML*/) {
 								//remove loose end tags
 								splitContents.remove(splitContents.size() - 1);

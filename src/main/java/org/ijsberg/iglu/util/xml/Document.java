@@ -45,6 +45,8 @@ public class Document extends ElementList {
 
 	private File file;
 
+	private boolean strictParsing = true;
+
 	//TODO add ?xml? header
 /*	private String doctype;
 	private String xmlVersion;
@@ -194,9 +196,10 @@ public class Document extends ElementList {
 	/**
 	 * @param name name of the top node
 	 */
-	public Document(String name, boolean interpreteAsXHTML) {
+	public Document(String name, boolean interpretAsXHTML, boolean strictParsing) {
 		this.name = name;
-		this.interpreteAsXHTML = interpreteAsXHTML;
+		this.interpreteAsXHTML = interpretAsXHTML;
+		this.strictParsing = strictParsing;
 	}
 
 	/**
@@ -244,9 +247,9 @@ public class Document extends ElementList {
 	// FIXME </endtag > does not parse because of the space
 
 
-	public void parse(String xmlInput) throws ParseException {
+	/*private void parse(String xmlInput) throws ParseException {
 		parse(xmlInput, false);
-	}
+	}*/
 
 	/**
 	 * Loads the contents from an XML text
@@ -257,14 +260,14 @@ public class Document extends ElementList {
 	 * @param xmlInput
 	 * @throws ParseException if the XML document can not be parsed
 	 */
-	public void parse(String xmlInput, boolean strict) throws ParseException {
+	private void parse(String xmlInput/*, boolean strict*/) throws ParseException {
 
 		if (xmlInput == null || "".equals(xmlInput)) {
 			throw new IllegalArgumentException("input can not be null");
 		}
 		ArrayList splitContents;
 		try {
-			splitContents = split(xmlInput, interpreteAsXHTML, true);
+			splitContents = split(xmlInput, interpreteAsXHTML, strictParsing);
 		} catch (Exception e) {
 			throw new ParseException("exception while parsing " + (file != null ? file.getName() : name), e);
 		}
