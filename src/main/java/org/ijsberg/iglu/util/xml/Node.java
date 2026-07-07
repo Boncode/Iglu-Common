@@ -230,7 +230,7 @@ public class Node extends ElementList implements XmlElement {
 	}
 
 	public String toString() {
-		return toString(EOL + TAB, CONDENSE, -1);
+		return toStringFast(EOL + TAB/*, CONDENSE, -1*/);
 	}
 
 
@@ -272,6 +272,7 @@ public class Node extends ElementList implements XmlElement {
 		}
 		return result.toString();
 	}
+
 
 	/**
 	 * @return the XML node as a formatted text
@@ -381,6 +382,9 @@ public class Node extends ElementList implements XmlElement {
 		return this;
 	}
 
+	public Node getParentNode() {
+		return parentNode;
+	}
 
 	public void setInterpreteAsXHTML(boolean interpreteAsXHTML) {
 		this.interpreteAsXHTML = interpreteAsXHTML;

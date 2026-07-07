@@ -394,7 +394,7 @@ public abstract class ElementList implements Serializable {
 			Object o = i.next();
 			if (o instanceof Node) {
 				Node subNode = (Node) o;
-				if ((name == null) || (subNode.nodeAttributes != null && subNode.nodeAttributes.containsKey(name))) {
+				if ((name == null) || (subNode.nodeAttributes != null && subNode.getAttributesAsStrings().containsKey(name))) {
 					result.add(subNode);
 				}
 				if (all) {
