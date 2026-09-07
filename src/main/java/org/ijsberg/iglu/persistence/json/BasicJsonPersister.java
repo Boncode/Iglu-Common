@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.persistence.PersistenceHelper;
 import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
 
@@ -61,7 +60,7 @@ public class BasicJsonPersister<T> {
             long id = getNextId();
             assertUniqueAttributes(entity, id);
 //            entity.setId(id); //BasicPersistable T todo
-            PersistenceHelper.setEntityId(id, "id", entity);
+            JsonPersistenceHelper.setEntityId(id, "id", entity);
             repository.put(id, entity);
             save();
             return entity;
@@ -82,7 +81,7 @@ public class BasicJsonPersister<T> {
 
     private void assertUniqueAttributes(T entity, long id) {
         for(String uniqueAttributeName : uniqueAttributeNames) {
-            Object fieldValue = PersistenceHelper.getFieldValue(uniqueAttributeName, entity);
+            Object fieldValue = JsonPersistenceHelper.getFieldValue(uniqueAttributeName, entity);
             List<T> existingEntityList = readByField(uniqueAttributeName, fieldValue);
             if(!existingEntityList.isEmpty()) {
                 if(existingEntityList.size() > 1) {
@@ -90,7 +89,7 @@ public class BasicJsonPersister<T> {
                 }
 //                T existingEntity = existingEntityList.get(0);
 //                if(existingEntity.getId() != id) { //todo BasicPersistable T
-                if(PersistenceHelper.getId("id", entity) != id) {
+                if(JsonPersistenceHelper.getId("id", entity) != id) {
                     throw new ResourceException("value " + fieldValue + " for field " + uniqueAttributeName + " must be unique");
                 }
             }
@@ -125,7 +124,7 @@ public class BasicJsonPersister<T> {
     public void update(T entity) {
         synchronized (lock) {
 //            Long id = entity.getId(); //todo BasicPersistable T
-            Long id = PersistenceHelper.getId("id", entity);
+            Long id = JsonPersistenceHelper.getId("id", entity);
             if(repository.containsKey(id)) {
                 assertUniqueAttributes(entity, id);
                 repository.put(id, entity);
