@@ -59,7 +59,6 @@ public class BasicJsonPersister<T> {
         synchronized (lock) {
             long id = getNextId();
             assertUniqueAttributes(entity, id);
-//            entity.setId(id); //BasicPersistable T todo
             JsonPersistenceHelper.setEntityId(id, "id", entity);
             repository.put(id, entity);
             save();
