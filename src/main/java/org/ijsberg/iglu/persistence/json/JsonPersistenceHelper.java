@@ -22,7 +22,7 @@ public class JsonPersistenceHelper {
 
     static void setEntityId(Long id, String entityIdName, Object entity) {
         try {
-            Field field = entity.getClass().getDeclaredField(entityIdName);
+            Field field = getField(entityIdName, entity.getClass());
             field.setAccessible(true);
             field.set(entity, id);
         } catch (ReflectiveOperationException e) {
@@ -36,10 +36,23 @@ public class JsonPersistenceHelper {
 
     static Object getFieldValue(String fieldName, Object entity) {
         try{
-            Field field = entity.getClass().getDeclaredField(fieldName);
+            Field field = getField(fieldName, entity.getClass());
             field.setAccessible(true);
             return field.get(entity);
         } catch (ReflectiveOperationException e) {
+            throw new ResourceException("cannot set entity id", e);
+        }
+    }
+
+    static Field getField(String fieldName, Class<?> entityClass) {
+        try{
+            Field field = entityClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field;
+        } catch (NoSuchFieldException nfe) {
+            return getField(fieldName, entityClass.getSuperclass());
+        }
+        catch (ReflectiveOperationException e) {
             throw new ResourceException("cannot set entity id", e);
         }
     }

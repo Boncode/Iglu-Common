@@ -62,11 +62,13 @@ public class BasicJsonPersister<T> {
             JsonPersistenceHelper.setEntityId(id, "id", entity);
             repository.put(id, entity);
             save();
+            //TODO return clone?
             return entity;
         }
     }
 
     public T insert(long id, T entity) {
+        //TODO test if this doesn't overwrite existing entity
         synchronized (lock) {
             assertUniqueAttributes(entity, id);
             repository.put(id, entity);
@@ -84,10 +86,9 @@ public class BasicJsonPersister<T> {
             List<T> existingEntityList = readByField(uniqueAttributeName, fieldValue);
             if(!existingEntityList.isEmpty()) {
                 if(existingEntityList.size() > 1) {
+                    //TODO check if this is useful
                     throw new ResourceException("multiple entities with the same unique attribute " + uniqueAttributeName + " found");
                 }
-//                T existingEntity = existingEntityList.get(0);
-//                if(existingEntity.getId() != id) { //todo BasicPersistable T
                 if(JsonPersistenceHelper.getId("id", entity) != id) {
                     throw new ResourceException("value " + fieldValue + " for field " + uniqueAttributeName + " must be unique");
                 }
@@ -106,6 +107,7 @@ public class BasicJsonPersister<T> {
 
     public T read(Long id) {
         synchronized (lock) {
+            //TODO return clone?
             return repository.get(id);
         }
     }
@@ -117,12 +119,12 @@ public class BasicJsonPersister<T> {
                 result.add(entity);
             }
         }
+        //TODO return clones?
         return result;
     }
 
     public void update(T entity) {
         synchronized (lock) {
-//            Long id = entity.getId(); //todo BasicPersistable T
             Long id = JsonPersistenceHelper.getId("id", entity);
             if(repository.containsKey(id)) {
                 assertUniqueAttributes(entity, id);
@@ -142,7 +144,7 @@ public class BasicJsonPersister<T> {
         }
     }
 
-    private void save() { //todo
+    private void save() {
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(getFileName()), repository);
         } catch (IOException e) {
@@ -159,6 +161,7 @@ public class BasicJsonPersister<T> {
     }
 
     public List<T> readAll() {
+        //TODO return clones?
         return new ArrayList<>(repository.values()); //todo probably just use a Collection in this chain
     }
 }
