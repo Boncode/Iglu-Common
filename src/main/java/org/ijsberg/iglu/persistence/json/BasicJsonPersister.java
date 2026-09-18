@@ -1,5 +1,7 @@
 package org.ijsberg.iglu.persistence.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -60,9 +62,8 @@ public class BasicJsonPersister<T> {
             long id = getNextId();
             assertUniqueAttributes(entity, id);
             JsonPersistenceHelper.setEntityId(id, "id", entity);
-            repository.put(id, entity);
+            repository.put(id, cloneEntity(entity));
             save();
-            //TODO return clone?
             return entity;
         }
     }
@@ -71,7 +72,7 @@ public class BasicJsonPersister<T> {
         //TODO test if this doesn't overwrite existing entity
         synchronized (lock) {
             assertUniqueAttributes(entity, id);
-            repository.put(id, entity);
+            repository.put(id, cloneEntity(entity));
             save();
             if(id > currentId) {
                 currentId = id;
@@ -105,10 +106,13 @@ public class BasicJsonPersister<T> {
         return nextId;
     }
 
+    public boolean contains(Long id) {
+        return repository.containsKey(id);
+    }
+
     public T read(Long id) {
         synchronized (lock) {
-            //TODO return clone?
-            return repository.get(id);
+            return cloneEntity(repository.get(id));
         }
     }
 
@@ -116,11 +120,19 @@ public class BasicJsonPersister<T> {
         List<T> result = new ArrayList<>();
         for(T entity : repository.values()) {
             if(JsonPersistenceHelper.fieldNameMatchesValue(entity, fieldName, fieldValue)) {
-                result.add(entity);
+                result.add(cloneEntity(entity));
             }
         }
-        //TODO return clones?
         return result;
+    }
+
+    private T cloneEntity(T entity) {
+        try {
+            String string = objectMapper.writeValueAsString(entity);
+            return objectMapper.readValue(string, entityClass);
+        } catch (JsonProcessingException e) {
+            throw new ResourceException("Error cloning entity", e);
+        }
     }
 
     public void update(T entity) {
@@ -128,10 +140,11 @@ public class BasicJsonPersister<T> {
             Long id = JsonPersistenceHelper.getId("id", entity);
             if(repository.containsKey(id)) {
                 assertUniqueAttributes(entity, id);
-                repository.put(id, entity);
+                repository.put(id, cloneEntity(entity));
                 save();
+            } else {
+                throw new IllegalArgumentException("Entity with id " + id + " does not exist");
             }
-            // todo maybe else throw
         }
     }
 
@@ -161,7 +174,10 @@ public class BasicJsonPersister<T> {
     }
 
     public List<T> readAll() {
-        //TODO return clones?
-        return new ArrayList<>(repository.values()); //todo probably just use a Collection in this chain
+        List<T> result = new ArrayList<>();
+        for(T entity : repository.values()) {
+            result.add(cloneEntity(entity));
+        }
+        return result;
     }
 }
