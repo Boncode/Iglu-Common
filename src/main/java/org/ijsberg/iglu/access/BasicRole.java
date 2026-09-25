@@ -13,6 +13,7 @@ public class BasicRole implements Role {
     private String name;
     private String description;
     private String permissionIds = "";
+    private String landingPage = "";
 
     @JsonProperty("systemRole")
     private boolean isSystemRole = false;
@@ -96,12 +97,17 @@ public class BasicRole implements Role {
         return isSystemRole;
     }
 
+    public String getLandingPage() {
+        return landingPage;
+    }
+
     @Override
     public String toString(){
         return "BasicRole{id=" + id +
                 ", name=" + name +
                 ", description=" + description +
                 ", permissionIds=" + permissionIds +
+                ", landingPage=" + landingPage +
                 ", isSystemRole=" + isSystemRole +
                 "}";
     }
