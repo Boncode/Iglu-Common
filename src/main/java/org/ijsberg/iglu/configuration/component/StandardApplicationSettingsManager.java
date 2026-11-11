@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.model.ApplicationSettingsDto;
 import org.ijsberg.iglu.configuration.model.WebTrafficSettingsDto;
-import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
 

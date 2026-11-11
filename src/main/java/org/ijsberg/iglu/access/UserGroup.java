@@ -1,7 +1,5 @@
 package org.ijsberg.iglu.access;
 
-import org.ijsberg.iglu.event.model.EventType;
-
 import java.util.ArrayList;
 import java.util.List;
 
